@@ -1,0 +1,35 @@
+<div id="email-modal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Email items</h4>
+            </div>
+            <div class="modal-body">
+
+                <div id="email-items-email">
+                    <label style="color: #393e46; font-weight:bold;">Enter the email address of the person to whom you want to send this item.</label>
+                    <br />
+                    <input id="email-to" data-bind="value: userEmail()" type="text" maxlength="60" />
+                </div>
+                <div id="email-items-message">
+                    <label>Message:</label>
+                    <br />
+                    <textarea id="email-message" rows="3"></textarea>
+                </div>
+                <div data-bind="visible: isAuthenticated" id="email-items-checkbox">
+                    <label>Check this box for a copy to be sent to your email address</label>
+                    <input type="checkbox" />
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal" id="email-items-cancel">Cancel</button>
+                <button type="button" class="btn btn-default" id="but-email-send">Send</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+

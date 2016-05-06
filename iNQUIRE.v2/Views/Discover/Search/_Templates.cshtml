@@ -1,0 +1,153 @@
+﻿<script type="text/html" id='recordset-sort-option-template'>
+    <li class="recordset-sort-option" data-bind="attr: {'data-sort-option': $data.OptionValue }">
+        <a href="" onclick="return false;"><span data-bind="text: $data.DisplayField"></span></a>
+    </li>
+</script>
+
+<script type="text/html" id='recordset-size-option-template'>
+    <li class="recordset-size-option" data-bind="attr: {'data-page-size': $data }"> 
+        <a href="" onclick="return false;"><span data-bind="text: $data"></span></a>
+    </li>
+</script>
+
+<script id='saved-search-template' type='text/html'>
+    <li class="saved-search-holder" data-bind="attr: { 'data-search-id': SearchID}">
+        <div>
+            <span class="saved-search" data-bind="html: DisplayName + ' (' + NumFound + ')'"></span> <span class="search-del"><i class="fa fa-remove"></i></span>
+        </div>
+    </li>
+</script>
+
+<script type="text/html" id="facet-field-template">
+    <div data-bind="attr: { class: getFacetBootstrapColumnClass() }">
+        <h3 class="facet-header" data-bind="text: Name"></h3>
+        <nav class="facets">
+            <ul data-bind="template: { name: $root.isFacetApplied, foreach: Values, as: 'facetValue' }"></ul>
+        </nav>
+    </div>
+</script>
+
+<script type="text/html" id='facet-value-template'>
+    <li>
+        <span class="facet" data-bind="attr: {'data-facet-field': $parent.Field, 'data-facet-query': $parent.Query, 'data-facet-value': Key }, text: Key + ' (' + Value + ')'"></span>
+    </li>
+</script>
+
+<script type="text/html" id='facet-value-applied-template'>
+    <li>
+        <div class="facet-selected-holder">
+            <span class="facet-selected" data-bind="attr: {'data-facet-field': $parent.Field, 'data-facet-query': $parent.Query, 'data-facet-value': Key }, text: Key + ' (' + Value + ')'"></span>
+            <span class="facet-remove" data-bind=" attr: { 'data-facet-field': $parent.Field, 'data-facet-value': Key, 'data-facet-query': $parent.Query }"><i class="fa fa-times"></i></span>
+        </div>
+    </li>
+</script>
+
+<script id='but-tool-add-to-collection-options-template' type='text/html'>
+    <li class="collection-option" data-bind="html: title(), attr: { 'data-id': id }"></li>
+</script>
+
+<script id='collections-template' type='text/html'>
+    <div data-bind="attr: { 'id': selector }" class="collection">
+
+
+        <div class="btn-group-xs collection-list-header-button">
+            <span class="collection-list-header-text">
+                <span data-bind="text: title, attr: { 'id': 'collection-list-header-title-' + id }"></span>
+                <!-- ko if: $root.collectionHasItems(items) -->
+                <span id="collection-list-header-count"> <span class="nowrap" data-bind="text: $root.collectionInfoText($data)"></span></span>
+                <!-- /ko -->
+            </span>
+
+
+                 <div class="btn-group no-padding" role="group">
+
+                    <div class="btn-group no-padding" role="group">
+                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <span class="fa fa-cog collection-dd-icon"></span>
+                        </button>
+                        <ul class="dropdown-menu collection-dd">
+                            <li><a class="but-collection-rename" data-bind="attr: { 'data-id': id }">Rename collection</a></li>
+                            <li><a class="but-collection-email" data-bind="attr: { 'data-id': id }">Email collection</a></li>
+                            <li><a class="but-collection-download" data-bind="attr: { 'data-id': id }">Download collection</a></li>
+                            <li><a class="but-collection-del" data-bind="attr: { 'data-id': id }">Delete collection <span><i class="fa fa-remove"></i></span></a></li>
+                        </ul>
+                    </div>
+
+                     <button type="button" class="btn btn-default" data-bind="click: function() {$root.collectionViewToggle(id)}">
+                         <span data-bind="css : {'fa-caret-down' : visible(), 'fa-caret-up' : !visible()}" class="fa collection-dd-icon"></span>
+                     </button>
+                </div>
+                
+            </div>
+
+
+
+
+
+
+
+
+
+
+        @*<div id="collection-list-header">
+            <span class="collection-list-header-text">
+                <span data-bind="text: title, attr: { 'id': 'collection-list-header-title-' + id }"></span>
+                <!-- ko if: $root.collectionHasItems(items) -->
+                <span id="collection-list-header-count"> <span class="nowrap" data-bind="text: $root.collectionInfoText($data)"></span></span>
+                <!-- /ko -->
+            </span>
+
+            <div class="collection-list-settings">
+                <div class="collection-list-settings-options">
+                    <div class="triangle-border collection-list">
+                        <p class="but-collection-rename" data-bind="attr: { 'data-id': id }">Rename collection</p>
+                        <p class="but-collection-email" data-bind="attr: { 'data-id': id }">Email collection</p>
+                        <p class="but-collection-download" data-bind="attr: { 'data-id': id }">Download collection</p>
+                        <p class="but-collection-del" data-bind="attr: { 'data-id': id }">Delete collection <span><i class="fa fa-remove"></i></span></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="clear"></div>
+        </div>*@
+        <ol id="collection-list" data-bind="template: { name: 'collection-item-template', foreach: items }, visible: visible"></ol> <!-- , templateOptions: { collection_id: $value.id } -->
+    </div>
+    <div class="clear"></div>
+    <hr />
+</script>
+
+<script id='collection-item-template' type='text/html'>
+    <li class="collection-item" data-bind="attr: { 'id': id }">
+        <!-- image thumbnail? would need to store image file and aspect ratio <img width="25" height="25" data-bind="attr: { src: 'http://localhost/iNQUIRE.v2/resolver.iip?FIF=' + file + '&WID=25&HEI=25&RGN=0.25,0.25,0.5,0.5&CVT=jpeg' }" />-->
+        <span class="collection-item-title" data-bind="text: title"></span>
+        <span class="but-collection-del-item" data-bind="attr: { 'data-id': id, 'data-title': title }"> <i class="fa fa-remove"></i></span>
+    </li>
+</script>
+
+
+<script id='tags-list-template' type='text/html'>
+    <li class="tag-item">
+        <span data-bind="html: Title"></span>
+        <span class="tag-rem" data-bind="attr: { 'data-tag-id': TagID }"><i class="fa fa-remove"></i></span>
+    </li>
+</script>
+
+<script id='notes-list-template' type='text/html'>
+    <li class="note-item">
+        <div>
+            <!-- ko if: (_vm.userID != UserID) -->
+            <span data-bind="text: UserName"></span>
+            <!-- /ko -->
+            <!-- ko if: (_vm.userID == UserID) -->
+            You
+            <!-- /ko -->
+            <span> said </span>
+            <span data-bind="text: ('&quot;' + Text + '&quot;')"></span>
+            <span class="note-date" data-bind="text: dateFormat(LastEdited)"></span>
+
+            <!-- ko if: (_vm.userID == UserID) -->
+            <span class="note-rem" data-bind="attr: { 'data-public': PublicNote, 'data-note_id': NoteID }"><i class="fa fa-remove"></i></span>
+            <!-- /ko -->
+        </div>
+    </li>
+</script>

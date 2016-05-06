@@ -1,0 +1,20 @@
+﻿@*if (!Request.IsAuthenticated) {
+      Response.Redirect("~/Account/LogOn");
+ }*@
+<!doctype html> 
+<html lang="en"> 
+    <head>
+        <style type="text/css">
+             body { font-family: Arial; }
+             span.label { font-weight: bold; }
+             #description { margin-top: 10px; margin-bottom: 10px; }
+             #metadata { font-size: 90%; }
+        </style>
+        <title>iNQUIRE Print</title>
+    </head>
+    <body onload="window.print();">
+        <div id="main">
+            @RenderBody()
+        </div>
+    </body>
+</html>

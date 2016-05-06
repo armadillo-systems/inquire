@@ -1,0 +1,3858 @@
+﻿<script type="text/javascript">
+    ko.computed(function() {
+        //alert('at: ' + this.fbAccessToken());
+        var t = this.fbAccessToken();
+        var fa = $('#fb_activity').find('iframe');
+        $(fa).attr('src', $(fa).attr('src')); // force a refresh of the activity widget
+        var fa = $('#fb-like').find('iframe');
+        $(fa).attr('src', $(fa).attr('src')); // force a refresh of the like uri
+
+        var flpup = $('#results-options-export #but-tool-facebook-login');
+        if ( $(flpup).is(':visible')){
+            $(flpup).slideUp(_fadeMsMax, _animType);
+        }
+    }, _gvm);
+
+
+    var _vm;
+    var _timeoutAction;
+    var _dzViewer = null;
+    var _facebook = Boolean(@ViewBag.Facebook.ToString().ToLower());
+    var _colonInFieldNames = Boolean(@ViewBag.ColonInFieldNames.ToString().ToLower());
+    var _savedSearchesMaxDisplay = @ViewBag.SavedSearchesDisplayMax;
+    var _concatFields = '@ViewBag.ConcatFields'.split(',');
+    var _concatSeparator = '@ViewBag.ConcatSeparator';
+    var _zoomViewerHeightPx = @ViewBag.ZoomViewerHeightPx;
+    var _mediaDirectory = '@Url.Content(String.Format("~{0}", ViewBag.MediaDirectory))';
+    var _JP2Resolver = '@ViewBag.JP2Resolver';
+    var _jpeg2000Namespace = '@ViewBag.Jpeg2000Namespace';
+    var _videoFileExt = new Array(".wmv", ".mov", ".m4v", ".ogv");
+    var _audioFileExt = new Array(".mp3", ".oga", ".wav");
+    var _textMore = '...';
+
+    var _oldResults;
+    var _oldResultsBgColour;
+    var _highlightBgColourOld;
+
+    var _animType = 'swing'; //'linear'
+    var _fadeMsTotal = 1;//1000;
+    var _fadeMs = 150;
+    var _fadeMsMax = 300;
+    var _fadeMsTags = _fadeMsMax;
+    var _fadeMsOut = 15;
+    var _resizeReverse = true;
+    var _resizeSequential = false;
+
+    var _jpeg2000Busy = false;
+    var _jpeg2000TickCount = 0;
+    var _jpeg2000TickCountMax = 7;
+    var _jpeg2000Ready = false;
+    var _jpeg2000TickMs = 3000;
+
+    var _sortFieldsString = '@ViewBag.SortFieldsString';
+
+    var _touchDoubleClickDelayMs = @ViewBag.TouchDoubleClickDelayMs;
+    var _alwaysShowOpenDeepZoomTouchIcon = @(ViewBag.AlwaysShowOpenDeepZoomTouchIcon.ToString().ToLower());
+
+    // Determine if user is on iPhone or iPad or Android
+    var _isiOS = false;
+    var _isAndroid = false;
+
+    var agent = navigator.userAgent.toLowerCase();
+    if (agent.indexOf('iphone') >= 0 || agent.indexOf('ipad') >= 0) {
+        _isiOS = true;
+    }
+    else if( agent.match( /Android/i ) ) {
+        _isAndroid = true;
+    }
+
+    var _isAndroidOriOS = (_isAndroid || _isiOS);
+
+    // _isAndroidOriOS = true;
+
+    // console.log('_isAndroidOriOS: ' + _isAndroidOriOS);
+    //if (_isAndroidOriOS) {
+    //    alert('_isAndroidOriOS: ' + _isAndroidOriOS);
+    //}
+    // alert('_isAndroid: ' + _isAndroid + '\n' + '_isiOS: ' + _isiOS + '\n' + '_isAndroidOriOS: ' + _isAndroidOriOS);
+
+
+    function checkAuthenticated() {
+        if(!_vm.isAuthenticated()) {
+            if(confirm('This feature requires you to register and be logged in to the site, do you wish to login or register?'))
+                logOn();
+            return false;
+        }
+        return true;
+    }
+
+    function logOn() {
+        window.location = '@Url.Content("~/Account/Login")' + '?r=' + encodeURIComponent(window.location.href);
+    }
+
+    function InquireViewModel()  {
+        var self = this;
+
+        // Start: Data
+        self.exportId = '';
+        self.toolButtonsEnabled = false;
+        self.parentTitle = ['']; /*@* track parent titles when viewing it's children as results (the parent no longer exists in memory, but we need to display it's title as we list it's children, make this an array in case a child might be a parent object iteself... *@*/
+        self.parentRecordsetRowStart = [0]; /*@* need to record a trail of the rowstart of the search the parent in when viewing a child, so when user hits back they go back to the right page set of results which contained the parent, otherwise would reset to the first page of the results set *@*/
+
+        self.facetsAppliedString = ko.observable('');
+        self.sortFields = ko.observableArray([]);
+        // self.sortsAppliedString = // computed, implement as with facetsAppliedString
+        self.sortField = ko.observable(); // can't have multiple sort fields (yet), could be implemented like facetsAppliedString above
+
+        // _searchParentId: '',
+        // _viewItem: '@ViewBag.ViewItemID',
+        self.viewItem = ko.observable('@ViewBag.ViewItemID');
+        self.deepZoomVisible = ko.observable(false);
+
+        self.zoomFrameSelector = 'dz-container';
+        self.mediaPlayerSelector = 'media-player';
+
+        self.userID = '@ViewBag.UserID';
+        self.userEmail = ko.observable('@ViewBag.UserEmail');
+        self.languageID = 'eng';
+        self.savedSearches = ko.observableArray([]);
+
+        self.classNameResult = 'result';
+        self.classNameThumbnail = 'thumbnail-i';
+        self.classNameOpenDeepZoomIcon = '@ViewBag.OpenDeepZoomTouchIcon';
+
+        self.searchTerm = ko.observable();
+        self.searchTermOld = self.searchTerm('');
+        self.searchTitle = 'Results';
+        self.searchCollectionIds = ko.observable('');
+        // searchCollectionIdsOld = '',
+        self.searchParentId = ko.observable('');
+        self.searchRequest = null;
+        self.searchInProgress = ko.observable(false);
+
+        self.notesPublic = ko.observableArray([]);
+        self.notesPrivate = ko.observableArray([]);
+
+        self.results = ko.observableArray([]);
+        self.resultsLayout = ko.observable('masonry'); // masonry grid 'list-simple' 'list-image' @* 'grid' not confirmed as still working since incorporating 'masonry' as default layout *@
+
+        self.thumbnailSize = '-m';
+        self.maxResultImgW = ko.observable(100);
+        self.resultSize = ko.observable('-m');
+        self.resultSizeOld = '';
+        self.resultsSelector = '.result'; // .result, ,.result-sm,.result-xl,.result-list,.result-list-image
+        self.resultsSelectorHeader = '.header';
+        self.resultsSelectorChildNodesClassName = '.result-child-node';
+        self.resultsOptionSelector = 'result-option-selected';
+        self.resultsTitleCharLimit = 45;
+        self.resultsSmallCharLimit = 25;
+        self.resultsMedCharLimit = 45;
+        self.resultsLargeCharLimit = 70;
+        self.resultSizePx = { Width: 0, Height: 0, ImageWidth: 0, ImageHeight: 0 };
+        self.resultCurrentIndex = ko.observable(-1);
+
+        /* @* Metadata properties stored in the database, this means they are not naturally or immediately available in the Solr search until re-index *@ */
+        self.resultCurrentTags = ko.observableArray([]);
+
+        self.recordsetPageSizes = [ 5, 10, 25, 50, 100, 200];
+        self.recordsetRowStart = ko.observable(0);
+        self.recordsetRecords = ko.observable(0);
+        self.recordsetRecordsOld = 0;
+        // recordsetTitle = ko.observable(''),
+        self.recordsetPageSize = ko.observable(25);
+        // recordsetPages = (0),
+        self.recordsetPagesDisplayed = 3;
+
+        //facetFields = ko.observableArray([]),
+        self.facets = ko.observableArray([]);
+
+        self.facetsApplied = ko.observableArray([]);
+        self.facetSort = ko.observableArray([{sort: "count"}, {sort: "alpha"}]);
+        self.facetSortCurrent = ko.observable('');
+
+        // recordCurrentId = ko.observable({}),
+        self.recordCurrentSlideToVisible = ko.observable(false);
+        self.recordCurrentSlideTo = ko.observable();
+        self.recordCurrentPosition = ko.observable(-1);
+        self.recordChildIds = ko.observableArray([]);
+        // recordCurrentShortTitle = ko.observable(''),
+
+        self.collections = ko.observableArray([]);
+        // End: Data
+
+        // Start: Behaviours
+        self.refreshSearch = function () {
+            var params = self.searchParamsString();
+
+            if (location.hash != ('#' + params)) {
+                location.hash = params;
+            }
+        }
+
+        self.clearContent = function () {
+            // alert('clearContent()');
+            $(self.resultsSelector).remove();
+            self.zoomFrameClear();
+            self.deepZoomVisible(false);
+            // mediaPlayerClear();
+        }
+
+        self.goChild = function (id) {
+            if(id == null) {
+                var p = self.recordCurrentPosition();
+                if((self.recordChildIds().length > 0) && (p > -1)) {
+                    id = self.recordChildIds()[p];
+                }
+                else
+                    return;
+            }
+            self.zoomFrameClear();
+            self.viewItem(id);
+            self.refreshSearch();
+        }
+
+        self.zoomFrameClear = function () {
+            // remove any zoom frames
+            // alert('zoomFrameClear()');
+            $('#' + self.zoomFrameSelector).remove();
+            if(_dzViewer != null) {
+                _dzViewer.destroy();
+            }
+            _dzViewer = null;
+            $('#results').css('background', _oldResultsBgColour);
+        }
+
+        self.mediaPlayerClear = function () {
+            // remove any html5 media elements
+            $('.' + self.mediaPlayerSelector).remove();
+        }
+
+
+        self.afterRenderCollection = function(elements) {
+            for (var i = 0; i < elements.length; i++) {
+                var id = $(elements[i]).attr('id');
+                var cl = $(elements[i]).attr('class');
+                //alert('id: ' + id + ', class: ' + cl);
+                if(cl == 'collection') {
+                    self.addCollectionEvents(id);
+                }
+            }
+        };
+
+        self.afterRenderResult = function(element, index) {
+            if(element && ($(element).is("li") || $(element).is("div"))) {
+                var id = $(element).attr('data-id');
+                var last_row = $(element).attr('data-lastrow');
+
+                if(index == 0) {
+                    self.calculateResultSize();
+                    $(element).trigger('click'); // select the first result
+                }
+
+                var w_img = self.resultSizePx.ImageWidth;
+                var h_img = self.resultSizePx.ImageHeight;
+
+                if(id) {
+                    self.resizeResultImage(element, w_img, h_img, 0);
+                    self.updateResultImage(element, w_img, h_img);
+                    //$(element).fadeOut(0); // commented out for masonry
+                }
+
+                //_fadeMs = calculateFadeMs(_vm.results().length, false); // commented out for masonry
+                //$(_vm.resultsSelector).attr('opacity', 0); //.fadeOut(0); // commented out for masonry
+
+                if(last_row) {
+                    if (self.resultsLayout().indexOf('masonry') != -1) {
+                        updateMasonryLayout(w_img);
+                    }
+                    //fadeInResults(true); // commented out for masonry
+                }
+
+                self.setupDragForElement(element);
+            }
+        };
+
+        self.makeResultClassName = function () {
+            return self.classNameResult + ' ' + self.resultsLayout() + self.resultSize();
+        } //  + " list-group-item"
+
+        self.makeResultImageClassName = function () {
+            return self.resultsLayout() + '-' + self.classNameThumbnail + self.thumbnailSize;
+        }
+
+        self.makeResultHeaderClassName = function () {
+            return self.resultsSelectorHeader.replace('.', '') + '-' + self.resultsLayout();
+        }
+
+        self.makeResultChildNodesClassName = function () {
+            return self.resultsSelectorChildNodesClassName.replace('.', '') + '-' + self.resultsLayout();
+        }
+
+
+        self.resultStr = function (text, is_record_title) {
+            /*@* return a data string, shortened if needed (eg the string is a title (limited space in the UI) and the string exceeds the title char limit (set above))
+
+                auto shortening text strings in the results is a little tricky if they have HTML in (which they might)
+                    - HTML shouldn't count towards string length when deciding whether to shorten
+                    - can't just shorten a string that has HTML, what if the result is an unclosed HTML tag, or the cutoff point falls within a tag... problems...
+                 *@*/
+
+            if(IsFieldNullOrEmpty(text))
+                return '';
+
+            /*@* sk dec2014: not sure how we could arrive here with text being an array? but keeping for compatibility *@*/
+            if ($.isArray(text)) {
+                text = text[0];
+            }
+
+            if(is_record_title)
+            {
+                return resultCharLimitText(text, self.resultsTitleCharLimit);
+            }
+
+            //@* thumbnails have limited space to display text, and there are three variants, so work out which one is active, set the char limit accordingly *@
+            switch(self.thumbnailSize)
+            {
+                case '-sm':
+                    char_limit = self.resultsSmallCharLimit;
+                    break;
+                case '-m':
+                    char_limit = self.resultsMedCharLimit;
+                    break;
+                case '-xl':
+                    char_limit = self.resultsLargeCharLimit;
+                    break;
+            }
+
+            return resultCharLimitText(text, char_limit);
+        }
+
+        self.applyHighlights = function (d) {
+            /*@* for all the results, overwrite normal data field with the highlighted one, if a highlighted one is present *@*/
+
+            // don't try to highlight search term if it's potentially a Solr wilcard query
+            var wc = (d.SearchQuery.Term.indexOf(':') != -1) || (d.SearchQuery.Term.indexOf('*') != -1);
+            if ((d.Highlights) && !(wc)) {
+                var h = d.Highlights;
+                var reg = new RegExp(d.SearchQuery.Term, 'gi');
+                var reg_replace = '<span class="highlight-search-text">$&</span>';
+
+                for(var rid in h) {
+                    for (var i = 0; i < h[rid].length; i++) {
+                        var kvp = h[rid][i];
+
+                        for (var j = 0; j < d.Results.length; j++) {
+                            if(d.Results[j].ID == rid) {
+                                var cs_name = kvp.Key.replace(":","-");
+                                var val_is_array = $.isArray(d.Results[j][cs_name]);
+                                var val = d.Results[j][cs_name];
+                                var hl_val = kvp.Value; // h[rid][hprop]
+
+                                if(!val_is_array) { /*@* single value property so can overwrite *@*/
+                                    //val = hl_val[0];
+                                    if (val != null) {
+                                        d.Results[j][cs_name] = d.Results[j][cs_name].replace(reg, reg_replace);
+                                    }
+                                }
+                                else { /*@* need to overwrite only the correct multi-value value *@*/
+                                    for(var z = 0; z < val.length; z++) {
+                                        var val_plain = stripHtml(val[z]);
+
+                                        /*@* Nov2014: this needs testing, can't remember where to find a multi value field... *@*/
+                                        for(var y = 0; y < hl_val.length; y++) {
+                                            if(val_plain.localeCompare(stripHtml(hl_val[y])) == 0) {
+                                                //val[z] = hl_val[y];
+                                                if (d.Results[j][cs_name][z] != null) {
+                                                    d.Results[j][cs_name][z] = d.Results[j][cs_name][z].replace(reg, reg_replace);
+                                                }
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        self.enableButton = function enableButton(button, f) {
+            $(button).removeClass('but-tool-disabled').addClass('but-tool-enabled').click(f);
+        }
+
+        self.disableButton = function disableButton(button) {
+            $(button).removeClass('but-tool-enabled').addClass('but-tool-disabled').unbind('click');
+        }
+
+        self.enableToolButtons = function enableToolButtons() {
+            if(self.toolButtonsEnabled == false) {
+                self.toolButtonsEnabled = true;
+                self.enableButton($('.but-tool-open'), self.butToolOpenClick);
+                self.enableButton($('.but-tool-add-to-collection'), self.butToolAddToCollection);
+                self.enableButton($('.but-tool-print'), self.butToolPrintClick);
+                if(_facebook) {
+                    self.enableButton($('.but-tool-facebook'), self.butToolFacebookClick);
+                }
+                self.enableButton($('.but-tool-download'), function() { self.butDownloadClick(''); });
+                self.enableButton($('.but-tool-email'), function() { self.butEmailSendClick(''); });
+            }
+        }
+
+        self.disableToolButtons = function disableToolButtons(force) {
+            if(self.toolButtonsEnabled || force) {
+                self.toolButtonsEnabled = false;
+                self.disableButton($('.but-tool-open'));
+                self.disableButton($('.but-tool-ocr'));
+                self.disableButton($('.but-tool-add-to-collection'));
+                self.disableButton($('.but-tool-facebook'));
+                self.disableButton($('.but-tool-email'));
+                self.disableButton($('.but-tool-download'));
+                self.disableButton($('.but-tool-print'));
+            }
+        }
+
+        self.butToolOpenClick = function butToolOpenClick () {
+            if(self.resultCurrentIndex() != -1 && self.results() != null) {
+                var item = self.resultCurrent();
+                if(item != null)  {
+                    var children = 0;
+                    if(item.ChildNodes != null) {
+                        children = item.ChildNodes.length;
+                    }
+
+                    var cn_str = '';
+
+                    if (item.ChildNodes) {
+                        cn_str = item.ChildNodes.toString();
+                    }
+                    self.openResult(item.ID, item.Index, children, cn_str);
+                }
+            }
+            else {
+                alert('No items selected');
+            }
+        }
+
+
+        self.searchClick = function (term) {
+            if(IsFieldNullOrEmpty(term)) {
+                term = self.searchTerm();
+            }
+
+            var term_changed = (self.searchTermOld != term);
+            if(term_changed) {
+                self.searchTermOld = (term == '') ? ' ' : term;
+            }
+
+            /*if((term_changed) || ((IsFieldNullOrEmpty(term)) && (IsFieldNullOrEmpty(self.searchCollectionIds()) == false))) {
+                self.searchTermOld = (term == '') ? ' ' : term;
+                clearSearch(true, true);
+            }*/
+            self.clearSearch(true, true, term_changed); /*@* 2014: will clear facets if search term has changed *@*/
+            self.refreshSearch();
+        }
+
+        self.searchDelete = function () {
+            var ss = $(this).parents('.saved-search-holder');
+            var id = $(ss).attr('data-search-id');
+
+            if(IsFieldNullOrEmpty(id)) {
+                return;
+            }
+
+            if(self.isAuthenticated()) {
+                var del = true;
+                $.post('@Url.Content("~/Discover/SearchDeleteAjax")', {  "user_id": self.userID, "search_id": id },
+                function (data) {
+
+                    if(data == false) {
+                        alert("Error deleting search");
+                        del = false;
+                    }
+                })
+                .error(function() { alert("Error deleting search, server returned an error"); del = false; })
+                .complete(function() {
+                    if (del) {
+                        self.searchDeleteClientOnly(id);
+                    }
+                });
+            } else {
+                self.searchDeleteClientOnly(id);
+            }
+        }
+
+        self.searchDeleteClientOnly = function (id) {
+            for(var i = 0; i < self.savedSearches().length; i++) {
+                var s = self.savedSearches()[i];
+                if(s.SearchID == id) {
+                    self.savedSearches.remove(s);
+                    break;
+                }
+            }
+        }
+
+        self.savedSearchClick = function () {
+            var ss = $(this).parents('.saved-search-holder');
+            var id = $(ss).attr('data-search-id');
+
+            if(IsFieldNullOrEmpty(id)) {
+                return;
+            }
+
+            var sq;
+            var q;
+            for(var i = 0; i < self.savedSearches().length; i++) {
+                q = self.savedSearches()[i];
+                if(q.SearchID == id) {
+                    sq = q;
+                    break;
+                }
+            }
+
+            if(IsFieldNullOrEmpty(sq)) {
+                return;
+            }
+
+            // alert(sq.SearchID);
+            self.clearSearch(true, true, true, false);
+            self.searchTerm(sq.Term);
+            self.searchCollectionIds(sq.IDs);
+            self.recordsetRowStart(sq.RowStart);
+            self.searchParentId(sq.ParentID);
+            //if(!IsFieldNullOrEmpty(sq.SortFields)) @* causes search to be re-triggered *@
+            //    self.sortField(sq.SortFields[0])
+            if(!IsFieldNullOrEmpty(sq.FacetConstraints)) {
+                self.facetsApplied(sq.FacetConstraints);
+            }
+
+            self.refreshSearch();
+        }
+
+        self.isFacetApplied = function (facet, bc) {
+            for(var i = 0; i < self.facetsApplied().length; i++) {
+                if((bc.$parent.Field == self.facetsApplied()[i].Field) && (facet.Key == self.facetsApplied()[i].Facet)) {
+                    return 'facet-value-applied-template';
+                }
+            }
+            return 'facet-value-template';
+        }
+
+        self.getItemIds = function (id) {
+            if(!IsFieldNullOrEmpty(id)) {
+                var ids = self.getCollectionIds(id);
+            }
+
+            if(IsFieldNullOrEmpty(ids) && !IsFieldNullOrEmpty(self.resultCurrent().ID)) {
+                ids = self.resultCurrent().ID;
+            }
+
+            if(IsFieldNullOrEmpty(ids)) {
+                alert('No item(s) selected');
+                return;
+            }
+            return ids;
+        }
+
+        self.getCollectionIds = function (id) {
+            var c = self.findCollectionByID(id);
+            if(!c) {
+                alert('Error, could not find collection');
+                return '';
+            }
+
+            var ids = '';
+
+            for(var i = 0; i < c.items().length; i++) {
+                ids = ids + '^' + c.items()[i].id;
+            }
+
+            /*if (!IsFieldNullOrEmpty(_vm.searchCollectionIds))
+                ids = _vm.searchCollectionIds;*/
+
+            return ids;
+        }
+
+        self.butToolPrintClick = function  () {
+            var url = '@Url.Content("~/Discover/Print/?id=")' + self.resultCurrent().ID;
+            window.location.href = url;
+        }
+
+
+        self.butToolFacebookClick = function () {
+            if(_gvm.fbConnected()) {
+                self.fbPhotoUpload();
+            }
+            else {
+                $('#results-options-export #but-tool-facebook-login').fadeToggle("slow");
+            }
+        }
+
+        self.fbPhotoUpload = function () {
+            var t = _gvm.fbAccessToken();
+            if( !IsFieldNullOrEmpty(t) ) {
+                //alert('fbPhotoUpload()');
+                var r = $.get("@Url.Content("~/Discover/fbUploadPhotoAjax")", { "id_str": self.resultCurrent().ID, "access_token": t },
+                function (data) {
+                    if(data == 'ok')
+                        data = 'Image uploaded to Facebook';
+                    alert(data);
+                })
+                .error(function() {
+                    alert('Error uploading photo to facebook');
+                })
+                .complete(function() {
+                })
+                ;
+            } else {
+                // not connected to facebook
+            }
+        }
+
+        self.butDownloadClick = function  (id) {
+            self.exportId = id;
+            //$('#fade-overlay').fadeIn();
+            //$('#download-items-container').fadeIn('slow');
+            $('#download-modal').modal('show');
+        }
+
+        self.download = function  (id) {
+            if(IsFieldNullOrEmpty(id)) {
+                id = self.exportId;
+            }
+            var ids = self.getItemIds(id);
+
+            var inc_asset = $('#download-item-asset-checkbox').prop('checked');
+            var formats_str = '';
+            if($('#download-item-format-xml-checkbox').prop('checked')) {
+                formats_str += '^xml';
+            }
+
+            if($('#download-item-format-ris-checkbox').prop('checked')) {
+                formats_str += '^ris';
+            }
+
+            var url = '@Url.Content("~/Discover/Download/?id_str=")' + ids + '&formats_str=' + formats_str + '&inc_asset=' + inc_asset;
+            window.location.href = url;
+            $('#download-modal').modal('hide');
+        }
+
+        self.butEmailSendClick = function (id) {
+            self.exportId = id;
+            $('#email-modal').modal('show');
+            //$('#fade-overlay').fadeIn();
+            //$('#email-items-container').fadeIn('slow');
+        }
+
+        self.emailSend = function (id) {
+            if(IsFieldNullOrEmpty(id)) {
+                id = self.exportId;
+            }
+            var ids = self.getItemIds(id);
+            $.post("@Url.Content("~/Discover/EmailExportAjax")", { "email_to": $('#email-to').val(), "message": $('#email-message').val(), "id_str": ids },
+                function(data) {
+                    if (data != 'ok') {
+                        alert('Error: Email could not be sent');
+                    }
+                    else {
+                        alert('Email sent');
+                    }
+                });
+            $('#email-modal').modal('hide');
+        }
+
+        self.setupSortFields = function () {
+            var sf = _sortFieldsString.split('^');
+            for(var i = 0; i < sf.length; i++) {
+                var f = sf[i].split('|');
+                self.sortFields.push({ DbField: f[0], DisplayField: f[1], SortDirection: f[2], OptionValue: f[0] + '^' + f[2] });
+            }
+            self.sortField(self.sortFields()[0]);
+        }
+        self.setupSortFields();
+
+        if (location.hash == '') {
+            location.hash = 't+*%3A*,rsrs+0,rsps+' + self.recordsetPageSize() + ',fa+,so+' + encodeURIComponent(self.sortField().OptionValue) + ',scids+,pid+,vi+' + self.viewItem();
+        }
+
+
+        self.clearSearchClick = function () {
+            self.clearSearch(true, true, true, false); @* clear sort doesn't work (see method) *@
+            self.searchTerm('');
+            self.refreshSearch();
+        }
+
+        self.clearSearch = function (reset_nav, reset_collection, clear_facets, clear_sort) {
+            // console.log('clearsearch(' + reset_nav + ')');
+            // self.recordCurrentId({ });
+
+            // self._searchParentId = '';
+            self.recordChildIds.removeAll();
+
+            if (self.recordCurrentPosition() != -1) {
+                self.recordCurrentPosition(-1);
+            }
+
+            //if (self.recordCurrentShortTitle() != '')
+            //    self.recordCurrentShortTitle('');
+
+            if(self.viewItem() != '') {
+                self.viewItem('');
+            }
+
+            if(self.searchParentId() != '') {
+                self.searchParentId('');
+            }
+
+            if(reset_nav) {
+                self.resetRecordsetPageNavigation();
+            }
+
+            if(reset_collection) {
+                if (self.searchCollectionIds() != '') {
+                    // console.log("search complete");
+                    self.searchCollectionIds('');
+                }
+            }
+
+            if(clear_facets) {
+                self.facetsApplied.removeAll();
+            }
+
+            @*//if(clear_sort) this doesn't work great, causes search to re-trigger
+            //    self.sortField('');*@
+        }
+
+        self.searchAbort = function () {
+            if (self.searchRequest) { // if any search is already in progress than cancel it asap
+                // console.log('aborting search');
+                self.searchRequest.abort();
+            }
+        }
+
+
+        self.resetResultCurrentIndex = function () {
+            self.resultCurrentIndex(-1);
+            self.notesPrivate.removeAll();
+            self.notesPublic.removeAll();
+        }
+
+        self.resetRecordsetPageNavigation = function () {
+            if(self.recordsetRowStart() != 0) {
+                // console.log('resetting recordsetRowStart()');
+                self.recordsetRowStart(0);
+            }
+        }
+
+        self.isRecordsetPageCurrent = function (page) {
+            if(isNaN(Number(page))) {
+                return false;
+            }
+            else {
+                return (self.recordsetPageCurrent() == (page - 1));
+            }
+        }
+
+
+        self.isRecordsetPageBack = function (page) {
+            return (page == "<");
+        }
+
+        self.isRecordsetPageForward = function (page) {
+            return (page == ">");
+        }
+
+        self.isRecordsetPageBeginning = function (page) {
+            return (page == "<<");
+        }
+
+        self.isRecordsetPageEnd = function (page) {
+            return (page == ">>");
+        }
+
+        self.getRecordsetStyleClassName = function (page) {
+            if(isNaN(Number(page)))
+            {
+                switch(page)
+                {
+                    case ">":
+                        return "";
+                    case ">>":
+                        return "";
+                    case "<":
+                        return "";
+                    case "<<":
+                        return "";
+                    default:
+                        return "";
+                }
+            }
+            else
+            {
+                if(self.recordsetPageCurrent() == (page - 1)) {
+                    return "recordset-page-current";
+                }
+                else {
+                    return "";
+                }
+            }
+        }
+
+        self.makeRecordsetPages = function (page_count, pages_displayed, page_current) {
+            // params may have come from url observable (hence string)
+            page_count = parseInt(page_count);
+            pages_displayed = parseInt(pages_displayed);
+            page_current = parseInt(page_current);
+
+            // alert('page_count: ' + page_count + ', pages_displayed: ' + pages_displayed + ', page_current: ' + page_current);
+
+            if (isNaN(page_count) || isNaN(pages_displayed) || isNaN(page_current)) {
+                return [1];
+            }
+
+            var pages = new Array();
+
+            if ((page_current > 0) && (page_count > pages_displayed)) {
+                pages.push('<<');
+                pages.push('<');
+            }
+
+            var page_start = page_current;
+            var page_max = Math.min(page_count, page_current + pages_displayed);
+
+            if (page_max <= pages_displayed) {
+                page_start = 0;
+            }
+
+            var overshoot = page_max - (page_current + pages_displayed);
+            if (overshoot < 0) {
+                //alert('page_start: ' + page_start + ', page_max: ' + page_max + ', page_current: ' + page_current + ', pages_displayed: ' + pages_displayed);
+                page_start += overshoot;
+                if(page_start < 0)
+                    page_start = 0;
+                //alert('page_start: ' + page_start);
+            }
+
+            // alert('page_max: ' + page_max);
+            for(var i = page_start; i < page_max; i++) {
+                pages.push(i + 1);
+            }
+
+            if((page_count > pages_displayed) && (page_current < page_count - pages_displayed)) {
+                pages.push('>');
+                pages.push('>>');
+            }
+            return pages;
+        }
+
+        self.recordsetPageClick = function () {
+            var r = 0;
+            var page = $(this).attr('data-page');
+            var z = Math.ceil(self.recordsetPageSize() * self.recordsetPagesDisplayed);
+
+            switch(page)
+            {
+                case '<<':
+                    r = 0;
+                    break;
+                case '<':
+                    r = self.recordsetRowStart() - z;
+                    break;
+                case '>>':
+                    r = self.recordsetRecords() - z;
+                    break;
+                case '>':
+                    r = self.recordsetRowStart() + z;
+                    break;
+                default:
+                    r = self.recordsetPageSize() * (page - 1);
+            }
+
+            if (r < 0) {
+                r = 0;
+            }
+
+            // console.log('RecordsetPageClick: ' + r);
+            self.recordsetRowStart(r);
+            self.refreshSearch();
+            //self.recordsetPageCurrent(Math.ceil(r / self.recordsetPageSize()));
+            // alert("r: " + r + ", self.recordsetPageSize(): " + self.recordsetPageSize() + ", new page: " + self.recordsetPageCurrent());
+        }
+
+        // End: Recordset page navigation
+
+        self.makeRecordsStr = function (records, short_title) {
+            if( !(IsFieldNullOrEmpty(short_title)) && (short_title.length > 0))
+                return self.resultStr(self.recordCurrentShortTitle(), true);
+
+            var str = "Result";
+
+            if(records == 0) {
+                return "No records found";
+            }
+            else if (records == 1) {
+                return str + " (1)";
+            }
+            else {
+                return str + "s (" + records + ")";
+            }
+        }
+
+        // Start: Facets
+        self.populateFacetFields = function (facet_fields, facet_queries) {
+            /*@* extract the data for the simple text based facets, eg Genre, values are the number of records for that facet  *@*/
+
+            var i = 0;
+            $.each( facet_fields, function(j, n){
+                if (i == 0) {
+                    self.facets.removeAll(); /*@* we have some facet data so remove old data *@*/
+                    i++
+                }
+
+                var facet_values = facet_fields[j];
+
+                var cleaned_fvals = ko.observableArray([]);
+                for(var index in facet_values) {
+                    var fval = facet_values[index];
+
+                    if(fval.Value != 0) { // capitalize 1st letter of value and add it to the list
+                        fval.Key = fval.Key.charAt(0).toUpperCase() + fval.Key.slice(1);
+                        cleaned_fvals.push(fval);
+                    }
+                }
+
+                var ff_split = j.split('^');
+                self.facets.push({ Field: ff_split[0], Name: ff_split[1], Values: cleaned_fvals });
+            });
+            //self.facets.push({ Field: 'Test', Name: 'Test Facet', Values: self.facets()[0].Values });
+            //self.facets.push({ Field: 'Language', Name: 'Language', Values: self.facets()[0].Values });
+            //self.facets.push({ Field: 'Language', Name: 'Language2', Values: self.facets()[0].Values });
+            //self.facets.push({ Field: 'Language', Name: 'Facet 3', Values: self.facets()[0].Values });
+
+            self.populateFacetQueries(facet_queries);
+        }
+
+        self.populateFacetQueries = function (facet_queries) {
+            $.each( facet_queries, function(j, n){
+                if(n != 0) {  // don't add if 0 records in the range
+                    var facet_query = j;
+                    var fq_split = facet_query.split(':[');
+                    var name_split = fq_split[0].split('^');
+
+                    var exists = false;
+                    $.each( self.facets(), function(k, m){
+                        if(m.Name == name_split[1]) {
+                            exists = true;
+                            m.Values.push(createQueryRangeValue(fq_split[1], n));
+                            return false;
+                        }
+                    });
+
+                    if(!exists) {
+                        var values = ko.observableArray([]);
+                        values.push(createQueryRangeValue(fq_split[1], n));
+                        self.facets.push({ Field: name_split[0], Name: name_split[1], Values: values });
+                    }
+                }
+            });
+        }
+
+        self.getFacetFields = function () {
+            self.searchInProgress(true);
+            self.searchRequest = $.get("@Url.Content("~/Discover/SearchAjax")",
+                { "term": '', "collection_ids": '', "rows": 0, "row_start": 0, "parent_id": '', "sort_orders": '', "facet_constraints": '' },
+                function (data) {
+                    var d = data.SearchResults;
+                    self.populateFacetFields(d.FacetFields, d.FacetQueries);
+                    self.searchRequest = null;
+                })
+                .error(function() {
+                    alert('Error getting facet fields');
+                })
+                .complete(function() {
+                    self.searchInProgress(false);
+                });
+        }
+
+        self.facetApply = function () {
+            var facet = { 'Field': $(this).attr('data-facet-field'), 'Facet': $(this).attr('data-facet-value')};
+
+            var new_facet = true;
+
+            for(var i = 0; i < self.facetsApplied().length; i++) {
+                // alert(_facetsApplied[i].facet != facet.facet);
+                if(self.facetsApplied()[i].Facet == facet.Facet) {
+                    new_facet = false;
+                }
+            }
+
+            if(new_facet) {
+                self.facetsApplied.push(facet);
+                self.resetRecordsetPageNavigation();
+                // console.log('new facet (total ' + self.facetsApplied().length + '): ' + facet.Field + ' ' + facet.Facet);
+                self.refreshSearch();
+            }
+        }
+
+        self.facetRemove = function () {
+            var facet = { 'Field': $(this).attr('data-facet-field'), 'Facet': $(this).attr('data-facet-value')};
+            var v = self.facetsApplied.remove(function(item) { return (item.Field == facet.Field) && (item.Facet == facet.Facet) });
+            if((v != null) && (v.length == 1)) {
+                self.resetRecordsetPageNavigation();
+                self.refreshSearch();
+            }
+        }
+        // End: Facets
+
+        // Start: Drag and drop
+        self.setupDrag = function () {
+            if (self.searchTypeCollection()) {
+                $( self.resultsSelector ).draggable({ revert: 'false', helper: 'original', stack: '.result' });
+            } else {
+                $( self.resultsSelector ).draggable({ revert: 'invalid', helper: 'clone', opacity: 0.7 });
+            }
+        }
+
+        self.setupDragForElement = function (element) {
+            if (self.searchTypeCollection()) {
+                $( element ).draggable({ revert: 'false', helper: 'original', stack: '.result' });
+            } else {
+                $( element ).draggable({ revert: 'invalid', helper: 'clone', opacity: 0.7 });
+            }
+        }
+        // End: Drag and drop
+
+        // Start: Collections
+        self.addCollectionEvents = function (drop_target_name) { // activeClass: "ui-state-hover", hoverClass: "ui-state-active",
+            // alert(drop_target_name);
+            var selector = '#' + drop_target_name;
+
+            $((selector + ' .collection-list-header-text')).click(function () {
+                var collection = self.findCollectionBySelector(drop_target_name);
+
+                if(collection) {
+                    // alert(collection.selector + ' ' + collection.items().length);
+                    if(collection.items().length == 0) {
+                        alert('No items in collection');
+                        return;
+                    }
+
+                    self.resetResultCurrentIndex();
+
+                    var ids = '';
+
+                    for(var i = 0; i < collection.items().length; i++) {
+                        ids = ids + '^' + collection.items()[i].id;
+                    }
+
+                    self.searchTerm('');
+                    //alert('cleared search term box');
+
+                    self.searchCollectionIds(ids);
+
+                    //if(self.searchCollectionIdsOld != self.searchCollectionIds()) {
+                    // self.searchCollectionIdsOld = self.searchCollectionIds();
+                    self.facetsApplied.removeAll();
+                    self.clearSearch(true);
+                    self.searchTitle = name;
+                    self.refreshSearch();
+                    //}
+                }
+            });
+
+            $( selector ).droppable({
+                accept: self.resultsSelector,
+                tolerance: 'pointer',
+                greedy: true,
+                hoverClass: "ui-state-hover",
+                drop: function( event, ui ) {
+                    // var collection = $(selector); // $(collection).find( ".collection_list_placeholder" ).remove();
+                    var title = $(ui.draggable).find('.result-title').text(); // this will return text without any html markup (for security) //.attr('data-title');
+                    var id = $(ui.draggable).attr('data-id');
+                    //alert(drop_target_name);
+                    //alert(id);
+                    var result = self.addItemToCollectionDb(drop_target_name, title, id);
+
+                    if(!result)
+                        alert('Failed to add item to collection');
+                }
+            });
+
+            $(selector).sortable({
+                // items: "li:not(.collection-list-/ aplaceholder)",
+                items: "#collection-list li",
+                update: function(event, ui) {
+                    var c_id =  $(ui.item).parents('.collection').attr('id');
+                    var c = self.findCollectionBySelector(c_id);
+                    var new_pos = ui.item.index();
+
+                    if(c != null) {
+                        var item;
+
+                        for (var i = 0; i < c.items().length; i++) {
+                            item = c.items()[i];
+                            var html_title = $(ui.item).find('.collection-item-title').text();
+                            // alert('item.title: ' + item.title + ', $(ui.item).html(): ' + html_title);
+
+                            if (item.title == html_title) {
+                                // alert('old pos: ' + item.position + ', new pos: ' + new_pos);
+                                for (var j = new_pos; j < c.items().length; j++) {
+                                    c.items()[j].position++; // all items equal to or below newly moved items must move down one
+                                }
+                                item.position = new_pos + 1;
+                                // alert('new item.position: ' +item .position);
+                                break;
+                            }
+                        }
+                        // re-sort the underlying array, as if not done then when a new collection is added and the collection are re-rendered the items will appear in the order they were originally added to the array
+                        c.items.sort(function(left, right) { return left.position < right.position ? -1 : 1; });
+
+                        // update database with new positions
+                        //alert(c.id);
+                        for(var i = 0; i < c.items().length; i++) {
+                            var id = c.items()[i].id;
+                            var position = c.items()[i].position;
+
+                            self.collectionUpdateItemPosition(c.id, id, position);
+                        }
+                    }
+                }
+            });
+
+
+            $(selector + ' .collection-list-settings').click(function (e) {
+                //  e.stopPropagation();
+                // $(selector + ' .collection-list-settings-options').fadeToggle("slow");
+            });
+        }
+
+        self.collectionUpdateItemPosition = function  (collection_id, item_id, position) {
+            $.post('@Url.Content("~/Discover/CollectionUpdateItemPositionAjax")', { "collection_id": collection_id, "item_id": item_id, "position": position },
+                function (data) {
+                })
+                .error(function() { })
+                .complete(function() { });
+        }
+
+        self.addItemToCollectionDb = function (collection_selector, title, id) {
+            // alert(collection_selector + ' ' + title + ' ' + id);
+            var c = self.findCollectionBySelector(collection_selector);
+
+            if(c) {
+                // alert('collection id: ' + collection.id + ', item id: ' + id);
+                // ajax call to update db
+                var err = null;
+                var position = c.items().length + 1;
+                // alert('addItemToCollectionDb position: ' + position);
+
+                $.post('@Url.Content("~/Discover/CollectionAddItemAjax")', { "collection_id": c.id, "item_id": id, "title": title, "search_term": self.searchTerm(), "language_id": self.languageID, "position": position },
+                    function (data) {
+                        if(data == 'ok') {
+                            /*@* might be able to get fade-in animation working, add to collection, then display:none immediately, then fadeInSlideDown...*@*/
+                            c.items.push({ title: title, id: id, position: position });
+                        }
+                        else
+                            err = data;
+                    })
+                    .error(function() {
+                        err = 'Failed to add item to collection';
+                    })
+                    .complete(function() {
+                        if(err) {
+                            if(err.match('exists'))
+                                alert('Item already exists in this collection');
+                            else
+                                alert(err);
+                        }
+                    })
+                ;
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+
+        self.findCollectionBySelector = function (s) {
+            for(var i = 0; i < self.collections().length; i++) {
+                if(self.collections()[i].selector == s) {
+                    return self.collections()[i];
+                }
+            }
+            return null;
+        }
+
+        self.findCollectionByID = function (collection_id) {
+            for(var i = 0; i < self.collections().length; i++) {
+                if(self.collections()[i].id == collection_id) {
+                    return self.collections()[i];
+                }
+            }
+            return null;
+        }
+
+        self.checkCollectionNameOk = function (name) {
+            for(var i = 0; i < self.collections().length; i++) {
+                if(self.collections()[i].title == name)
+                    return true;
+            }
+            return false;
+        }
+
+        self.collectionNew = function (name) {
+            // ajax call to add to db
+            if(!self.isAuthenticated())
+                return;
+
+            $.get("@Url.Content("~/Discover/CollectionNewAjax")", { "user_id": self.userID, "title": name },
+            function (data) {
+                // alert("new collection id: " + data);
+                self.makeCollection(name, data)
+            })
+            .error(function() { })
+            .complete(function() {
+                // $('#collection-settings-options').fadeOut("slow");
+            });
+        }
+
+        self.makeCollection = function (name, id) {
+            if(!self.isAuthenticated())
+                return;
+
+            var selector = '';
+
+            if(!id) { /*@* no id, so user must have just created this collection *@*/
+                self.collectionNew(name);
+                return;
+            } else {
+                selector = self.makeCollectionSelector(id);
+
+                // get any existing items
+                $.post("@Url.Content("~/Discover/CollectionGetItemsAjax")", { "collection_id": id },
+                function (data) {
+                    // alert('name: ' + name + ', selector: ' + selector + ', items: ' + data.WorkspaceItems.length);
+                    var collection = self.findCollectionBySelector(selector);
+                    if(collection) {
+                        for(var i = 0; i < data.length; i++) {
+                            var item = data[i];
+                            var object_data = item.ObjectLocaleData;
+                            collection.items.push({ title: item.Title, id: item.ObjectID, position: item.Position });
+                        }
+                    }
+                }).error(function() { }).complete(function() {});
+            }
+
+            var items = ko.observableArray([]);
+            // alert('adding collection (' + name + ' )');
+            self.collections.push({ title: ko.observable(name.replace("'", "\'")), selector: selector, id: id, items: items, visible: ko.observable(false) });
+            return selector;
+        }
+
+        self.collectionRename = function() {
+            var cid = $(this).attr('data-id');
+            var col = self.findCollectionByID(cid);
+            var tid = 'collection-list-header-title-' + cid;
+            var tid_sel = '#' + tid;
+            var t = $(tid_sel).html();
+            $(tid_sel).html('');
+
+            var tid_input = tid + '_input';
+            var tid_input_sel = '#' + tid_input;
+            $(tid_sel).append('<input id="' + tid_input + '" value="' + t + '"/> [ok]').focus();
+
+            $(tid_input_sel).focus();
+
+            $(tid_input_sel).click(function (e) { /*@* user may click to focus the element manually, don't want this triggering refresh of the collection items in the main search window, which will happen if click event bubble up the tree *@*/
+                e.stopPropagation();
+            });
+
+            $(tid_input_sel).keydown(function (e) { /*@* if enter pressed then trigger blur, will trigger blur function above *@*/
+                if (e.which == 10 || e.which == 13) {
+                    $(tid_input_sel).blur()
+                }
+            });
+
+            $(tid_input_sel).blur(function() {
+                var new_t = $(tid_input_sel).val();
+                $(tid_input_sel).remove();
+                $(tid_sel).html(new_t);
+
+                $.get('@Url.Content("~/Discover/CollectionRenameAjax")', { "collection_id": cid, "new_title": new_t },
+                    function (data) { r = data; })
+                    .error(function() { r = false; })
+                    .complete(function() {
+                        if(r) {
+                            col.title(new_t); /*@* must remember to update the collection in the data array that the visual element is bound to *@*/
+                        } else {
+                            alert('Could not rename collection');
+                            $(tid_sel).html(t); /*@* rename has failed, revert the html to the original title *@*/
+                        }
+                    });
+            });
+        }
+
+        self.collectionDelete = function() {
+            var c_id =  $(this).attr('data-id');
+            var c = self.findCollectionByID(c_id);
+            if(!c) {
+                alert('Error, could not delete collection');
+                return;
+            }
+
+            var r = confirm('Are you sure you want to delete collection "' + c.title() + '"?');
+
+            if(r) {
+                var r_db = false;
+                $.get('@Url.Content("~/Discover/CollectionDeleteAjax")', { "collection_id": c_id },
+                    function (data) { r_db = data; })
+                    .error(function() { r_db = false; })
+                    .complete(function() {
+                        if(r_db) {
+                            // remove collection from underlying array, which will be automatically reflected in the UI
+
+                            if(c) {
+                                var p = -1;
+
+                                for (var i = 0; i < self.collections().length; i++) {
+                                    var col = self.collections()[i];
+                                    var col_selector = '#' + col.selector;
+                                    if(col.id == c_id) {
+                                        fadeOutAndSlideUp($(col_selector), function() { $(col_selector).remove();  self.collections.remove(col); });
+                                        break;
+                                    }
+                                }
+                            }
+                        } else {
+                            alert('Could not delete collection');
+                        }
+                    });
+            }
+        }
+
+        self.collectionItemDelete = function () {
+            // var c_id = $(this).attr('data-collection-id');
+
+            var col = $(this).closest('.collection');
+
+            if (col.length == 1) {
+                var c_id = $(col[0]).attr('id').substring(2);
+
+                // alert('delete collection item: ' + $(this).attr('data-id') + ', collection id: ' + c_id);
+                var r = confirm('Are you sure you want to remove "' + $(this).attr('data-title') + '" from this collection?');
+
+                if(r) {
+                    var item_id = $(this).attr('data-id');
+                    var elem = $(this).parents('#' + item_id)[0];
+                    var r_db = false;
+                    $.post('@Url.Content("~/Discover/CollectionDeleteItemAjax")', { "collection_id": c_id, "item_id": item_id },
+                        function (data) { r_db = data; })
+                        .error(function() { r_db = false; })
+                        .complete(function() {
+                            if(r_db) {
+                                // remove item from underlying array, which will be automatically reflected in the UI
+                                var c = self.findCollectionByID(c_id);
+
+                                if(c) {
+                                    var p = -1;
+
+                                    for (var i = 0; i < c.items().length; i++) {
+                                        if(c.items()[i].id == item_id) {
+                                            if(elem)
+                                                fadeOutAndSlideUp(elem, function() { $(elem).remove();  c.items.remove(c.items()[i]); });
+                                            p = i;
+                                            break;
+                                        }
+                                    }
+                                    // if the object was removed then we need to update all the sort positions of the other items in the collection (otherwise if there was 1,2,3 and 2 is removed then get a sort gap)
+                                    if(p > -1) {
+                                        for (var j = p; j < c.items().length; j++) {
+                                            var new_pos = c.items()[j].position - 1;
+                                            c.items()[j].position = new_pos;
+                                            self.collectionUpdateItemPosition (c_id, c.items()[j].id, new_pos);
+                                        }
+                                    }
+                                }
+                            } else {
+                                alert('Could not remove item from collection');
+                            }
+                        });
+                }
+            }
+            else {
+                alert('Could not remove item from collection, could not find the parent collection');
+            }
+        }
+
+        self.makeCollectionSelector = function (str) {
+            return 'c_' + str; // + str.replace(/'/gi, "\'").replace(/ /gi, '_');
+        }
+
+        self.collectionInfoText = function (data) {
+            var str = '(' + data.items().length + ' item';
+            str = (self.collectionHasMultipleItems(data.items)) ? str + 's' : str;
+            str = str + ')';
+            return str;
+        }
+
+        self.collectionViewToggle = function (id)
+        {
+            
+            for(var i = 0; i < self.collections().length; i++)
+            {
+                if(self.collections()[i].id == id)
+                {
+                    self.collections()[i].visible(!self.collections()[i].visible());
+                    break;
+                }
+            }
+        }
+
+        self.collectionHasMultipleItems = function (items) {
+            return items().length > 1;
+        }
+
+        self.collectionHasItems = function (items) {
+            return items().length > 0;
+        }
+
+        self.setupDiscoveryColumn = function () {
+            if(self.isAuthenticated()) {
+                $.post("@Url.Content("~/Discover/CollectionsListUserAjax")", { "user_id": self.userID },
+                    function (data) {
+                        if(data.length == 0)
+                            self.makeCollection("My Collection"); // create an initial empty collection, addCollectionEvents will be automatically run by the after render template method
+                        else {
+                            for(var i = 0; i < data.length; i++) {
+                                self.makeCollection(data[i].Title, data[i].WorkspaceID);
+                            }
+                        }
+                    }).error(function() { }).complete(function() {});
+
+                $.post("@Url.Content("~/Discover/GetSearchesForUserAjax")", { "user_id": self.userID },
+                function (data) {
+                    var d = new Array();
+                    /*@* need to flatten out facet constraints property for the JS code *@*/
+                    for(var j = 0; j < data.length; j++) {
+                        d.push(searchQueryDecode(data[j]));
+                    }
+                    self.savedSearches(d);
+                }).error(function() { }).complete(function() {});
+            }
+
+            //$('#but-collection-visibility').click(function () {
+            //    $('.col2 #collections').slideToggle(_fadeMsMax, _animType);
+            //});
+
+            $('#but-new-collection').click(function () {
+                event.stopPropagation();
+
+                if(!checkAuthenticated())
+                    return;
+
+                var name = "New Collection " + self.collections().length;
+                while (self.checkCollectionNameOk(name)) {
+                    name = name + 'a';
+                }
+                self.makeCollection(name);
+            });
+
+            self.getFacetFields();
+        }
+        // End: Collections
+
+        // Start: Notes
+        self.noteNew = function () {
+            if(!checkAuthenticated()) {
+                return;
+            }
+
+            var public_note = false;
+            var note_text;
+
+            if($(this).attr('id').indexOf("note") != -1) {
+                note_text = $('#notes #input-note').val();
+            }
+            else {
+                public_note = true;
+                note_text = $('#comments #input-comment').val();
+            }
+
+            if(IsFieldNullOrEmpty(note_text)) {
+                return;
+            }
+
+            var item_id = self.resultCurrent().ID;
+            if(IsFieldNullOrEmpty(item_id)) {
+                return;
+            }
+
+            $.post("@Url.Content("~/Discover/NoteAddAjax")", { "lang_id": self.languageID, "user_id": self.userID, "item_id": item_id, "text": note_text, "public_note": public_note },
+            function (data) {
+                if(data.NoteID == '00000000-0000-0000-0000-000000000000') {
+                    alert("Error adding note: " + data.Text);
+                }
+                else {
+                    if(data.PublicNote) {
+                        self.notesPublic.unshift(data);
+                        $('#comments #input-comment').attr('value', '');
+                        $('#comments #input-comment').val('');
+                    }
+                    else {
+                        self.notesPrivate.unshift(data);
+                        $('#notes #input-note').attr('value', '');
+                        $('#notes #input-note').val('');
+                    }
+                }
+            })
+            .error(function() { alert("Error adding note to item, server returned an error"); })
+            .complete(function() { });
+        }
+
+        self.noteDelete = function () {
+            if(!checkAuthenticated()) {
+                return;
+            }
+
+            var r = confirm('Are you sure you want to delete this note?');
+
+            if(r) {
+                var note_id = $(this).attr('data-note_id');
+                var public_note = $(this).attr('data-public');
+
+                if(IsFieldNullOrEmpty(note_id))
+                    return;
+
+                $.post('@Url.Content("~/Discover/NoteDeleteAjax")', {  "user_id": self.userID, "note_id": note_id },
+                function (data) {
+                    if(data == false) {
+                        alert("Error deleting note");
+                    }
+                    else {
+                        var notes;
+                        if(public_note == 'true') // var is a string as came from attr value!
+                            notes = self.notesPublic;
+                        else
+                            notes = self.notesPrivate;
+
+                        for(var i = 0; i < notes().length; i++) {
+                            var note = notes()[i];
+
+                            if(note.NoteID.toLowerCase() == note_id.toLowerCase()) {
+                                notes.remove(note);
+                                break;
+                            }
+                        }
+                    }
+                })
+                .error(function() { alert("Error deleting note, server returned an error"); })
+                .complete(function() { });
+            }
+        }
+        // End: Notes
+
+        // Start: Tags
+        self.tagNew = function () {
+            if(!checkAuthenticated()) {
+                return;
+            }
+
+            var tags = $('#tags #input-tags').val();
+            if(IsFieldNullOrEmpty(tags)) {
+                return;
+            }
+
+            var item_id = self.resultCurrent().ID;
+            if(IsFieldNullOrEmpty(item_id)) {
+                return;
+            }
+
+            var tags_array = tags.split(',');
+
+            for (var i = 0; i < tags_array.length; i++) {
+                var title = tags_array[i];
+                title = jQuery.trim(title);
+                $.post("@Url.Content("~/Discover/TagItemAjax")", { "lang_id": self.languageID, "user_id": self.userID, "title": title, "item_id": item_id  },
+                function (data) {
+                    if(data.Result == false) {
+                        if(data.Message.toLowerCase().indexOf("error") != -1) // @* if not an error it's probably because the item is already tagged by this user with this tag *@
+                            alert("Error tagging item: " + data.Title);
+                    }
+                    else {
+                        self.resultCurrentTags.push({ "TagID": data.TagID, "Title": data.Title});
+                        $('#tags #input-tags').val('');
+                    }
+                })
+                .error(function() { alert("Error tagging item, server returned an error: " + title); })
+                .complete(function() { });
+            }
+        }
+
+        self.tagRemove = function () {
+            if(!checkAuthenticated()) {
+                return;
+            }
+
+            var tag_id = $(this).attr('data-tag-id');
+
+            if(IsFieldNullOrEmpty(tag_id))
+                return;
+
+            var item_id = self.resultCurrent().ID;
+            if(IsFieldNullOrEmpty(item_id)) {
+                return;
+            }
+
+            $.post("@Url.Content("~/Discover/UnTagItemAjax")", {  "user_id": self.userID, "tag_id": tag_id, "item_id": item_id  },
+            function (data) {
+                if(data == false) {
+                    alert("Error un-tagging item");
+                }
+                else {
+                    for(var i = 0; i < self.resultCurrentTags().length; i++) {
+                        var tag = self.resultCurrentTags()[i];
+
+                        if(tag.TagID.toLowerCase() == tag_id.toLowerCase()) {
+                            self.resultCurrentTags.remove(tag);
+                            break;
+                        }
+                    }
+                }
+            })
+            .error(function() { alert("Error tagging item, server returned an error: " + title); })
+            .complete(function() { });
+        }
+
+        // End: Tags
+
+        // Start: Results
+        self.addResultClick = function () {
+            if (_isAndroidOriOS && (_touchDoubleClickDelayMs > 0)) { // android or ios AND we want to enable touchDoubleClick
+
+                delay = _touchDoubleClickDelayMs;
+
+                var onDoubleTapCallback = function(event){
+                    // alert('double-tap');
+                    var result = event.currentTarget;
+                    self.openResult( $(result).attr('data-id'),
+                        parseInt($(result).attr('data-index')),
+                        $(result).attr('data-children-count'),
+                        $(result).attr('data-children'));
+                };
+
+                var onTapCallback = function(event){
+                    // alert('single-tap');
+                    selectResult(event[0].currentTarget);
+                };
+
+                $("#results").on('click', self.resultsSelector, function (event) {
+                    var now = new Date().getTime();
+                    var lastTouch = $(this).data('lastTouch') || now + 1 /** the first time this will make delta a negative number */;
+                    var delta = now - lastTouch;
+                    clearTimeout(_timeoutAction);
+                    if (delta < delay && delta > 0) {
+                        if (onDoubleTapCallback != null && typeof onDoubleTapCallback == 'function') {
+                            onDoubleTapCallback(event);
+                        }
+                    } else {
+                        $(this).data('lastTouch', now);
+                        _timeoutAction = setTimeout(function (evt) {
+                            if (onTapCallback != null && typeof onTapCallback == 'function') {
+                                onTapCallback(evt);
+                            }
+                            clearTimeout(_timeoutAction);   // clear the timeout
+                        }, delay, [event]);
+                    }
+                    $(this).data('lastTouch', now);
+                });
+            }
+            else {
+                // desktop browser
+                $("#results").on('click', self.resultsSelector, function(event) {
+                    selectResult(this);
+                });
+
+                // dz icon handler, only show if android or ios (check the _Templates file, this handler won't have anything to bind to unless it's android and ios), but also show if _alwaysShowOpenDeepZoomTouchIcon true
+                if (_alwaysShowOpenDeepZoomTouchIcon || _isAndroidOriOS) {
+                    $("#results").on('click', '.openDeepZoom', function(event) {
+                        var result = $(this).closest('.result');
+
+                        if (result.length == 1) {
+                            var r = result[0];
+                            var id = $(r).attr('data-id');
+                            var index = parseInt($(r).attr('data-index'));
+                            var children = $(r).attr('data-children-count');
+                            self.openResult( id, index, children, $(r).attr('data-children'));
+                        }
+                    });
+                }
+            }
+        }
+
+        self.resultDoubleClick = function () {
+            self.openResult( $(this).attr('data-id'), parseInt($(this).attr('data-index')),
+            $(this).attr('data-children-count'), $(this).attr('data-children'));
+        }
+
+        self.resultChildNodeClick = function () {
+            event.stopPropagation();
+            var o = $(this).parents('.result');
+            self.openResult(o.attr('data-id'), parseInt(o.attr('data-index')),
+                o.attr('data-children-count'), o.attr('data-children'));
+        }
+
+        self.showJpeg2000 = function (id, img_w, img_h) {
+            if(IsFieldNullOrEmpty(id)) {
+                return;
+            }
+
+            self.clearContent();
+
+            self.deepZoomVisible(true);
+            _oldResultsBgColour = $('#results').css('background');
+            $('#results').css('background', '#000');
+
+            // put in info: if not present in filename (needed for djatoka?)
+            /*if(id.indexOf('info:') == -1) {
+                id = id.substr(0, id.lastIndexOf('.')) || id;
+                id = _jpeg2000Namespace + id;
+            }*/
+
+            var dz = $('<div style="background: #000;"></div>').attr('id', self.zoomFrameSelector); // , { width: $('#dz-wrapper').width(), height: $('#dz-wrapper').height()  }
+            dz.appendTo('#dz-wrapper');
+            self.resizeDeepZoom();
+
+            @* OSD size fix: causes ugly flash of resizing of dz container: if the OpenSeadragon mini navigator is enabled then this code must also be enabled
+            if (dz.height() <= 1)
+                adjustLayout(); *@
+
+            var dz_url = "@Url.Content(String.Format("{0}?{1}=", ViewBag.DeepZoomViewer, "DeepZoom"))" + id + "_files/";
+            _dzViewer = goOpenSeadragonIIIF(id, self.zoomFrameSelector, img_w, img_h);
+            // _dzViewer = goOpenSeadragon(id, self.zoomFrameSelector, img_w, img_h);
+        }
+
+        self.resizeDeepZoom = function (timeout) {
+            if (!timeout) {
+                timeout = 500;
+            }
+
+            setTimeout ( function () {
+                var ww = 0, wh = 0;
+                if( typeof( window.innerWidth ) == 'number' ) {
+                    //Non-IE
+                    ww = window.innerWidth;
+                    wh = window.innerHeight;
+                } else if( document.documentElement && ( document.documentElement.clientWidth || document.documentElement.clientHeight ) ) {
+                    //IE 6+ in 'standards compliant mode'
+                    ww = document.documentElement.clientWidth;
+                    wh = document.documentElement.clientHeight;
+                } else if( document.body && ( document.body.clientWidth || document.body.clientHeight ) ) {
+                    //IE 4 compatible
+                    ww = document.body.clientWidth;
+                    wh = document.body.clientHeight;
+                }
+
+                // wh = $('.content-wrapper').height();
+
+                var header_h = $("#cd-header-wrapper").height();
+                var footer_h = $("#footer").height();
+                var results_title_h = $("#results-title-wrapper").height();
+                // var content_wrapper_padding_h = $('.content-wrapper').innerHeight() - $('.content-wrapper').height();
+                var rh = wh - header_h - footer_h - results_title_h - 20; // slight fudge // - content_wrapper_padding_h;
+                $('#dz-wrapper').css('height', rh + 'px');
+                $('#' + self.zoomFrameSelector).css('height', rh + 'px');
+                // console.log('resizeDeepZoom(): ' + rh);
+            }, timeout);
+        }
+
+
+        @*self.addMouseOverHighlight = function () {
+            // tried using toggleHighlight (uses the toggleClass method) but problems if mouse over an item when resizing,
+            // items get stuck in a highlight state when mouse not over, and not highlighted when mouse over (so inverse highlighted)
+            // toggleClass prob better for click highlighting
+            $( "#results" ).on( 'mouseenter', self.resultsSelector, function (e) { self.highlightAdd(this); } );
+            $( "#results" ).on( 'mouseleave', self.resultsSelector, function (e) { self.highlightRemove(this); } );
+        }*@
+
+        self.highlightRemoveAll = function () {
+            $("#results .highlight").each(function () {
+                self.highlightRemove(this);
+            });
+        }
+
+        self.highlightAdd = function (object) {
+            _highlightBgColourOld = $(object).css('background-color');
+            // _highlightOutlineColourOld = $(object).css('border-top');
+            $(object).addClass("highlight");
+            $(object).animate({ backgroundColor: "#a6a8ac" }, _fadeMsMax, _animType);// .animate({ outlineColor: "#ff0000" }, _fadeMsOut);
+            $(object).addClass("shadow-highlight");
+        }
+
+        self.highlightRemove = function (object) {
+            // alert(_highlightBgColourOld);
+            $(object).animate({ backgroundColor: _highlightBgColourOld }, _fadeMsMax, _animType); //.animate({ outlineColor: _highlightOutlineColourOld }, _fadeMsOut);;
+            $(object).removeClass("highlight");
+            $(object).removeClass("shadow-highlight");
+            //$(object).addClass("shadow");
+        }
+
+        self.calculateResultSize = function () {
+            // need to get the dimensions (width and height) of the css class, but class won't be applied until added to the DOM, so create an invisible element, measure it then remove
+            var test_class = self.classNameResult + ' ' + self.resultsLayout() + self.resultSize();
+            // alert('test_class: ' + test_class);
+            var html = '<div style="display: none;" id="test" class="' + test_class + '"><img id="test_img" class="' + self.makeResultImageClassName() + '" /></div>';
+            $('#results').append($(html));
+            // alert($('#results #test').length);
+            var o = $('#results #test').get(0);
+            var w = $(o).css('width');
+            var h = $(o).css('height');
+            self.resultSizePx.Width = Number(w.replace('px', ''));
+            self.resultSizePx.Height = Number(h.replace('px', ''));
+
+            var img = $(o).find('#test_img');
+            var w_img = $(img).css('width');
+            var h_img = $(img).css('height');
+            self.resultSizePx.ImageWidth = Number(w_img.replace('px', ''));
+            self.resultSizePx.ImageHeight = Number(h_img.replace('px', ''));
+
+            $(o).remove();
+        }
+
+        self.resizeResults = function (size, sequential, reverse, force) {
+            if ((self.resultsLayout() != 'list-simple') && ((self.resultSize() != size) || (force))) {
+                self.resultSizeOld = self.resultSize();
+                self.resultSize(size);
+                self.thumbnailSize = size;
+
+                self.maxResultImgW(0);
+
+                self.calculateResultSize();
+                var w = self.resultSizePx.Width;
+                var h = self.resultSizePx.Height;
+
+                var w_img = self.resultSizePx.ImageWidth;
+                var h_img = self.resultSizePx.ImageHeight;
+                // alert(w_img + ' ' + h_img);
+
+                var results = $(self.resultsSelector);
+
+                // work out if we are upsizing or downsizing the results, as if downsizing need to update image after anim, if upscaling before anim (else will see pixelated image)
+                var dir = 0;
+
+                if(results.length > 0) {
+                    var r = $(results).get(0);
+                    var r_w = $(r).css('width').replace('px', '');
+                    //alert(r_w);
+                    var r_h = $(r).css('height').replace('px', '');
+                    if((w > r_w) || (h > r_h))
+                        dir = 1;
+                    else if((w < r_w) || (h < r_h))
+                        dir = -1;
+                }
+
+                var fade_ms = _fadeMsMax;
+
+                if (self.resultsLayout() == 'masonry') { // don't animate if masonry layout as the re-layout tranisions will be enough movement
+                    fade_ms = 0;
+                }
+
+                $(results).each(function (index) {
+                    // animate image container to new size
+                    // animate image thumbnail to new size, whether or not we have requested the new RES image we need to get the SIZE animation going
+                    self.resizeResultImage(this, w_img, h_img, fade_ms);
+                    // animate result container to new size
+                    var f = function (object) { self.updateClass(object, self.resultsLayout(), size); };
+
+                    if (dir == -1) {
+                        // downscaling, so swap lo res image in after animation done, to stop lo res image popping in before sized down
+                        f  = function (object) {
+                            self.updateResultImage(object, w_img, h_img);
+                            self.updateClass(object, self.resultsLayout(), size);
+                        };
+                    }
+                    else {
+                        self.updateResultImage(this, w_img, h_img); // scaling up, so load higher res image as animation starts
+                    }
+
+                    if (self.resultsLayout() == 'grid')
+                    {
+                        //change the length of title and author shown in grid view. Should move out of resize method but will leave here for now so just one loop is run.
+                        //this animation should only be run in grid view.
+                        $(this).animate({ width: w, height: h }, fade_ms, _animType, f(this));
+
+                        // $(".header-grid")[index].innerHTML = "<header><h3><span class='result-title'>"+ resultStr($(results[index]).attr('data-title')) +"</span></h3>" + resultStr($(results[index]).attr('data-author')) + "</header>" ;
+                        $(".header-grid .result-title")[index].innerHTML  = self.resultStr($(results[index]).attr('data-title'));
+                        $(".header-grid .result-author")[index].innerHTML = self.resultStr($(results[index]).attr('data-author'))
+                    }
+                    else {
+                        f($(this));
+
+                        if (self.resultsLayout() == 'masonry') {
+                            if (index == results.length - 1) {
+                                updateMasonryLayout(w_img, true);
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+
+        self.updateClass = function (object, class_name, new_size) {
+            var rem = class_name + self.resultSizeOld;
+            var add = class_name + new_size;
+            // alert('removing: ' + rem + ', adding: ' + add);
+            $(object).removeClass(rem);
+            $(object).addClass(add);
+        }
+
+        self.resizeResultImage = function (element, w_req, h_req, fade_ms) {
+            // console.log('resizeResultImage()');
+            var w_new;
+            var h_new;
+
+            var img = $(element).find('.' + self.classNameThumbnail);
+            // console.log('img: ' + $(img).css('margin-top'));
+            var w;
+            var h;
+
+            //if (data && data.ImageMetadata) {
+            //    w = data.ImageMetadata.Width;
+            //    h = data.ImageMetadata.Height;
+            //}
+            //else {
+            w = $(img).attr('data-width');
+            h = $(img).attr('data-height');
+            //}
+
+            // alert('w: ' + w + ', h: ' + h + ', w_req: ' + w_req + ', h_req: ' + h_req + ', fade_ms: ' + fade_ms);
+
+            @*// must take in to account the header for the result item, which will affect the height.
+            // Warning!: IE does not report height correctly for HTML5 elements, so have to use a div wrapper
+
+            // Warning2!: For items with really long titles that will spill on to two lines, we *really* need the height of
+            // the header at it's new size (ie after it's been animated to the new size) so text will reformat and the number
+            // of lines it takes up is likely to change (so new a height) but this animation hasn't happened yet. bit of a catch 22.
+            // if it becomes problematic.. could quickly add an invisible result element (just the header?) with real text in the background at the new w + h,
+            // grab the new height for the text formatted at this size, then remove the element from the DOM, use the height value below.*@
+
+            var header = $(element).find(self.resultsSelectorHeader + '-' + self.resultsLayout());
+            var resultChildNode = $(element).find(self.resultsSelectorChildNodesClassName + '-' + self.resultsLayout());
+
+            // alert(self.resultsSelectorHeader + '_' + self.resultsLayout());
+            var h_header = 0;
+            var h_result_child_node = 0;
+
+            if(self.resultsLayout() == 'grid') {
+                // alert($(header).html());
+                if($(resultChildNode).length > 0) {
+                    h_result_child_node = $(resultChildNode).css('height').replace('px', '');
+                }
+                h_header = $(header).css('height').replace('px', '');
+            } else if(self.resultsLayout() == 'list-image') {
+                var m_top = $(img).css('margin-top');
+                if(m_top)
+                    m_top = parseInt(m_top.replace('px', ''));
+                else
+                    m_top = 0;
+
+                var p_top_h = $(header).css('padding-top');
+                if(p_top_h)
+                    p_top_h = parseInt(p_top_h.replace('px', ''));
+                else
+                    p_top_h = 0;
+
+                var p_top_i = $(img).css('padding-top');
+                if(p_top_i)
+                    p_top_i = parseInt(p_top_i.replace('px', ''));
+                else
+                    p_top_i = 0;
+
+                h_header = p_top_h + m_top + p_top_i;
+            }
+            //alert(self.resultsSelectorHeader + ' ' + h_req + ' ' + h_header);
+            //alert($(header).css('height'));
+
+            var ar = w / h;
+            h_req = h_req - h_header - h_result_child_node;
+
+            // commented out for masonry test
+            w_new = w_req;
+            h_new = Math.round(w_new / ar);
+
+            if(self.resultsLayout() == 'grid') {
+                @*// divide x/y, set scale down accordingly etc, but then must adjust the other axis to maintain the aspect ratio *@
+                if(ar >= 1) {
+                    @*// landscape, set width to max available, then see if height will fit, if not will have to scale down*@
+                    w_new = w_req;
+                    h_new = Math.round(w_new / ar);
+
+                    if(h_new > h_req) { @*// height is too big for available height, so set height to max avail, then get a new width based on that using aspect ratio *@
+                        h_new = h_req;
+                        w_new = Math.round(h_new * ar);
+                    }
+                }
+                else {
+                    @*// portrait, same logic as above *@
+                    h_new = h_req;
+                    w_new = Math.round(h_new * ar);
+
+                    if(w_new > w_req) {
+                        w_new = w_req;
+                        h_new = Math.Round(w_new / ar);
+                    }
+                }
+            }
+
+            //alert(ar + ', ' + w_req + ' ' + w_new + ', ' + h_req + ' ' + h_new);
+
+            //alert(h_req + ' ' + h_header + ' ' + h_new + ': ' + (h_req - h_header - h_new));
+            //var margin_top = (h_req - h_header - h_new);
+
+            if (fade_ms > 0) {
+                $(img).animate({ width: w_new, height: h_new }, fade_ms, _animType); // 'margin-top': (h_req - h_header - h_new)
+            }
+            else {
+                $(img).css('width', w_new);
+                $(img).css('height', h_new);
+            }
+
+
+            if(w_new > self.maxResultImgW())
+            {
+                self.maxResultImgW(w_new);
+            }
+        }
+
+        self.updateResultImage = function (element, w_img, h_img) { @*// method only updates the <img src> to the correct res, doesn't resize the image *@
+            // alert(w_img + ' ' + h_img);
+            // var file = result.File; @*// info:arm/test/greek_map  // info:arm/test/african*@
+            var file = $(element).attr('data-file');
+
+            if(file == null)
+            {
+                return;
+            }
+
+            var ext = file.split('.').pop();
+
+            // for .mp3 and .mov files so jpg icon can be located
+            if((ext == 'mp3') || (ext == 'mov') || (ext == 'wmv') || (ext == 'webm') || (ext == 'ogg') || (ext == 'ogv') || (ext == 'oga') ) {
+                file = file.substr(0, file.lastIndexOf('.')) + '.jpg';
+            }
+
+            var img = $(element).find('.' + self.classNameThumbnail);
+
+            if(file.indexOf("yale.edu") > -1 ||file.indexOf("gallica.bnf.fr") > -1 )
+            {
+                img_src = file + "/full/" + w_img+ ",/0/native.jpg";
+                $(img).attr('src', img_src);
+            }
+            else
+            {
+                img_src = file + "/full/" + w_img+ ",/0/default.jpg";
+                $(img).attr('src', img_src);
+            }
+            return;
+
+
+            /*var w = result.ImageMetadata.Width;
+            var h = result.ImageMetadata.Height;
+            var levels = result.ImageMetadata.Levels;*/
+            var w = $(img).attr('data-width');
+            var h = $(img).attr('data-height');
+            var levels = $(img).attr('data-levels');
+
+            var img_src;
+
+            if (levels != 0) { // jpeg2000
+                // calculate level needed, as only using probably around 300-500px images can just take the level
+                // above the level which is below the desired size, wouldn't be good logic for requesting higher
+                // res images, as the jump would be too great (eg small jump from 192 to 394px but much bigger eg 1536 to 3072px)
+                var level = 0;
+
+                for(var i = levels; i > -1; i--) {
+                    // alert('i: ' + i + ', w_img: ' + w_img + ', w: ' + w + ', h_img: ' + h_img + ', h: ' + h);
+                    if((w < w_img) && (h < h_img)) {
+                        level = i + 1;
+                        break;
+                    }
+                    w = w / 2;
+                    h = h / 2;
+                }
+
+                var r_x = Math.round(w * 2);
+                var r_y = Math.round(h * 2);
+                // alert('level: ' + level + ', r_x: ' + r_x + ', r_y: ' + r_y);
+
+
+                @* //could be make an Ajax call here to Ajax GetImageUri, but adds an additional request latency (multiplied by potentially large number of images being displayed and dynamically changed) *@
+                if (_JP2Resolver.indexOf(".iip") == -1) {
+                    img_src = _JP2Resolver + '?url_ver=Z39.88-2004&rft_id=' + file + '&svc_id=info:lanl-repo/svc/getRegion&svc_val_fmt=info:ofi/fmt:kev:mtx:jpeg2000&svc.format=image/jpeg&svc.level=' + level + '&svc.rotate=0&svc.region=0,0,' + r_y + ',' + r_x;
+                }
+                else
+                {
+                    var s;
+                    if (r_x > r_y)
+                        s = 'WID=' + r_x;
+                    else
+                        s = 'HEI=' + r_y;
+                    img_src = _JP2Resolver + '?FIF=' + file + '&' + s + '&RGN=0,0,1,1&CVT=jpeg';
+                }
+            }
+            else { // non jpeg2000 so can use IIS resizing
+                //img_src = _mediaDirectory + file + '.ashx?maxwidth=' + w_img + '&amp;maxheight=' + h_img; // disabled for masonry js test
+                img_src = '@Url.Content("~/Content/images/white_square_1x1.gif")';
+            }
+
+            // console.log('img: ' + img);
+            // update img width and height to avoid layout issues
+            var ar = 1;
+
+            if (w != 0 && h != 0) {
+                ar = w / h;
+            }
+
+            if (ar > 1) {
+                h_img = Math.round(w_img / ar);
+            }
+            else {
+                w_img = Math.round(h_img * ar);
+            }
+
+            //$(element).css('width', w_img);
+            //$(element).css('height', h_img);
+
+            //$(img).css('width', w_img);
+            //$(img).css('height', h_img);
+            $(img).attr('src', img_src);
+        }
+
+
+        self.getRecord = function (id) {
+            $.get("@Url.Content("~/Discover/GetRecordAjax")", { "id": id },
+            function (data) {
+                // alert('GetRecordAjax returned: ' + data.SearchResults.Results.length);
+                var d = data.SearchResults;
+                if (d.Results.length == 1) {
+                    d.Results[0].LastRow = true;
+                    concatenateDisplayFields(d.Results);
+                    self.results(d.Results);
+                    self.resultCurrentIndex(0);
+                    self.recordsetRecords(1);
+
+                    var pn = self.results()[self.resultCurrentIndex()].ParentNodes;
+                    if((IsFieldNullOrEmpty(self.searchParentId())) && !IsFieldNullOrEmpty(pn)) // this._searchParentId
+                    {
+                        self.searchParentId(pn[0]); // this._searchParentId
+                    }
+
+                    if ($( "#results-options" ).is(':visible')) {
+                        $( "#results-options" ).slideUp(_fadeMsMax, _animType);
+                    }
+
+                    $('.nav-results-pager').fadeOut(_fadeMsMax, _animType);
+
+                    var f = self.resultCurrent().IIIFImageRoot; //self.resultCurrent().File;
+
+                    if(fileIsVideo(f) || fileIsAudio(f)) {
+                        showMedia(f);//alert('showMedia: ' + f); //
+                    }
+                    else {
+                        //self.goJpeg2000(f, self.resultCurrent().ImageMetadata.Width, self.resultCurrent().ImageMetadata.Height);
+                        self.goJpeg2000(f, self.resultCurrent().Width, self.resultCurrent().Height);
+                    }
+                }
+                else {
+                    alert('getRecord error, results found: ' + d.Results.length);
+                }
+            });
+        }
+
+        self.getParentRecord = function (id) {
+            $.get("@Url.Content("~/Discover/GetRecordAjax")", { "id": id },
+                function (data) {
+                    // alert('GetRecordAjax returned: ' + data.SearchResults.Results.length);
+                    if (data.SearchResults.Results.length == 1) {
+                        var p = data.SearchResults.Results[0];
+                        self.recordChildIds(p.ChildNodes);
+                        setupSlider(self.recordChildIds().length);
+                        // alert(self.recordChildIds.indexOf(self._viewItem));
+                        self.recordCurrentPosition(self.recordChildIds.indexOf(self.viewItem())); // self._viewItem
+                    }
+                    else {
+                        alert('getRecord error, results found: ' + data.SearchResults.Results.length);
+                    }
+                });
+        }
+
+
+        self.openResult = function (item_id, item_index, children_count, children_string)
+        {
+            if (IsFieldNullOrEmpty(children_count)) {
+                children_count = 0;
+            }
+
+            var children_array = [];
+
+            if (!IsFieldNullOrEmpty(children_string)) {
+                children_array = children_string.split(',');
+            }
+
+            if((children_count == 0) && (self.recordChildIds().length == 0)) {
+                self.viewItem(item_id);
+                self.refreshSearch();
+            } else {
+                // this will display a subsearch of child items, these can then be clicked to show the jpeg2000
+                self.parentTitle.push(self.recordCurrentShortTitle());
+                self.parentRecordsetRowStart.push(self.recordsetRowStart());
+                self.recordsetRowStart(0);
+
+                if(self.recordChildIds().length == 0) {
+                    self.recordChildIds(children_array);
+                    setupSlider(self.recordChildIds().length);
+
+                    if(self.searchParentId() != item_id) {
+                        self.searchParentId(item_id);
+                        self.refreshSearch();
+                    }
+                } else {
+                    /*@* index position on screen will be determined by the sort order user has selected, this may not be the same as the order of child elements in the data source, so get the correct position, else child navigation on the dz screen will go badly wrong *@*/
+                    var index = -1;
+                    for (var i = 0; i < self.recordChildIds().length; i++) {
+                        if(self.recordChildIds()[i] == item_id) {
+                            index = i;
+                            break;
+                        }
+                    }
+
+                    if(index != -1) {
+                        self.recordCurrentPosition(index);
+                        self.goChild(item_id);
+                    } else
+                        alert('Error, child item not found');
+                }
+            }
+        }
+
+        self.goJpeg2000 = function (jpeg2000_id, img_w, img_h) {
+            if (jpeg2000_id != null) { // && ((jpeg2000_id.indexOf('info:') != -1)))
+                self.showJpeg2000(jpeg2000_id, img_w, img_h);
+            } else {
+                // creates jpeg2000 on the fly, updates the source db, disabled for now
+            }
+        };
+        // End: Results
+        // End: Behaviours
+
+        // Start: Computed properties
+        self.showResultsPager = ko.pureComputed(function() {
+            return (!self.searchInProgress() && !self.backButton() && (self.recordsetRecords() > 0));
+        }, self);
+
+        self.resultsLayoutMode = ko.pureComputed(function() {
+            return 'result-' + self.resultsLayout() + '-template';
+        }, self);
+
+        self.isLayoutMasonrySmall = ko.pureComputed(function() {
+            return ((self.resultsLayout().indexOf('masonry') > -1) && (self.resultSize().indexOf('-sm') > -1));
+        }, self);
+
+        self.childNavigation = ko.computed(function() {
+            return !IsFieldNullOrEmpty(self.searchParentId()) && !IsFieldNullOrEmpty(self.viewItem());
+        }, self);
+
+        self.backButton = ko.computed(function() {
+            return ( !IsFieldNullOrEmpty(self.searchParentId()) || !IsFieldNullOrEmpty(self.viewItem()) );
+        }, self);
+
+        self.showResultsListHeader = ko.computed(function() {
+            return ((!self.deepZoomVisible()) && (self.resultsLayout() == 'list-simple'));
+        }, self);
+
+        self.recordCurrentId = ko.computed(function() {
+            if((self.recordCurrentPosition() > -1) && (self.recordChildIds().length > self.recordCurrentPosition())) {
+                return self.recordChildIds()[self.recordCurrentPosition()];
+            }
+            else {
+                return {};
+            }
+        }, self);
+
+        self.recordCurrentPositionStr = ko.computed(function() { if(self.recordCurrentSlideToVisible()) return self.recordCurrentSlideToStr(); return self.recordCurrentPosition() + 1; }, self).extend({ rateLimit: 1 });
+        self.recordCurrentSlideToStr = ko.computed({
+            read: function () {
+                if(isNaN(self.recordCurrentSlideTo()))
+                    return self.recordCurrentPositionStr();
+                return (self.recordCurrentSlideTo() + 1);
+            },
+            owner: self }).extend({ rateLimit: 1 });
+
+        self.recordsetPageCurrent = ko.computed(function() { return Math.ceil(self.recordsetRowStart() / self.recordsetPageSize()); }, self).extend({ rateLimit: 1 });
+        self.searchTypeCollection = ko.computed(function() { return self.searchCollectionIds().length > 0; }, self);
+        self.recordsetPages = ko.computed(function() {
+            return self.makeRecordsetPages(Math.ceil(parseInt(self.recordsetRecords()) / parseInt(self.recordsetPageSize())), parseInt(self.recordsetPagesDisplayed), parseInt(self.recordsetPageCurrent()));
+        }, self).extend({ rateLimit: 1 });
+        self.childPrevAvailable = ko.computed(function() { return ((self.recordCurrentId()) && (self.recordCurrentPosition() > 0) && (self.recordChildIds().length > 0)); }, self).extend({ rateLimit: 1 });
+        self.childNextAvailable = ko.computed(function() { return ((self.recordCurrentId()) && (self.recordCurrentPosition() < (self.recordChildIds().length - 1)) && (self.recordCurrentPosition() >= 0)); }, self).extend({ rateLimit: 1 });
+        self.childAvailable = ko.computed(function() { return (self.childPrevAvailable() || self.childNextAvailable()); }, self).extend({ rateLimit: 1 });
+        self.notesCountText = ko.computed(function() { if(self.notesPrivate().length == 0) return ''; else return self.notesPrivate().length; }, self);
+        self.commentsCountText = ko.computed(function() { if(self.notesPublic().length == 0) return ''; else return self.notesPublic().length; }, self);
+        self.tagsCountText = ko.computed(function() { if(self.resultCurrentTags().length == 0) return ''; else return self.resultCurrentTags().length; }, self);
+        self.collectionsCountText = ko.computed(function() { if(self.collections().length == 0) return ''; else return self.collections().length; }, self);
+        self.savedSearchesCountText = ko.computed(function() { if(self.savedSearches().length == 0) return ''; else return self.savedSearches().length; }, self);
+        self.isAuthenticated = ko.computed(function() { return !IsFieldNullOrEmpty(self.userID); }, self);
+
+        self.childOptions = ko.computed(function() {
+            var children = [];
+            for(var i = 0; i < this.recordChildIds().length; i++)
+                children.push(i);
+            return children;
+        }, self);
+
+        self.resultCurrent = ko.computed(function() {
+            if((self.resultCurrentIndex() > -1) && (self.results().length > self.resultCurrentIndex())) {
+                return self.results()[self.resultCurrentIndex()];
+            }
+            else {
+                return {};
+            }
+        }, self);
+
+        self.updateViewItemUri = ko.computed(function() {
+            var uri = '@ViewBag.ViewItemBaseUri' + self.resultCurrent().ID;
+
+            // update twitter button
+            if(self.resultCurrent().ID) {
+                var  tl = 140;
+                var tll = uri.length; // @* tll = tweet link length, tl = tweet length *@
+                var  tt = '@ViewBag.TwitterText @ViewBag.TwitterHashtag ... '; @* note trailing space *@
+
+                var title_len = 140 - tll - tt.length - 1 - _textMore.length;
+                @* tweet is 140 chars, -19 for the link, -1 needed for space between
+                   title and link else link won't parse, whatever left can be used for title of item *@
+                if(title_len < 0) {
+                    title_len == 0;
+                }
+
+                var title = self.resultCurrent().Title;
+                var title_str = resultCharLimitText(title, title_len, true);
+                var tweet_title = tt + title_str; //  + ' '
+
+                var t = '<a href="http://twitter.com/share" class="twitter-share-button" data-text="' + tweet_title + '" data-url="' + uri + '" data-count="Horizontal">Tweet</a>';
+                t += '<script type="text/javascript" src="http://platform.twitter.com/widgets.js"><//script>';
+                $('#tweet').empty().append(t);
+            }
+            return uri;
+        }, self);
+
+        self.recordCurrentShortTitle = ko.computed(function () {
+            var words = (checkMQ() == 'mobile') ? 10 : 25;
+
+            var t = '';
+            if((self.results().length > 0) && (self.resultCurrentIndex() > -1) && (self.resultCurrentIndex() < self.results().length))
+                t = self.results()[self.resultCurrentIndex()].Title;
+            return shortenWordsTo(t, words); }, self).extend({ rateLimit: 1 });
+
+
+        self.recordsetTitle = ko.computed(function () {
+            var t = '';
+            if(!IsFieldNullOrEmpty(self.viewItem()))
+                t = self.recordCurrentShortTitle();
+
+            var pt = self.parentTitle[self.parentTitle.length - 1];
+            if(!IsFieldNullOrEmpty(pt))
+                t = pt;
+
+            var t2 = self.makeRecordsStr(self.recordsetRecords(), t);
+            $(document).attr("title", t2);
+            /*@*try{ // fb like button doesn't see js updated page title.. this doesn't seem to fix it
+                FB.XFBML.parse();
+            } catch(ex) {} *@*/
+            return t2;
+        }, self).extend({ rateLimit: 1 });
+
+        ko.computed(function() {
+            var item_id;
+
+            if(this.resultCurrent() && (this.resultCurrent().ID)) {
+                item_id = this.resultCurrent().ID;
+            }
+
+            if(IsFieldNullOrEmpty(item_id)) {
+                return;
+            }
+
+            _fadeMsTags = 0;
+
+            self.resultCurrentTags([]);
+            $.post("@Url.Content("~/Discover/GetUserItemTagsAjax")",
+                    { "lang_id": this.languageID, "item_id": item_id,
+                        "user_id": this.userID },
+                    function(data) {
+                        self.resultCurrentTags(data);
+                        _fadeMsTags = _fadeMsMax;
+                    } );
+
+            self.notesPrivate([]);
+            $.post("@Url.Content("~/Discover/GetNotesForItemAjax")",
+                    { "item_id": item_id, "user_id": this.userID },
+                    function(data) {
+                        self.notesPrivate(data);
+                        _fadeMsTags = _fadeMsMax;
+                    } );
+
+            /*@* including this causes infinte loop...? if(self.notesPublic().length != 0) *@*/
+            self.notesPublic([]);
+
+            $.post("@Url.Content("~/Discover/GetPublicNotesForItemAjax")",
+                    {"item_id": item_id, "approved": true },
+                    function(data) {
+                        self.notesPublic(data);
+                        _fadeMsTags = _fadeMsMax;
+                    } );
+        }, self).extend({ rateLimit: 10 });
+
+        self.searchParamsString = ko.pureComputed(function () {
+            // var params_str = 't+' + encodeURIComponent(self.searchTerm()) + ',rsrs+' + self.recordsetRowStart() + ',rsps+' + self.recordsetPageSize() + ',fa+' + encodeURIComponent(self.facetsAppliedString()) + ',so+' + encodeURIComponent(self.sortsAppliedString()) + ',scids+' + self.searchCollectionIds() + ',pid+' + self.searchParentId() + ',vi+' + self.viewItem();
+            var params_str = 't+' + encodeURIComponent(self.searchTerm()) + ',rsrs+' + self.recordsetRowStart() + ',rsps+' + self.recordsetPageSize() + ',fa+' + encodeURIComponent(self.facetsAppliedString()) + ',so+' + encodeURIComponent(self.sortField()) + ',scids+' + self.searchCollectionIds() + ',pid+' + self.searchParentId() + ',vi+' + self.viewItem();
+            // console.log('searchParamsString read: ' + params_str);
+            return params_str;
+        }).extend({ rateLimit: 100 });
+
+        self.facetsAppliedString = ko.pureComputed({
+            read: function () {
+                // console.log('facetsAppliedString read');
+                var fa = '';
+                for(var i = 0; i < this.facetsApplied().length; i++) {
+                    var f = this.facetsApplied()[i];
+                    fa = fa + f.Field + '^' + f.Facet;
+
+                    if(i < this.facetsApplied().length - 1)
+                        fa = fa + '|';
+                }
+                return fa; // encodeURIComponent(fa);
+            },
+            write: function (value) {
+                if((value) && (value != undefined) && (value.length > 0)) {
+                    // this.facetsApplied.removeAll();
+                    // value = decodeURIComponent(value);
+
+                    var facets_array = value.split('|');
+
+                    var facets = [];
+
+                    for (var i = 0; i < facets_array.length; i++) {
+                        var facet_pair = facets_array[i].split('^');
+                        var facet = { 'Field': facet_pair[0], 'Facet': facet_pair[1]};
+                        facets.push(facet);
+                    }
+
+                    this.facetsApplied(facets);
+                    // console.log('facetsAppliedString write: ' + value);
+                } else {
+                    if(this.facetsApplied().length > 0)
+                        this.facetsApplied.removeAll();// = ko.observableArray([]);
+                    // console.log('facetsAppliedString removedAll');
+                }
+            },
+            owner: self });
+
+
+        @*self.searchParamsString = ko.pureComputed({
+            read: function () {
+                // var params_str = 't+' + encodeURIComponent(self.searchTerm()) + ',rsrs+' + self.recordsetRowStart() + ',rsps+' + self.recordsetPageSize() + ',fa+' + encodeURIComponent(self.facetsAppliedString()) + ',so+' + encodeURIComponent(self.sortsAppliedString()) + ',scids+' + self.searchCollectionIds() + ',pid+' + self.searchParentId() + ',vi+' + self.viewItem();
+                var params_str = 't+' + self.searchTerm() + ',rsrs+' + self.recordsetRowStart() + ',rsps+' + self.recordsetPageSize();
+                console.log('searchParamsString read: ' + params_str);
+                return params_str;
+            },
+            write: function (value) {
+                if(self.searchParamsString() != value) {
+                    console.log('searchParamsString write: ' + value);
+
+                    if(IsFieldNullOrEmpty(value))
+                        value = 't+,rsrs+0,rsps+' + self.recordsetPageSize() + ',fa+,scids+,pid+,vi+'; /**/
+
+                    var params_array = value.split(',');
+                    var params = {};
+                    for(var i = 0; i < params_array.length; i++) {
+                        var param = params_array[i].split('+');
+                        params[param[0]] = param[1];
+                    }
+
+                    if(self.viewItem() != params.vi) {
+                        if(self.searchParentId() != params.pid) {
+                            self.searchParentId(params.pid);
+                        }
+                        // alert('viewItem changed: ' + params.vi);
+                        self.viewItem(params.vi); // not triggering view item
+
+                        if (self.recordChildIds().length > 0) { // if in child view mode need to find which position this child is at so can display the child object navigation and slider correctly
+                            var p = self.recordChildIds.indexOf(params.vi);
+                            if (p != self.recordCurrentPosition())
+                                self.recordCurrentPosition(p)
+                        }
+
+                        if(IsFieldNullOrEmpty(params.vi)) /**/
+                            search();
+                    }
+                    else {
+                        var pchanged = false;
+                        var term_changed = false;
+
+                        var t = decodeURIComponent(params.t);
+                        if(self.searchTerm() != t) {
+                            // opera.postError('searchTerm changed');
+                            self.searchTerm(t);
+                            self.recordsetRowStart(0);
+                            clearSearch(true, true);
+                            pchanged = true;
+                            term_changed = true;
+                        }
+
+                        if(self.recordsetRowStart() != params.rsrs) {
+                            // opera.postError('recordsetRowStart changed');
+                            self.recordsetRowStart(params.rsrs);
+                            pchanged = true;
+                        }
+
+                        if(self.recordsetPageSize() != params.rsps) {
+                            // opera.postError('recordsetPageSize changed');
+                            self.recordsetPageSize(parseInt(params.rsps));
+                            pchanged = true;
+                        }
+
+                        //var fa = decodeURIComponent(params.fa);
+                        //if(self.facetsAppliedString() != fa) {
+                        //    // opera.postError('facetsAppliedString changed, old: ' + self.facetsAppliedString() + ', new: ' + params.fa);
+                        //    self._facetsAppliedString = fa; // had to put this in here as facetsAppliedString() is a dependentObservable and doesn't seem to update like an observable
+                        //    self.facetsAppliedString(fa);
+                        //    pchanged = true;
+                        //}
+
+                        //var so = decodeURIComponent(params.so);
+                        //if(self.sortField() != so) {
+                        //    // opera.postError('sortsAppliedString changed, old: ' + self.sortsAppliedString() + ', new: ' + params.so);
+                        //    self._sortsAppliedString = so; // had to put this in here as sortsAppliedString() is a dependentObservable and doesn't seem to update like an observable
+                        //    self.sortField(so);
+                        //    pchanged = true;
+                        //}
+
+                        //if(self.searchCollectionIds() != params.scids) {
+                        //    // opera.postError('searchCollectionIds changed');
+                        //    self.searchCollectionIds(params.scids);
+                        //    pchanged = true;
+                        //}
+
+                        //if(self.searchParentId() != params.pid) {
+                        //    // opera.postError('searchParentId changed');
+                        //    self.searchParentId(params.pid);
+                        //    pchanged = true;
+                        //}
+
+                        //if(pchanged) {
+                        //    // opera.postError('parameters changed');
+                        //    search(0);
+                        //}
+                    }
+                }
+                else {
+                    // opera.postError('self.searchParamsString.write SKIPPED: ' + value);
+                }
+            },
+            owner: self }).extend({ rateLimit: 100 });*@
+
+        ko.pureComputed(function() {
+            var id = decodeURIComponent(self.viewItem());
+            // alert('viewItem set: ' + id);
+            if(IsFieldNullOrEmpty(id) == false) {
+                self.getRecord(id);
+            }
+        }, self).extend({ throttle: 100 });
+
+        ko.pureComputed(function() {
+            var pid = decodeURIComponent(self.searchParentId());
+            // alert('searchParentId set: ' + pid);
+            if(IsFieldNullOrEmpty(pid) == false) { @* need to make sure if coming straight to a child object from a url that we populate the parent info too, else child navigation will not work *@
+                self.getParentRecord(pid);
+            }
+            else {
+                if(self.recordChildIds().length > 0)
+                    self.recordChildIds.removeAll(); // clear all children, get here from viewing a child object, then going back to a parent
+            }
+        }, self).extend({ throttle: 100 });
+
+        // End: Computed properties
+
+
+        // Start: Routes
+        self.search = function () {
+            console.log('Sammy search(' + self.searchParamsString() + ')');
+            self.disableToolButtons(true);
+
+            self.searchInProgress(false); //
+            self.searchInProgress(true);
+            self.resultCurrentIndex(-1);
+
+            $('#results-options').slideDown(_fadeMsMax, _animType);
+            $('.nav-results-pager').fadeIn(_fadeMsMax, _animType);
+
+            self.clearContent();
+
+            if(self.searchTypeCollection() == false) {
+                self.searchTitle = 'Results';
+            }
+
+            // console.log('search: '  + "term: " + self.searchTerm + ", row_start: " + self.recordsetRowStart  + ", rows: " + self.recordsetPageSize +  ", facets: " + self.facetsAppliedString +  ", sorts: " + self.sortsAppliedString + ", parent_id: " + self._searchParentId + ", collection_ids: " + self.searchCollectionIds);
+
+            self.searchRequest = $.get("@Url.Content("~/Discover/SearchAjax")", { "user_id": self.userID, "term": self.searchTerm(), "rows": self.recordsetPageSize(), "row_start": self.recordsetRowStart(), "sort_orders": self.sortField(), "facet_constraints": self.facetsAppliedString(),"collection_ids": self.searchCollectionIds(), "parent_id": self.searchParentId(), "lang_id": self.languageID },
+                function (data) {
+                    var d = data.SearchResults;
+                    self.applyHighlights(d);
+                    concatenateDisplayFields(d.Results);
+                    self.populateFacetFields(d.FacetFields, d.FacetQueries);
+
+                    // successful requests get here, now update the results
+                    // fade out old results quickly
+                    _oldResults = self.results();
+
+                    for(var k = 0; k < d.Results.length; k++) { // just quickly add a simple index number, to quickly and easily identify result later on, could all be removed and just use ID guid
+                        d.Results[k].Index = k;
+                        d.Results[k].LastRow = (k == d.Results.length - 1);
+                    }
+
+                    self.results.removeAll();
+                    self.results(d.Results);
+                    self.recordsetRecordsOld = self.recordsetRecords();
+                    self.recordsetRecords(d.NumFound);
+                    self.searchRequest = null;
+
+
+                    /*@* work out if we need to add this search to the user's recent searches *@*/
+                    if(!IsFieldNullOrEmpty(d.SearchDisplayName) && (!d.SearchQuery.Empty) && (d.NumFound > 0) && (!d.SearchQuery.Hidden)) {
+                        if(self.savedSearches().length >= _savedSearchesMaxDisplay)
+                            self.savedSearches.pop();
+
+                        var sq = searchQueryDecode(d.SearchQuery);
+                        var add_sq = true;
+
+                        for (var i = 0; i < self.savedSearches().length; i++)
+                        {
+                            if (sq.DisplayName == self.savedSearches()[i].DisplayName)
+                            {
+                                add_sq = false;
+                                self.savedSearches.unshift(self.savedSearches.splice(i, 1)[0]); /*@* this search already exists in the history, bring it to the top of the pile *@*/
+                                break;
+                            }
+                        }
+
+                        if (add_sq) {
+                            self.savedSearches.unshift(sq);
+                        }
+                    }
+                })
+                .error(function() {
+                    console.log("search error");
+                })
+                .complete(function() {
+                    self.searchInProgress(false);
+                });
+        }
+
+        // Client-side routes
+        Sammy(function() {
+            this.get('#:p', function() {
+                console.log('Sammy params: ' + this.params);
+                var sp_str = (this.params.p);
+
+                // break down url params
+                var sp_arr = sp_str.split(',');
+                var ps = {};
+                for(var i = 0; i < sp_arr.length; i++) {
+                    // bit annoying, sammy returns the param names and values separated by a space,
+                    // we have lots of params that can have spaces in, example sammy prams string: t ,rsrs 0,rsps 25,fa DateStartYear^1950 to 1999,so score^desc,scids ,pid
+                    // so when splitting with a space need to take the first value in the array as the param key, and join the remaining members to be the value
+                    var p = sp_arr[i].split(' ');
+
+                    if (p.length > 2) {
+                        var field = p.shift();
+                        ps[field] = p.join(' ');
+                    } else {
+                        ps[p[0]] = p[1];
+                    }
+                }
+
+                if(IsFieldNullOrEmpty(ps.vi) == false) { //  != ps.vi
+                    if(self.viewItem() != ps.vi) {
+                        self.viewItem(ps.vi);
+                    }
+
+                    if(self.searchParentId() != ps.pid) {
+                        // opera.postError('searchParentId changed');
+                        self.searchParentId(ps.pid);
+                    }
+                    // alert('viewItem changed: ' + params.vi);
+                    // self.viewItem(ps.vi);
+
+                    if (self.recordChildIds().length > 0) { // if in child view mode need to find which position this child is at so can display the child object navigation and slider correctly
+                        var pos = self.recordChildIds.indexOf(ps.vi);
+                        if (pos != self.recordCurrentPosition()) {
+                            self.recordCurrentPosition(pos);
+                        }
+                    }
+
+                    @*if(IsFieldNullOrEmpty(ps.vi)) { // trigger a search if view item has been cleared
+                        self.search();
+                    }*@
+                }
+                else {
+
+                    // update KO observables
+
+                    // searchTerm
+                    if(self.searchTerm() != ps.t) {
+                        // console.log('searchTerm changed');
+                        self.searchTerm(ps.t);
+                        self.recordsetRowStart(0);
+                        self.clearSearch(true, true);
+                    }
+
+                    // recordsetRowStart
+                    if(self.recordsetRowStart() != ps.rsrs) {
+                        // console.log('recordsetRowStart changed');
+                        self.recordsetRowStart(parseInt(ps.rsrs));
+                    }
+
+                    // recordsetPageSize
+                    if(self.recordsetPageSize() != ps.rsps) {
+                        // console.log('recordsetPageSize changed');
+                        self.recordsetPageSize(parseInt(ps.rsps));
+                    }
+
+                    // applied facets
+                    if(self.facetsAppliedString() != ps.fa) {
+                        self.facetsAppliedString(ps.fa);
+                    }
+
+                    // sort order
+                    if(self.sortField() != ps.so) {
+                        self.sortField(ps.so);
+                    }
+
+                    // collection ids
+                    if(self.searchCollectionIds() != ps.scids) {
+                        self.searchCollectionIds(ps.scids);
+                    }
+
+                    // parent item id
+                    if(self.searchParentId() != ps.pid) {
+                        self.searchParentId(ps.pid);
+                    }
+
+                    self.search();
+                }
+            });
+
+
+
+            //this.get('#:folder/:mailId', function() {
+            //    self.chosenFolderId(this.params.folder);
+            //    self.chosenFolderData(null);
+            //    $.get("/mail", { mailId: this.params.mailId }, self.chosenMailData);
+            //});
+
+            //this.get('', function() { // causes crazy problems on record set page click for some reason, loses url path and hash totally?!
+            //    console.log('Sammy no params');
+            //    // window.location = 'http://localhost/iNQUIRE.v2/Discover/Search#t+,rsrs+0,rsps+25,fa+,so+score%5Edesc';
+            //    //location.hash = 't+*%3A*,rsrs+0,rsps+' + self.recordsetPageSize() + ',fa+,so+';
+            //    // self.searchTerm('*:*');
+            //    // self.refreshSearch();
+            //    // this.app.runRoute('get', '#t+*%3A*,rsrs+0,rsps+' + self.recordsetPageSize() + ',fa+,so+');
+            //});
+
+        }).run();
+        // End: Routes
+    }
+
+
+    function getFacetBootstrapColumnClass () {
+        var min_col = (_vm.facets().length > 6) ? 2 : 3;
+        var col = Math.max((Math.floor(12 / _vm.facets().length)), min_col);
+        return 'col-xs-12 col-sm-' + (col + 2) + ' col-md-' + (col + 1) + ' col-lg-' + col;
+    }
+
+    var _masonry;
+    var _masonryColumnWidth;
+
+    function updateMasonryLayout(width, reload) {
+        // console.log('updateMasonryLayout()');
+
+        if (!_masonry || reload || (_masonryColumnWidth != width)) {
+            _masonry = $('#results').masonry({
+                itemSelector: '.result',
+                gutter: 20,
+                columnHeight: width
+            });
+            _masonryColumnWidth = width;
+        }
+
+        _masonry.masonry( 'reloadItems' );
+        _masonry.masonry( 'layout' );
+    }
+
+
+    /*ko.bindingHandlers.slideVisible = {
+        init: function (element, valueAccessor) {
+            var value = valueAccessor();
+            value = (value == true);
+            $(element).toggle(ko.utils.unwrapObservable(value));
+        },
+        update: function (element, valueAccessor) {
+            var value = valueAccessor();
+            ko.utils.unwrapObservable(value) ? $(element).slideDown(_fadeMsMax, _animType) : $(element).slideUp(_fadeMsMax, _animType);
+        }
+    };*/
+
+    ko.bindingHandlers.jqSlider = {
+        init: function(element, valueAccessor, allBindingsAccessor) {
+            //initialize the control
+            var options = allBindingsAccessor().jqOptions || {};
+            $(element).slider(options);
+
+            //handle the value changing in the UI
+            ko.utils.registerEventHandler(element, "slidestart", function(event, ui) {
+                _vm.recordCurrentSlideToVisible(true);
+            });
+
+            ko.utils.registerEventHandler(element, "slidestop", function(event, ui) {
+                _vm.recordCurrentSlideToVisible(false);
+                var observable = valueAccessor();
+                if ((_vm.recordChildIds().length > 0) && (observable() != ui.value)) { // only update model value if we are in child viewing mode and if value is different
+                    observable(ui.value);
+                    _vm.recordCurrentSlideTo(ui.value);
+                    _vm.goChild();
+                }
+            });
+
+            ko.utils.registerEventHandler(element, "slide", function(event, ui) {
+                if ((_vm.recordChildIds().length > 0) && (_vm.recordCurrentSlideTo() != ui.value))
+                    _vm.recordCurrentSlideTo(ui.value);
+            });
+
+        },
+        //handle the model value changing
+        update: function(element, valueAccessor) {
+            var value = ko.utils.unwrapObservable(valueAccessor());
+
+            if(value < 0) // can't set slider to -1
+                value = 0;
+
+            if($(element).slider("value") != value)
+                $(element).slider("value", value);
+        }
+    };
+
+    function setupSlider(vmax) {
+        $("#results-children-slider").slider("option", "min", 0).slider("option", "max", vmax - 1); @* could this be data bound somehow... *@
+        $('#results-children-slider-container').css('display', 'inline-block'); // have to re-apply this for some reason
+    }
+
+
+
+    $(function () {
+        _vm = new InquireViewModel();
+        ko.applyBindings(_vm, document.body);
+
+        _vm.searchInProgress.subscribe(function(searching) {
+            if(searching) {
+                $('#loading-spinner').removeClass('spinner').addClass('spinner');
+                $('#loading-modal').modal('show');
+            }
+            else {
+                $('#loading-modal').modal('hide');
+                $('#loading-spinner').removeClass('spinner');
+            }
+        });
+
+        // $(".button-collapse").sideNav();
+        $("#nav-tools").click(function(e) {
+            toggleSidebar(e);
+        });
+
+        $('#but-sequential').attr('checked', _resizeSequential);
+        $('#but-reverse').attr('checked', _resizeReverse);
+
+        addEventHandlers();
+        _vm.setupDiscoveryColumn();
+        setupSidebar();
+        setup3dRotatingNav();
+        _vm.calculateResultSize();
+
+        updateButtonDisplayViewAndStates(_vm.resultsLayout(), true);
+        updateButtonDisplaySizeStates();
+
+        $('#nav-back').click(function () {
+            if(_vm.parentRecordsetRowStart.length > 1) { @* 1st record acts as a buffer so we never end up with an empty array, potentially giving a null reference *@
+                _vm.recordsetRowStart(_vm.parentRecordsetRowStart.pop());
+            }
+            if(_vm.parentTitle.length > 1) {
+                _vm.parentTitle.pop();
+            }
+
+            if (!IsFieldNullOrEmpty(_vm.viewItem())) {
+                _vm.viewItem('');
+            }
+            else if(!IsFieldNullOrEmpty(_vm.searchParentId())) {
+                _vm.searchParentId('');
+            }
+
+            _vm.recordCurrentPosition(-1);
+            _vm.refreshSearch();
+        });
+
+        $("#search-term").keypress(function (e) {
+            if (e.which == 10 || e.which == 13) {
+                _vm.searchTerm($(this).val());
+                _vm.searchClick();
+            }
+        });
+
+        $("#search-go").click(function () {
+            _vm.searchClick();
+        });
+
+        $("#search-clear").click(function () {
+            _vm.clearSearchClick();
+        });
+
+        /*@* don't perform an automatic search if we've come here via a deeplink uri *@*/
+        /*var auto_search = true;
+        var dl = document.URL.split("vi+");
+        if(dl.length > 1)
+            auto_search = IsFieldNullOrEmpty(dl[1]);
+
+        if(auto_search)
+            _vm.search();*/
+    });
+
+    function toggleSidebar (e) {
+        if(e != null)
+        {
+            e.preventDefault();
+        }
+        $([_sidebar, _sidebarTrigger]).toggleClass('nav-is-visible');
+        // _miniNav.toggleClass('hidden');
+    }
+
+    function butToolAddToCollection() {
+        if(!checkAuthenticated())
+            return;
+
+        $('#results-options-export #collection-options').fadeToggle("slow");
+    }
+
+
+    function concatenateDisplayFields(res) {
+        for(var i = 0; i < _concatFields.length; i++) {
+            var f = $.trim(_concatFields[i]);
+
+            if(_colonInFieldNames)
+                f = f.replace(':', '-');
+
+            for(var j = 0; j < res.length; j++) {
+                var r = res[j];
+                if(r.hasOwnProperty(f)) {
+                    var concat = '';
+                    if($.isArray(r[f])) {
+                        for(var k = 0; k < r[f].length; k++) {
+                            if(!IsFieldNullOrEmpty(r[f][k])) {
+                                if(k != 0)
+                                    concat += _concatSeparator;
+                                concat += r[f][k];
+                            }
+                        }
+                    } else {
+                        concat = r[f];
+                    }
+                    r[f + "-display"] = concat;
+                }
+            }
+        }
+    }
+
+    function searchQueryDecode(q) { /*@* from server facet constraint has Field property, and Constraints property, which is a list of constraints, must convert to simple js object with just field and constraint, so might need multiple simple objects to account for the list  *@*/
+        var fcs = new Array();
+        if(!IsFieldNullOrEmpty(q.FacetConstraints)) {
+            for(var i = 0; i < q.FacetConstraints.length; i++) {
+                var fc = q.FacetConstraints[i];
+                for(var j = 0; j < fc.Constraints.length; j++) {
+                    fcs.push( { Field: fc.Field, Facet: fc.Constraints[j] } );
+                }
+            }
+        }
+        q.FacetConstraints = fcs;
+        return q;
+    }
+
+    function createQueryRangeValue (key, value) {
+        return { Key: key.toLowerCase().substring(0, key.length-1), Value: value, Query: '[' + key};
+    }
+
+
+    function dateFormat(ms) {
+        ms = ms.replace('/Date(', '');
+        ms = ms.replace(')/', '');
+        var d = new Date(parseInt(ms));
+        return d.getDate() + '/' + d.getMonth() + '/' + d.getYear();
+    }
+
+
+    function resultChildrenCount(child_nodes) {
+        if(child_nodes)
+            return child_nodes.length;
+        return 0;
+    }
+
+    function resultChildrenStr(child_nodes) {
+        if(child_nodes)
+            return '(' + child_nodes.length + ')';
+        return '';
+    }
+
+    function hasChildNodes(child_nodes) {
+        if(parseInt(child_nodes) > 0)
+            return true;
+
+        return false;
+    }
+
+    function stripHtml(html) {
+        var tmp = document.createElement("DIV");
+        tmp.innerHTML = html;
+        return tmp.textContent||tmp.innerText;
+    }
+
+    function shortenWordsTo (str, max_words) {
+        var words = stripHtml(str).split(' ');
+
+        if (words.length > 0) {
+            if (words.length > max_words) {
+                var start = Math.min(max_words, words.length);
+                words.splice(start, words.length - start, "...");
+            }
+            else {
+                return words.join(' ');
+            }
+        }
+        return words.join(' ');
+    }
+
+
+    function getWords(text, char_limit) {
+        return $.trim((text).replace(/\s+/g," ")).substr(0,char_limit).split(' ');
+    }
+
+    function rebuildText(words, inc_last_word) {
+        text = '';
+
+        var limit = words.length - 1;
+        if(inc_last_word)
+            limit++;
+
+        for(var i = 0; i < limit; i++) /*@* last word may have been split mid word if text is longer than the char limit *@*/
+        {
+            if(text == '')
+                text += words[i];
+            else
+                text += ' ' + words[i];
+        }
+
+        text += _textMore;
+        return text;
+    }
+
+    function resultCharLimitText(text, char_limit, no_html)
+    {
+        var text_no_html = stripHtml(text);
+
+        if (text_no_html.length <= char_limit)
+            return text;
+
+        if(text.length == text_no_html.length) @* no html content *@
+            return rebuildText(getWords(text, char_limit));
+
+        @* note positions of any html markup, stripping already scanned text as we go to speed up subsequent searches,
+         char limit the non_html text, then re-insert the html markup into _this _new text using the stored offset positions and html strings *@
+        var html_pos = [];
+        var html = [];
+        var text;
+
+        if ($.isArray(text)) @* not sure how we could arrive here with this as an array, but leaving in just in case *@
+            text = text[0];
+
+        var p_start = -1;
+        var p_end = -1;
+        @* would be even better to only store html fragments up to the charLimit, but we dont know where _this will occurr until html is removed, so _catch 22 *@
+        for(var i = 0; i < text.length; i++) {
+            p_start = text.indexOf('<');
+
+            if(p_start == -1)
+                break;
+
+            html_pos.push(p_start);
+            text = text.substr(p_start, text.length);
+            p_end = text.indexOf('>');
+
+            if(p_start == -1)
+                break;
+
+            html.push(text.substr(0, p_end + 1));
+            text = text.substr(p_end + 1, text.length);
+        }
+
+        var new_text = rebuildText(getWords(text_no_html, char_limit), (text_no_html.length <= char_limit));
+
+        if (no_html)
+            return new_text;
+
+        @* put back in to the string the html we had to take out above *@
+        var old_pos = 0;
+        for(var j = 0; j < html.length; j++) {
+            var new_pos = old_pos + html_pos[j];
+
+            if(new_pos > new_text.length - _textMore.length) // _textMore.length because we've added three dots (or other) at the end '...'
+                break;
+
+            new_text = new_text.splice(new_pos, 0, html[j]);
+            old_pos += html_pos[j] + html[j].length;
+        }
+
+        return new_text;
+    }
+
+    String.prototype.splice = function( idx, rem, s ) {
+        return (this.slice(0,idx) + s + this.slice(idx + Math.abs(rem)));
+    };
+
+    /* Start: facets 3d nav */
+    function setup3dRotatingNav () {
+        //toggle 3d navigation
+        $('.cd-3d-nav-trigger, #nav-facets').on('click', function(){
+            scrollWindowToTop(0);
+            toggle3dBlock(!$('.cd-main-header').hasClass('nav3d-is-visible'));
+        });
+    }
+
+    function toggle3dBlock(addOrRemove) {
+        if(typeof(addOrRemove)==='undefined') addOrRemove = true;
+        $('.cd-main-header').toggleClass('nav3d-is-visible', addOrRemove);
+        $('.cd-3d-nav-container').toggleClass('nav3d-is-visible', addOrRemove);
+        $('#nav-facets-button').toggleClass('cd-selected', addOrRemove);
+
+    }
+    /* End: facets 3d nav */
+
+
+    /* Start: Sidebar */
+    var _mainContent, _header, _sidebar, _sidebarTrigger, _topNavigation, _searchForm, _resizing; // _accountInfo, _miniNav;
+
+    function setupSidebar() {
+        // add highlight to currently selected recordset page size
+        var page_size_options = $('.recordset-size-option');
+
+        for (var i = 0; i < page_size_options.length; i++) {
+            if (parseInt($(page_size_options[i]).attr('data-page-size')) == _vm.recordsetPageSize()) {
+                $(page_size_options[i]).addClass(_vm.resultsOptionSelector);
+            }
+        }
+
+        // add highlight to currently selected sort order
+        var recordset_sort_options = $('.recordset-sort-option');
+
+        for (var i = 0; i < recordset_sort_options.length; i++) {
+            if ($(recordset_sort_options[i]).attr('data-sort-option') == _vm.sortField()) {
+                $(recordset_sort_options[i]).addClass(_vm.resultsOptionSelector);
+            }
+        }
+
+        //cache DOM elements
+        _mainContent = $('.cd-main-content');
+        _header = $('.cd-main-header'),
+        _subHeader = $('.cd-sub-header'),
+        _sidebar = $('.cd-side-nav'),
+        _sidebarTrigger = $('.cd-nav-trigger'),
+        _topNavigation = $('.cd-top-nav'),
+        _searchForm = $('.cd-search'),
+        // _miniNav = $('#mini-nav');
+
+        //on resize, move search and top nav position according to window width
+    _resizing = false;
+        moveNavigation();
+        $(window).on('resize', function(){
+            if( !_resizing ) {
+                (!window.requestAnimationFrame) ? setTimeout(moveNavigation, 300) : window.requestAnimationFrame(moveNavigation);
+                _resizing = true;
+            }
+        });
+
+        //on window scrolling - fix sidebar nav
+        var scrolling = false;
+        checkScrollbarPosition();
+        $(window).on('scroll', function(){
+            if( !scrolling ) {
+                (!window.requestAnimationFrame) ? setTimeout(checkScrollbarPosition, 300) : window.requestAnimationFrame(checkScrollbarPosition);
+                scrolling = true;
+            }
+        });
+
+        _sidebarTrigger.on('click', function(event){
+            toggleSidebar(event);
+        });
+
+        //click on item and show submenu
+        $('.has-children > a').on('click', function(event){
+            var mq = checkMQ(),
+                selectedItem = $(this);
+            if( mq == 'mobile' || mq == 'tablet' || mq == 'desktop' ) {
+                event.preventDefault();
+                if( selectedItem.parent('li').hasClass('selected')) {
+                    selectedItem.parent('li').removeClass('selected');
+                } else {
+                    //_sidebar.find('.has-children.selected').removeClass('selected');
+                    selectedItem.parent('li').addClass('selected');
+                }
+            }
+        });
+
+        //$(document).on('click', function(event){
+        //    if( !$(event.target).is('.has-children a') ) {
+        //        _sidebar.find('.has-children.selected').removeClass('selected');
+        //    }
+        //});
+
+        //on desktop - differentiate between a user trying to hover over a dropdown item vs trying to navigate into a submenu's contents
+        _sidebar.children('ul').menuAim({
+            activate: function(row) {
+                $(row).addClass('hover');
+            },
+            deactivate: function(row) {
+                $(row).removeClass('hover');
+            },
+            exitMenu: function() {
+                _sidebar.find('.hover').removeClass('hover');
+                return true;
+            },
+            submenuSelector: ".has-children",
+            submenuDirection: "right"
+        });
+    }
+
+    function checkMQ() {
+        //check if mobile or desktop device
+        return window.getComputedStyle(document.querySelector('.cd-main-content'), '::before').getPropertyValue('content').replace(/'/g, "").replace(/"/g, "");
+    }
+
+    function moveNavigation(){
+        var mq = checkMQ();
+
+        if (( mq == 'mobile' ) && _topNavigation.parents('.cd-side-nav').length == 0 ) {
+            detachElements();
+            _topNavigation.appendTo(_subHeader);
+            //_searchForm.removeClass('is-hidden').prependTo(_sidebar);
+
+            if (_sidebarTrigger.hasClass('nav-is-visible')) {
+                // _miniNav.addClass('hidden');
+            }
+            else {
+                // _miniNav.removeClass('hidden');
+            }
+        } else if ((( mq == 'tablet' || mq == 'desktop') ) &&  _topNavigation.parents('.cd-sub-header').length > 0 ) {
+            detachElements();
+            //_searchForm.insertAfter(_header.find('.cd-logo'));
+            // make sure the mini nav is put back on screen in case it was hidden because user was in mobile mode with sidebar
+            // _miniNav.removeClass('hidden');
+            _topNavigation.appendTo(_header.find('.cd-nav'));
+            if (_sidebarTrigger.hasClass('nav-is-visible')) {
+                toggleSidebar(null);
+            }
+        }
+        checkSelected(mq);
+
+        if (_vm.deepZoomVisible()) {
+            _vm.resizeDeepZoom(); // need KO to update bindings, eg title, else result-title will have no text and thus no height
+        }
+
+        _resizing = false;
+    }
+
+    function detachElements() {
+        _topNavigation.detach();
+        //_searchForm.detach();
+    }
+
+    function checkSelected(mq) {
+        //on desktop, remove selected class from items selected on mobile/tablet version
+        //if( mq == 'desktop' ) $('.has-children.selected').removeClass('selected');
+    }
+
+    function checkScrollbarPosition() {
+        var mq = checkMQ();
+
+        if( mq != 'mobile' ) {
+            var sidebarHeight = _sidebar.outerHeight(),
+                windowHeight = $(window).height(),
+                _mainContentHeight = _mainContent.outerHeight(),
+                scrollTop = $(window).scrollTop();
+
+            // ( ( scrollTop + windowHeight > sidebarHeight ) && ( _mainContentHeight - sidebarHeight != 0 ) ) ? _sidebar.addClass('is-fixed').css('bottom', 0) : _sidebar.removeClass('is-fixed').attr('style', '');
+        }
+        scrolling = false;
+    }
+    /* End: Sidebar */
+
+
+    function scrollWindowToTop(ms) {
+        $('html, body').stop().animate({
+            'scrollTop': 0
+        }, ms, 'swing');
+    }
+
+    function addEventHandlers() {
+        //addMouseOverHighlight();
+        _vm.addResultClick();
+
+        if (_isAndroidOriOS == false) {
+            $("#results").delegate(_vm.resultsSelector, 'dblclick', _vm.resultDoubleClick);
+        }
+
+        $('#nav-top').click(function () {
+            scrollWindowToTop(900);
+        });
+
+
+        $("#results").delegate('.but-view-children', 'click', _vm.resultChildNodeClick);
+
+        $("#facets-holder").delegate('.facet', 'click', _vm.facetApply);
+        $("#facets-holder").delegate('.facet-remove', 'click', _vm.facetRemove);
+
+        $(".cd-side-nav").delegate('.recordset-sort-option', 'click', function () {
+            $('.recordset-sort-option').removeClass(_vm.resultsOptionSelector);
+            _vm.sortField($(this).attr('data-sort-option'));
+            $(this).addClass(_vm.resultsOptionSelector);
+            _vm.refreshSearch();
+        });
+
+        $(".cd-side-nav").delegate('.recordset-size-option', 'click', function () {
+            $('.recordset-size-option').removeClass(_vm.resultsOptionSelector);
+            _vm.recordsetPageSize(parseInt($(this).attr('data-page-size')));
+            $(this).addClass(_vm.resultsOptionSelector);
+            _vm.resetRecordsetPageNavigation();
+            _vm.refreshSearch();
+        });
+
+        $('#tags #tag-new').click(_vm.tagNew);
+        $("#tags").delegate('#tag-list .tag-rem', 'click', _vm.tagRemove);
+
+        $("#saved-searches").delegate('.search-del', 'click', _vm.searchDelete);
+        $("#saved-searches").delegate('#saved-search-list .saved-search', 'click', _vm.savedSearchClick);
+
+        $('#notes #note-new, #comments #comment-new').click(_vm.noteNew);
+        $("#note-list, #comment-list").delegate('.note-rem', 'click', _vm.noteDelete);
+
+        $(".nav-results-pager").delegate('.recordset-page', 'click', _vm.recordsetPageClick);
+
+        $('#nav-prev').click(function () { _vm.recordCurrentPosition(_vm.recordCurrentPosition() - 1); _vm.goChild(); });
+        $('#nav-next').click(function () { _vm.recordCurrentPosition(_vm.recordCurrentPosition() + 1); _vm.goChild(); });
+
+        $("#collections").delegate('.but-collection-email', 'click', function() { _vm.butEmailSendClick($(this).attr('data-id')); });
+
+        $("#collection-options").delegate('.collection-option', 'click', function() {
+            var col_id = $(this).attr('data-id');
+            var r = _vm.addItemToCollectionDb(_vm.makeCollectionSelector(col_id), _vm.resultCurrent().Title, _vm.resultCurrent().ID);
+        });
+
+        $("#collections").delegate('.but-collection-download', 'click', function() { _vm.butDownloadClick($(this).attr('data-id')); });
+        $("#collections").delegate('.but-collection-del', 'click', _vm.collectionDelete );
+        $("#collections").delegate('.but-collection-rename', 'click', _vm.collectionRename);
+        $("#collections").delegate('.but-collection-del-item', 'click', _vm.collectionItemDelete);
+
+        _vm.disableToolButtons(true);
+
+        $("#video-overlay").bind('onBeforeClose', function () { stopVideo(); });
+        $("#video-overlay").bind('onClose', function () { clearMedia('#video-player', '#video-overlay'); });
+        $("#video-overlay").bind('onLoad', function () { playVideo(); });
+
+        $("#audio-overlay").bind('onBeforeClose', function () { stopAudio(); });
+        $("#audio-overlay").bind('onClose', function () { clearMedia('#audio-player', '#audio-overlay'); });
+        $("#audio-overlay").bind('onLoad', function () { playAudio(); });
+
+
+
+        $('#tags #input-tags').focus(function () { $(this).attr('value', ''); });
+
+        $('#but-small').click(function () { _vm.resizeResults('-sm', _resizeSequential, _resizeReverse, false); updateButtonDisplaySizeStates('-sm'); });
+        $('#but-med').click(function () { _vm.resizeResults('-m', _resizeSequential, _resizeReverse, false); updateButtonDisplaySizeStates('-m'); });
+        $('#but-large').click(function () { _vm.resizeResults('-xl', _resizeSequential, _resizeReverse, false); updateButtonDisplaySizeStates('-xl'); });
+
+        $('#but-sequential').change(function () { _resizeSequential = $(this).attr('checked'); });
+        $('#but-reverse').change(function () { _resizeReverse = $(this).attr('checked'); });
+
+        //        $('.results_layout').click(function () {
+        //            var layout = $(this).attr('id').replace('but-', '');
+        //
+        //            if(_resultsLayout != layout) {
+        //            _resultsLayout = layout
+        //            search();
+        //            }
+        //        });
+
+        $('#but-masonry').click(function () {
+            var layout = $(this).attr('id').replace('but-', '');
+            updateButtonDisplayViewAndStates(layout);
+        });
+
+        $('#but-grid').click(function () {
+            var layout = $(this).attr('id').replace('but-', '');
+            updateButtonDisplayViewAndStates(layout);
+        });
+
+        //$('#but-list-simple').click(function () {
+        //    var layout = $(this).attr('id').replace('but-', '');
+        //    updateButtonDisplayViewAndStates(layout);
+        //});
+
+        $('#but-list-image').click(function () {
+            var layout = $(this).attr('id').replace('but-', '');
+            updateButtonDisplayViewAndStates(layout);
+        });
+
+        //$('#saved-search-header').click(function () {
+        //    $('#saved-searches').slideToggle(_fadeMsMax, _animType);
+
+        //    if($('#saved-search-arrow').attr('class') == 'arrow-holder') {
+        //        $('#saved-search-arrow').attr('class', 'arrow-holder-active');
+        //    }
+        //    else {
+        //        $('#saved-search-arrow').attr('class', 'arrow-holder');
+        //    }
+        //});
+
+        //$('#narrow-search-header').click(function () {
+        //    $('#facets-holder').slideToggle("slow");
+
+        //    if($('#narrow-search-arrow').attr('class') == 'arrow-holder') {
+        //        $('#narrow-search-arrow').attr('class', 'arrow-holder-active');
+        //    }
+        //    else {
+        //        $('#narrow-search-arrow').attr('class', 'arrow-holder');
+        //    }
+        //});
+
+        $("#search-facets").delegate('.facet-header', 'click', facetCollapse);
+
+
+        $('#collection-header').click(function () {
+            $('#collections').slideToggle(_fadeMsMax, _animType);
+
+            if($('#collection-arrow').attr('class') == 'arrow-holder') {
+                $('#collection-arrow').attr('class', 'arrow-holder-active');
+            }
+            else {
+                $('#collection-arrow').attr('class', 'arrow-holder');
+            }
+        });
+
+        $('#collection-settings').click(function (e) {
+            // e.stopPropagation();
+            // $('#collection-settings-options').fadeToggle("slow");
+        });
+
+        $('#but-email-send').click(function () { _vm.emailSend(); });
+        $('#but-download').click(function () { _vm.download(); });
+    }
+
+    function facetCollapse() {
+        $(this).parent().find( ".facets" ).slideToggle(_fadeMsMax, _animType);
+    }
+
+    function updateButtonDisplayViewAndStates(layout, force)
+    {
+        if(_vm.resultsLayout() != layout || force) {
+
+            _vm.maxResultImgW(0);
+
+            if (_vm.resultsLayout() != layout) {
+                _vm.resultsLayout(layout); // this will force the results re-render with the new template
+
+                $(_vm.resultsSelector).each(function(index) {
+                    _vm.afterRenderResult(this, index);
+
+                    if (_vm.resultsLayout() == 'masonry') {
+                        if (index == _vm.results.length - 1) {
+                            updateMasonryLayout(_vm.resultSizePx.ImageWidth, true);
+                        }
+                    }
+                });
+
+                if (layout.indexOf('masonry') == -1) {
+                    $('#results').css('height', 'auto'); // masonry sets an absolute height for the results element, so need to set back to auto so it expands to the size needed for the result elements in other view modes
+                }
+            }
+
+            // set the correct button states
+            $('#but-masonry').removeClass(_vm.resultsOptionSelector);
+            //$('#but-grid').attr('class', '');
+            //$('#but-list-simple').attr('class', '');
+            $('#but-list-image').removeClass(_vm.resultsOptionSelector);
+            $('#results-options-size').css({ 'display': 'inline'});
+
+            switch(layout)
+            {
+                case 'masonry':
+                    $('#but-masonry').addClass(_vm.resultsOptionSelector);
+                    break;
+                    //case 'grid':
+                    //    $('#but-grid').attr('class', 'active');
+                    //    break;
+                    //case 'list-simple':
+                    //    $('#but-list-simple').attr('class', 'active');
+                    //    $('#results-options-size').css({ 'display': 'none'});
+                    //    break;
+                case 'list-image':
+                    $('#but-list-image').addClass(_vm.resultsOptionSelector);
+                    break;
+            }
+        }
+    }
+
+    function updateButtonDisplaySizeStates(button)
+    {
+        if (!button) {
+            button = _vm.resultSize();
+        }
+
+        $('#but-small').removeClass(_vm.resultsOptionSelector);
+        $('#but-med').removeClass(_vm.resultsOptionSelector);
+        $('#but-large').removeClass(_vm.resultsOptionSelector);
+
+        switch(button)
+        {
+            case '-sm':
+                $('#but-small').removeClass(_vm.resultsOptionSelector).addClass( _vm.resultsOptionSelector );
+                break;
+            case '-m':
+                $('#but-med').removeClass(_vm.resultsOptionSelector).addClass( _vm.resultsOptionSelector );
+                break;
+            case '-xl':
+                $('#but-large').removeClass(_vm.resultsOptionSelector).addClass( _vm.resultsOptionSelector );
+                break;
+        }
+    }
+
+
+    function selectResult(result) {
+        _vm.highlightRemoveAll();
+        _vm.highlightAdd(result);
+
+        // updateMetadata(result);
+        var di = $(result).attr('data-index');
+        if (_vm.resultCurrentIndex() != di) {
+            _vm.resultCurrentIndex(di); // update the binding values by updating the observable
+        }
+
+        if (_gvm.fbLoaded()) { // might not be loaded yet (as async load)
+            FB.XFBML.parse(); // fb like buttons needs updated like refs for the newly selected item
+        }
+
+        _vm.enableToolButtons();
+    }
+
+    function fadeOutAndSlideUp(elem, callback) {
+        $(elem).animate({opacity:0.01}, _fadeMsMax, _animType, function() { $(elem).slideUp(_fadeMsMax, _animType, callback )});
+    }
+
+    @*function updateMetadata(result) {
+        // Could make this an ajax request(id specific search) for the one item, returning the full data set.
+        // The main default search could then just return item summaries (ie title, image, author) so less data
+        // coming back in ajax request, could have a new search param "full" to return all data, else just title, image, author fields
+        var di = $(result).attr('data-index');
+        var metadata_fields = $('#metadata-fields .metadata-field-text');
+        $(metadata_fields).each(function (index, field) {
+            $(field).fadeOut(_fadeMsOut, _animType, function() {
+                // var parent = $(field).parents('.metadata-field');
+                if ((index == 0) && (_vm.resultCurrentIndex() != di)) {
+                    _vm.resultCurrentIndex(di); // update the binding values by updating the observable
+                }
+                $(field).fadeOut(0, _animType, function() { $(field).fadeIn(_fadeMsOut, _animType); }); // have to re-fade out for some reason, opacity must get reset on template update
+            });
+        });
+    }*@
+
+    function capitaliseFirstLetter(string) {
+        return string.charAt(0).toUpperCase() + string.slice(1);
+    }
+
+
+    function showMedia(fn, w, h) {
+        if((w == null) || (w == 0))
+            w = 640;
+
+        if((h == null) || (h == 0))
+            h = 480;
+
+        var f = encodeURIComponent(fn);
+        var f_thumb = f.substr(0, f.lastIndexOf('.')) + '.jpg';
+        var img_src = _mediaDirectory + f_thumb + '.ashx?maxwidth=' + w + '&amp;maxheight=' + h;
+
+        var o;
+
+        if(fileIsVideo(fn))
+            o = showVideo(fn, w, h, img_src);
+        else if (fileIsAudio(fn))
+            o = showAudio(fn, w, h, img_src);
+        else
+            return;
+
+        if(o) {
+            $(o).removeData('overlay');
+            $(o).overlay({ effect: 'apple', mask: { color: '#000' }, closeOnClick: false, load: true });
+            // $(o).data("overlay").load();
+        }
+    }
+
+    function showVideo(fn, w, h, img_src) {
+        var o = $("#video-overlay").get(0);
+
+        if($(o).css('display') != 'none') {
+            $(o).overlay().close();
+            return;
+        }
+
+        clearMedia('#video-player', '#video-overlay');
+
+        $(o).append('<video id="video-player" controls="controls" preload="metadata">Your browser does not support the video tag.</video>');
+
+        var p = $('#video-player').get(0);
+        $(p).attr('poster', img_src);
+        p.insertBefore(createSource(makeOGV(fn), 'video/ogg'), p.firstChild);
+        p.insertBefore(createSource(makeMP4(fn), 'video/mp4'), p.firstChild.nextSibling);
+        p.load();
+
+        var width = w + 'px';
+        var height = h + 'px';
+
+        $(p).css('width', width);
+        $(o).css('width', width);
+
+        $(p).css('height', height);
+        $(o).css('height', height);
+
+        return o;
+    }
+
+    function showAudio(fn, w, h, img_src) {
+        var o = $("#audio-overlay").get(0);
+
+        if($(o).css('display') != 'none') {
+            $(o).overlay().close();
+            return;
+        }
+
+        clearMedia('#audio-player', '#audio-overlay');
+
+        $(o).append('<img id="audio_image" alt="Audio Image" src="" /><audio id="audio-player" controls="controls">Your browser does not support the audio tag.</audio>');
+
+        var img = $('#audio_image').get(0);
+        $(img).attr('src', img_src);
+
+        var p = $('#audio-player').get(0);
+        p.insertBefore(createSource(makeOGA(fn), 'audio/ogg'), p.firstChild);
+        p.insertBefore(createSource(makeMP3(fn), 'audio/mpeg'), p.firstChild.nextSibling);
+
+        var width = w + 'px';
+        var height = h + 'px';
+
+        $(p).css('width', width);
+        $(o).css('width', width);
+        $(img).css('width', width);
+
+        $(o).css('height', height);
+        $(img).css('height', height);
+
+        return o;
+    }
+
+    function createSource(src, type) {
+        var source = document.createElement('source');
+        source.src = src;
+        source.type = type;
+        return source;
+    }
+
+    function playVideo() {
+        $('#video-player').get(0).play();
+    }
+
+    function stopVideo() {
+        $('#video-player').get(0).pause();
+    }
+
+    function playAudio() {
+        $('#audio-player').get(0).play();
+    }
+
+    function stopAudio() {
+        $('#audio-player').get(0).pause();
+    }
+
+    function clearMedia(p_selector, o_selector) {
+        var p = $(p_selector).get(0);
+
+        if(p) {
+            p.pause();
+            var src = $(p).children(); //@* set src for <source> tags to '', should abort streaming *@//
+
+            $(src).each(function(index) {
+                $(this).attr('src', '');
+            });
+
+            $(p).empty();
+        }
+        $(o_selector).empty();
+    }
+
+    function fileIsVideo(filename) {
+        return checkFileExt(filename, _videoFileExt);
+    }
+
+    function fileIsAudio(filename) {
+        return checkFileExt(filename, _audioFileExt);
+    }
+
+    function checkFileExt(filename, ext_array) {
+        if (IsFieldNullOrEmpty(filename) || IsFieldNullOrEmpty(ext_array))
+            return;
+
+        while (filename.indexOf("\\") != -1)
+            file = filename.slice(filename.indexOf("\\") + 1);
+        ext = filename.slice(filename.lastIndexOf(".")).toLowerCase();
+
+        for (var i = 0; i < ext_array.length; i++) {
+            if (ext_array[i] == ext) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    function makeHTML5MediaName(filename, ext) {
+        return '@Url.Content("~/Media/Crimea/")' + filename.substr(0, filename.lastIndexOf('.')) + ext;
+    }
+
+    function makeWebM(filename) {
+        return makeHTML5MediaName(filename, '.webm');
+    }
+
+    function makeMP4(filename) {
+        return makeHTML5MediaName(filename, '.mp4');
+    }
+
+    function makeOGV(filename) {
+        return makeHTML5MediaName(filename, '.ogv');
+    }
+
+    function makeOGA(filename) {
+        return makeHTML5MediaName(filename, '.oga');
+    }
+
+    function makeMP3(filename) {
+        return makeHTML5MediaName(filename, '.mp3');
+    }
+
+    /*self.toggleFacets = function () {
+        $('#search-facets').css('height', '200px');
+    }*/
+
+    /*var _search_facets_h = 0;
+
+    $('#search-facets').on('show.bs.collapse', function () {
+        _search_facets_h = $( window ).height() - $('#top-strap').height();
+        $('body').css('overflow-y', 'hidden');
+        $('#search-facets').css('overflow-y', 'hidden');
+    })
+
+    $('#search-facets').on('shown.bs.collapse', function () {
+        $('#search-facets').css('height', _search_facets_h + 'px');
+        $('#search-facets').css('overflow-y', 'auto');
+    })
+
+    $('#search-facets').on('hide.bs.collapse', function () {
+        $('body').css('overflow-y', 'hidden');
+        $('#search-facets').css('overflow-y', 'hidden');
+    })
+
+    $('#search-facets').on('hidden.bs.collapse', function () {
+        $('body').css('overflow-y', 'auto');
+    })
+
+    $(window).on('resize', function(){
+        @* collpase the facets dropdown, as it's size won't be correct, especially if going from portrait to landscape
+                 (eg ipad) so use must click button again to re-trigger the dropdown and hence the calculation for the height *@
+    $('#search-facets').collapse('hide');
+    });
+    */
+
+    @*// redundant
+    //function fadeInResults(select_first) {
+    //    // alert('fadeInResults(): ' + $(_vm.resultsSelector).length);
+    //    var r = $(_vm.resultsSelector).get(0);
+    //    var f = null;
+    //    if(select_first)
+    //        f = function() { $(r).trigger('click'); };
+    //    fadeInResult(r, 0, f);
+    //}
+
+    //function fadeInResult(result, index, fn_after_last) {
+    //    var next = index + 1;
+    //    var f = null;
+
+    //    if (next < _vm.results().length) {
+    //        var r_next = $(_vm.resultsSelector).get(next);
+    //        f = function () { fadeInResult(r_next, next, fn_after_last); };
+    //    } else {
+    //        f = fn_after_last;
+    //    }
+
+    //    // console.log('fadeInResult: result: ' + result + ', index: ' + index + ', f: ' + f);
+    //    $(result).fadeIn(_fadeMs, _animType, f);
+    //}
+
+    //function fadeOutOldResult(old_result, index) {
+    //    var next = index - 1;
+    //    var f = null;
+
+    //    if (next > -1) {
+    //        f = function () { fadeOutOldResult($(_oldResults).get(next), next); };
+    //    }
+    //    else {
+    //        f = function () {
+    //            makeResults();
+    //        }; // done fading old results, make the new ones
+    //    }
+
+    //    $(old_result).fadeOut(_fadeMs, _animType, f);
+    //}
+
+    //function calculateFadeMs(item_count, fade_out) {
+    //    var fade_ms = _fadeMsTotal / item_count;
+
+    //    if (fade_out) {
+    //        fade_ms = Math.min(fade_ms, _fadeMsOut);
+
+    //    }
+    //    else {
+    //        fade_ms = Math.min(fade_ms, _fadeMsMax);
+    //    }
+    //    return fade_ms;
+    //}*@
+</script>

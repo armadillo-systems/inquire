@@ -1,0 +1,31 @@
+/* the overlayed element */
+#video-overlay, #audio-overlay {
+	
+	/* initially overlay is hidden */
+	display:none;
+	
+	/* growing background image */
+		background-image:url(images/transparent.png);		
+		color:#fff;
+	
+	/* 
+		width after the growing animation finishes
+		height is automatically calculated
+	
+	width:640px;*/
+	
+	/* some padding to layout nested elements nicely  */
+	padding:35px;
+
+	/* a little styling */	
+	font-size:11px;
+}
+
+/* default close button positioned on upper right corner */
+#video-overlay .close, #audio-overlay .close {
+	background-image:url(images/close.png);
+	position:absolute; right:5px; top:5px;
+	cursor:pointer;
+	height:35px;
+	width:35px;
+}

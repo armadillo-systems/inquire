@@ -1,0 +1,42 @@
+﻿[
+  {
+    "outputFile": "Content/Site.css",
+    "inputFile": "Content/Site.scss"
+  },
+  {
+    "outputFile": "Content/UserDefined2.css",
+    "inputFile": "Content/UserDefined2.scss"
+  },
+  {
+    "outputFile": "Content/Site2.css",
+    "inputFile": "Content/Site2.scss"
+  },
+  {
+    "outputFile": "Content/simple-sidebar.css",
+    "inputFile": "Content/simple-sidebar.scss"
+  },
+  {
+    "outputFile": "Content/styles.css",
+    "inputFile": "Content/styles.scss"
+  },
+  {
+    "outputFile": "Content/bourbon/_bourbon.css",
+    "inputFile": "Content/bourbon/_bourbon.scss"
+  },
+  {
+    "outputFile": "Content/bourbon/settings/_prefixer.css",
+    "inputFile": "Content/bourbon/settings/_prefixer.scss"
+  },
+  {
+    "outputFile": "Content/cd-rsn.css",
+    "inputFile": "Content/cd-rsn.scss"
+  },
+  {
+    "outputFile": "Content/cd-3dnav.css",
+    "inputFile": "Content/cd-3dnav.scss"
+  },
+  {
+    "outputFile": "Content/_cd-header-properties.css",
+    "inputFile": "Content/_cd-header-properties.scss"
+  }
+]

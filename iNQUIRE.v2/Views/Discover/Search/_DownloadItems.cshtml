@@ -1,0 +1,57 @@
+<div id="download-modal" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-sm">
+
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Download items</h4>
+            </div>
+            <div class="modal-body">
+
+                <p>Select which elements to export:</p>
+                <div id="download-items-options">
+                    <div class="download-items-asset">
+                        <label for="download-item-asset-checkbox">Asset file</label>
+                        <input id="download-item-asset-checkbox" type="checkbox" checked="checked" />
+                    </div>
+                    <div class="download-items-format-xml">
+                        <label for="download-item-format-xml-checkbox">Xml format</label>
+                        <input id="download-item-format-xml-checkbox" type="checkbox" checked="checked" />
+                    </div>
+                    <div class="download-items-format-ris">
+                        <label for="download-item-format-ris-checkbox">RIS format</label>
+                        <input id="download-item-format-ris-checkbox" type="checkbox" checked="checked" />
+                    </div>
+
+                    @*<div class="download-items-basic-metadata">
+                    <label>Basic Metadata</label>
+                    <input id="download-item-basic-metadata-checkbox" type="checkbox" />
+                    </div>
+                    <div class="download-items-full-metadata">
+                        <label>Full Metadata</label>
+                        <input id="download-item-full-metadata-checkbox" type="checkbox" />
+                    </div>
+                    <div class="download-items-notes">
+                        <label>Notes</label>
+                        <input id="download-item-notes-checkbox" type="checkbox" />
+                    </div>
+                    <div class="download-items-tags">
+                        <label>Tags</label>
+                        <input id="download-item-tags-checkbox" type="checkbox" />
+                    </div>
+                    <div class="download-items-comments">
+                        <label>Comments</label>
+                        <input id="download-item-comments-checkbox" type="checkbox" />
+                    </div>*@
+                </div>
+
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal" id="download-items-cancel-button">Cancel</button>
+                <button type="button" class="btn btn-default" id="but-download">Download</button>
+            </div>
+        </div>
+
+    </div>
+</div>

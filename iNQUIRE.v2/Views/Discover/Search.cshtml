@@ -1,0 +1,74 @@
+﻿@Html.Partial("~/Views/Discover/Search/_SearchJS.cshtml")
+
+@Html.Partial("~/Views/Discover/_DeepZoom.cshtml")
+
+@Html.Partial("~/Views/Discover/Search/_Templates.cshtml")
+
+@Html.Partial("~/Views/Discover/Search/_ResultsPager.cshtml")
+
+<div id="results-title-wrapper" data-bind="visible: backButton">
+    <div id="results-title" data-bind='html: recordCurrentShortTitle'></div>
+
+    <div id="results-children" data-bind="visible: childNavigation" style="display: none;">
+        <nav id="results-children-nav">
+            <div id="results-children-pos">
+                <span data-bind="visible: childPrevAvailable()"><a href="" onclick="return false;" id="nav-prev"><span class="glyphicon glyphicon-arrow-left"></span><span class="nav-desc"> Prev</span></a></span>
+                <span>Item</span>
+                <span data-bind="visible: childAvailable, text: recordCurrentPositionStr"></span>
+                <span data-bind="visible: childAvailable"> / </span>
+                <span data-bind="visible: childAvailable, text: recordChildIds().length"></span>
+                <span data-bind="visible: childNextAvailable()"><a href="" onclick="return false;" id="nav-next"><span class="nav-desc">Next </span><span class="glyphicon glyphicon-arrow-right"></span></a></span>
+            </div>
+
+            <div id="results-children-slider-container" data-bind="visible: childAvailable"> <!--  style="width: 33%; margin-left:auto; margin-right:auto;" -->
+                @*<div style="float: right; margin-right: 20px;" id="results-children-nav-next" data-bind="visible: childNextAvailable"><a></a></div>*@
+                <div id="results-children-slider" data-bind="jqSlider: recordCurrentPosition, jqOptions: { step: 1, animate: true, min: 0, max: 0 }"></div>
+                <!-- style="width: 50%; float: right; margin-right: 20px;" -->
+                @*<div style="float: right; margin-right: 20px;" id="results-children-nav-prev" data-bind="visible: childPrevAvailable"><a></a></div>*@
+            </div>
+        </nav>
+    </div>
+</div>
+
+<div id="results-container">    
+    <section id="results" data-bind="visible: !deepZoomVisible(), template: { name: resultsLayoutMode, foreach: results, afterAdd: afterRenderResult }"></section>
+    <section id="dz-wrapper" data-bind="if: deepZoomVisible"></section>
+</div>
+
+@Html.Partial("~/Views/Discover/Search/_ResultsPager.cshtml")
+
+
+<script>
+    var _debug = true;
+
+    if (_debug) {
+        $('#title-recordset').css('background', 'pink');
+        $('#results-options').css('background', 'cyan');
+        $('#sort-by').css('background', '#aaa');
+        //$('#recordset-size').css('background', '#ccc');
+        //$('#results-options-layout').css('background', '#cca');
+        //$('#results-size').css('background', '#acc');
+        $('#results-toolbar').css('background', '#cac');
+        $('#results-child-navigation').css('background', 'orange');
+        //$('#results-container').css('background', 'yellow');
+    }
+</script>
+
+
+<div id="video-overlay"></div>
+
+<div id="audio-overlay"></div>
+
+@Html.Partial("~/Views/Discover/Search/_ResultTemplates.cshtml")
+
+<div id="loading-modal" class="modal fade" data-backdrop="static" data-keyboard="false" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div id="loading-spinner"></div>
+    </div>
+</div>
+
+@*<div id="fade-overlay" style="display: none; width: 100%; height: 100%; background: black; top: 0px; position: absolute; z-index:1;
+        zoom: 1;
+        filter: alpha(opacity=30);
+        opacity: 0.3;">
+</div>*@

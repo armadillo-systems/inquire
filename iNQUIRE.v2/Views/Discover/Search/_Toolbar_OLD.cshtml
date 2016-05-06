@@ -1,0 +1,99 @@
+﻿<!-- start: results options and tools -->
+<div id="toolbar" class="row collapse navbar-collapse"> <!--  collapse navbar-collapse -->
+    <div id="title-recordset" class="row">
+        <div><!--- data-bind="attr: { 'class': (backButton == false) ? 'col-xs-12' : 'col-xs-5'}">-->
+            <!--<span data-bind="text: (backButton == false)"></span> -->
+            <nav id="results-children-back" data-bind="visible: backButton">
+                <button type="button" class="btn btn-default but-back"><i class="fa fa-chevron-left"></i> <b>Back</b></button>
+            </nav>
+            <div id="results-title" data-bind="text: recordsetTitle()"></div>
+        </div>
+
+        <div class="col-xs-7">
+            <nav id="nav-results-pager" class="text-right">
+                <ul class="pagination margin-none" data-bind="template: { name: 'results-page-template', foreach: recordsetPages }"></ul>
+            </nav>
+        </div>
+    </div>
+
+    <div id="results-options" class="row row-no-padding">
+        <div id="sort-by" class="col-xs-5 col-sm-3 col-lg-3 form-group" style="display: inline !important;">
+            <label class="control-label" style="display: inline; font-size: 80%;">Sort</label>
+            <select id="recordset-sort-options" style="display: inline;" class="drop-down form-control no-h-padding" data-bind="options: sortFields, optionsText: 'DisplayField', optionsValue: 'OptionValue', value: sortField"></select>
+        </div>
+
+        <div id="recordset-size" class="col-xs-4 col-sm-2 col-lg-2 form-group">
+            <label class="control-label" style="display: inline; font-size: 80%;">D</label>
+            <select id="recordset-page-size" class="drop-down form-control no-h-padding" data-bind="options: recordsetPageSizes, value: recordsetPageSize"></select>
+        </div>
+
+        <div id="results-options-layout" class="col-xs-2 col-sm-1 col-lg-2 btn-group" role="group">
+            <!--<a id="but-masonry" class="active" title="Masonry grid view">MIG</a> |
+            <!--<a id="but-grid" class="active" title="Grid view">IG</a> |
+            <a id="but-list-image" class="" title="List and image view">IL</a> -->
+            <button type="button" class="btn btn-default" id="but-small"><i id="but-small-text" class="fa fa-th-large"></i></button>
+            <!--<button type="button" class="btn btn-default" id="but-med"><i id="but-med-text" class="fa fa-th-list"></i></button>-->
+        </div>
+
+        <div id="results-size" class="col-xs-4 col-sm-2 col-lg-2 btn-group" role="group">
+            <button type="button" class="btn btn-default" id="but-small"><i id="but-small-text" class="fa fa-square"></i></button>
+            <button type="button" class="btn btn-default" id="but-med"><i id="but-med-text" class="fa fa-square"></i></button>
+            <button type="button" class="btn btn-default" id="but-large"><i id="but-large-text" class="fa fa-square"></i></button>
+        </div>
+
+        <div id="results-toolbar" class="col-xs-8 col-sm-4 col-lg-3 btn-group" role="group">
+            <button type="button" class="but-tool-open btn btn-default"><i class="fa fa-search-plus"></i></button>
+
+            <div class="btn-group" role="group">
+                <button type="button" class="btn btn-default dropdown-toggle but-tool-add-to-collection" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fa fa-plus"></i>
+                    <span class="caret"></span>
+                </button>
+                <ul id="collection-options" class="dropdown-menu" data-bind="template: { name: 'but-tool-add-to-collection-options-template', foreach: collections }"></ul>
+            </div>
+
+            <div class="btn-group" role="group">
+                <button type="button" class="btn btn-default dropdown-toggle but-tool-facebook" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class=" fa fa-facebook"></i>
+                    <span class="caret"></span>
+                </button>
+                <div class="dropdown-menu">
+                    @if (ViewBag.Facebook)
+                    {
+                        <div class="fb-login-button" data-max-rows="1" data-size="medium" data-show-faces="false" data-auto-logout-link="true"></div>
+                    }
+                </div>
+            </div>
+
+            <button type="button" class="but-tool-email btn btn-default"><i class="fa fa-envelope"></i></button>
+            <button type="button" class="but-tool-download btn btn-default"><i class="fa fa-download"></i></button>
+            <button type="button" class="but-tool-print btn btn-default"><i class="fa fa-print"></i></button>
+        </div>
+
+        <!--<div class="col-xs-6 col-sm-4 col-lg-3 btn-group">
+            <nav id="nav-results-pager" class="text-right">
+                <ul class="pagination margin-none" data-bind="template: { name: 'results-page-template', foreach: recordsetPages }"></ul>
+            </nav>
+        </div>-->
+    </div>
+
+
+    <div id="results-child-navigation" class="row">
+        <div id="results-children" data-bind="visible: childNavigation">
+            <nav id="results-children-nav">
+                <div id="results-children-pos">
+                    <span data-bind="visible: childAvailable, text: recordCurrentPositionStr"></span>
+                    <span data-bind="visible: childAvailable"> / </span>
+                    <span data-bind="visible: childAvailable, text: recordChildIds().length"></span>
+                </div>
+
+                <div data-bind="visible: childAvailable" style="width: 33%; margin-left:auto; margin-right:auto; float: right;">
+                    <div style="float: right; margin-right: 20px;" id="results-children-nav-next" data-bind="visible: childNextAvailable"><a></a></div>
+                    <div style="width: 50%; float: right; margin-right: 20px;" id="results-children-slider" data-bind="jqSlider: recordCurrentPosition, jqOptions: { step: 1, animate: true, min: 0, max: 0 }"></div>
+                    <div style="float: right; margin-right: 20px;" id="results-children-nav-prev" data-bind="visible: childPrevAvailable"><a></a></div>
+                </div>
+            </nav>
+        </div>
+    </div>
+</div>
+<!-- end: results options and tools -->

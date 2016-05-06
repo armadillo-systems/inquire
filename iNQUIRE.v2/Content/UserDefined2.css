@@ -1,0 +1,192 @@
+﻿.highlight-search-text {
+  color: #5aa000;
+  font-weight: bold; }
+
+/* needed by the JS code in Search.cshtml to work out heights of images at the different result sizes, etc so they can be dynamically resized from jp2s */
+/* start: grid of results with thumbnail */
+div .result-title-inset {
+  background-color: #000;
+  bottom: 0;
+  color: #fff;
+  left: 0;
+  opacity: 0.65;
+  position: absolute;
+  width: 100%; }
+
+.result {
+  margin-bottom: 20px; }
+
+#results {
+  overflow-y: hidden;
+  /*height: 100%;*/
+  background: transparent url(images/site/bckgd_centre_panel.jpg) repeat 0 0; }
+
+#results .grid-thumbnail-i-m, #results .grid-thumbnail-i-sm, #results .grid-thumbnail-i-xl {
+  margin-left: auto;
+  margin-right: auto;
+  display: block; }
+
+#results .header-grid {
+  margin: 5px 10px 5px 0; }
+
+/* IE8 does not report this correctly for new html5 elements? */
+#results .grid-m, #results .grid-sm, #results .grid-xl {
+  float: left; }
+
+#results .grid-m {
+  width: 340px;
+  height: 330px; }
+
+#results .grid-sm {
+  width: 220px;
+  height: 210px; }
+
+#results .grid-xl {
+  width: 520px;
+  height: 510px; }
+
+#results .grid-thumbnail-i-m {
+  width: 320px;
+  height: 320px; }
+
+#results .grid-thumbnail-i-sm {
+  width: 200px;
+  height: 200px; }
+
+#results .grid-thumbnail-i-xl {
+  width: 500px;
+  height: 500px; }
+
+#results .result-child-node-grid {
+  height: 27px;
+  float: right; }
+
+#results .header-grid header {
+  color: #44474d; }
+
+#results .header-grid header h3 {
+  font-size: 1.1em;
+  font-weight: bold; }
+
+/* end: grid of results with thumbnail */
+/* masonry result item test*/
+/*.masonry-result { width: 200px; background: green; }
+.masonry-result-wide { width: 400px; background: orange; }*/
+#results .masonry-m {
+  width: 220px; }
+
+/* background: orange; width: 220px; height: 330px; } */
+#results .masonry-sm {
+  width: 100px; }
+
+/* background: green; width: 100px; height: 210px; }  */
+#results .masonry-xl {
+  width: 340px; }
+
+/*  background: red; height: 510px; }  */
+#results .masonry-thumbnail-i-m {
+  width: 220px;
+  height: 220px; }
+
+#results .masonry-thumbnail-i-sm {
+  width: 100px;
+  height: 100px; }
+
+#results .masonry-thumbnail-i-xl {
+  width: 340px;
+  height: 340px; }
+
+/* end: masonry result item test */
+/* start: list of results with thumbnail */
+#results .header-list-image {
+  margin: 0;
+  padding: 10px 10px 10px 0; }
+
+#results .desc-list-image {
+  margin: 0;
+  padding: 0 10px 10px 0; }
+
+#results .date-list-image {
+  margin: 0; }
+
+#results .list-image-m, #results .list-image-sm, #results .list-image-xl {
+  width: auto; }
+
+#results .list-image-sm {
+  min-height: 120px; }
+
+#results .list-image-xl {
+  min-height: 420px; }
+
+#results .list-image-m .thumbnail-i, #results .list-image-sm .thumbnail-i, #results .list-image-xl .thumbnail-i {
+  margin: 0px; }
+
+#results .list-image-thumbnail-i-m {
+  width: 200px;
+  height: 200px; }
+
+#results .list-image-thumbnail-i-sm {
+  width: 100px;
+  height: 100px; }
+
+#results .list-image-thumbnail-i-xl {
+  width: 400px;
+  height: 400px; }
+
+#results li {
+  list-style-type: none;
+  padding: 0;
+  margin: 0; }
+
+/* end: list of results with thumbnail */
+#notes-fields textarea, #comments-fields textarea {
+  min-width: 200px; }
+
+.shadow {
+  -moz-box-shadow: 2px 2px 3px #000;
+  -webkit-box-shadow: 2px 2px 3px  #000;
+  box-shadow: 2px 2px 3px  #000;
+  /* For IE 8 */
+  -ms-filter: "progid:DXImageTransform.Microsoft.Shadow(Strength=4, Direction=135, Color='#000000')";
+  /* For IE 5.5 - 7 */
+  filter: progid:DXImageTransform.Microsoft.Shadow(Strength=4, Direction=135, Color='#000000'); }
+
+.shadow-highlight {
+  -moz-box-shadow: 6px 6px 5px #D4217D;
+  -webkit-box-shadow: 6px 6px 5px #D4217D;
+  box-shadow: 6px 6px 5px #D4217D;
+  /* For IE 8 */
+  -ms-filter: "progid:DXImageTransform.Microsoft.Shadow(Strength=6, Direction=135, Color='#D4217D')";
+  /* For IE 5.5 - 7 */
+  filter: progid:DXImageTransform.Microsoft.Shadow(Strength=6, Direction=135, Color='#D4217D'); }
+
+.btn-social {
+  width: 125px;
+  display: inline; }
+
+#results {
+  /*background: red;*/ }
+
+@media (min-width: 768px) {
+  #results {
+    /*background: purple;*/ }
+  #search-facets {
+    margin-left: 230px; } }
+
+@media (min-width: 1170px) {
+  #results {
+    /*background: green;*/ }
+  #search-facets {
+    margin-left: 300px; } }
+
+/* found this extra ref in Site.css, not sure what it does
+    @media (min-width: 600px) {
+    .result-list-text{
+        width: 320px;
+        width: calc(100% - 200px);
+        margin-top: 0px;
+        padding-left: 10px;
+    }
+}
+*/
+

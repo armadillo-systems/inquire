@@ -1,0 +1,46 @@
+﻿@model iNQUIRE.Models.IInqItem
+
+@{
+    Layout = "~/Views/Shared/_LayoutPrint.cshtml";
+    ViewBag.Title = "Print";
+}
+
+@* This page must be updated to match the fields in your data model *@
+
+<article>
+    <h2>@Model.Title</h2>
+    <img src="@ViewBag.ImageUri" alt="@Model.Title" />
+    <section id="description">
+        @if (!String.IsNullOrEmpty(Model.Description))
+        {
+            @Model.Description
+        }
+    </section>
+    
+    <section id="metadata">    
+        @if (!String.IsNullOrEmpty(Model.Author))
+        {
+            <div><span class="label">Author:</span> @Model.Author</div>
+        }
+        
+        @*@if (!String.IsNullOrEmpty(Model.Source))
+    {
+        <div><span class="label">Source:</span> @Model.Source</div>
+    }
+
+    @if (!String.IsNullOrEmpty(Model.Collection))
+    {
+        <div><span class="label">Collection:</span> @Model.Collection</div>
+    }
+
+    @if (!String.IsNullOrEmpty(Model.Subject))
+    {
+        <div><span class="label">Subject:</span> @Model.Subject</div>
+    }
+
+    <div><span class="label">Year:</span> @Model.Year</div>*@
+
+    </section>
+</article>
+
+

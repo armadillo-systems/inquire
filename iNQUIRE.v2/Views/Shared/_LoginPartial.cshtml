@@ -1,0 +1,20 @@
+﻿@using Microsoft.AspNet.Identity
+
+    @if (Request.IsAuthenticated)
+    {
+        <li><a title="Manage" href='@Url.Action("Index", "Manage", routeValues: new { @returnUrl = ViewContext.HttpContext.Request.Url.PathAndQuery })'><span class="glyphicon glyphicon-user"></span><span class="nav-desc"> @User.Identity.GetUserName()</span></a></li>
+        <li>
+            @using (Html.BeginForm("LogOff", "Account",
+            new { @returnUrl = ViewContext.HttpContext.Request.Url.PathAndQuery },
+            FormMethod.Post,
+            new { id = "logoutForm"}))
+            {
+                @Html.AntiForgeryToken()
+                <a href="javascript:document.getElementById('logoutForm').submit()"><span class="glyphicon glyphicon-log-out"></span><span class="nav-desc"> Logout</span></a>
+            }
+        </li>
+    }
+    else
+    {
+        <li><a href='@Url.Action("Login", "Account", routeValues: new { @returnUrl = ViewContext.HttpContext.Request.Url.PathAndQuery} )'><span class="glyphicon glyphicon-log-in"></span><span class="nav-desc"> Login</span></a></li>
+    }

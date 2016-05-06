@@ -1,0 +1,171 @@
+﻿<script type="text/javascript">
+    //function linkObservables() {
+    //    ko.linkObservableToUrl(_vm.searchParamsString, "p", _vm.searchParamsString()); // , _vm.searchParamsString()
+    //    /*ko.linkObservableToUrl(_vm.facetSort, "fs");
+    //    ko.linkObservableToUrl(_vm.facetSortCurrent, "fsc"); */
+    //}
+
+    self.searchParamsString = ko.computed({
+        read: function () {
+            var params_str = 'c+' + this.searchCount() +  ',t+' + encodeURIComponent(this.searchTerm) + ',rsrs+' + this.recordsetRowStart + ',rsps+' + this.recordsetPageSize() + ',fa+' + encodeURIComponent(this.facetsAppliedString) + ',so+' + encodeURIComponent(this.sortsAppliedString) + ',scids+' + this.searchCollectionIds + ',pid+' + this.searchParentId() + ',vi+' + this.viewItem(); // this._searchParentId
+            // console.log('self.searchParamsString.read: ' + params_str);
+            return params_str;
+        },
+        write: function (value) { /*@* effectively this is a browser back button click handler, also run on direct restful url access *@*/
+            if(this.searchParamsString() != value) {
+                /*@* decode all the url parameters and make in to a [key].[value] js object *@*/
+                if(IsFieldNullOrEmpty(value))
+                    value = 'c+' + this.searchCount() + ',t+,rsrs+0,rsps+' + this.recordsetPageSize() + ',fa+,scids+,pid+,vi+'; /*@* default, all params empty *@*/
+
+                var params_array = value.split(',');
+                var params = {};
+                for(var i = 0; i < params_array.length; i++) {
+                    var param = params_array[i].split('+');
+                    params[param[0]] = param[1];
+                }
+                // alert(params.t);
+                // console.log('self.searchParamsString.write: ' + value);
+
+                if(this.viewItem() != params.vi) {
+                    if(this.searchParentId() != params.pid) {
+                        // console.log('searchParentId changed');
+                        this.searchParentId(params.pid);
+                    }
+                    // alert('viewItem changed: ' + params.vi);
+                    this.viewItem(params.vi); // not triggering view item
+
+                    if (self.recordChildIds().length > 0) { // if in child view mode need to find which position this child is at so can display the child object navigation and slider correctly
+                        var p = self.recordChildIds.indexOf(params.vi);
+                        if (p != self.recordCurrentPosition())
+                            self.recordCurrentPosition(p)
+                    }
+
+                    if(IsFieldNullOrEmpty(params.vi)) /*@* trigger a search if view item has been cleared *@*/
+                        search();
+                }
+                else {
+                    var pchanged = false;
+                    var term_changed = false;
+
+                    var t = decodeURIComponent(params.t);
+                    if(this.searchTerm() != t) {
+                        // console.log('searchTerm changed');
+                        this.searchTerm(t);
+                        this.recordsetRowStart(0);
+                        clearSearch(true, true);
+                        pchanged = true;
+                        term_changed = true;
+                    }
+
+                    if(this.recordsetRowStart() != params.rsrs) {
+                        // console.log('recordsetRowStart changed');
+                        this.recordsetRowStart(params.rsrs);
+                        pchanged = true;
+                    }
+
+                    if(this.recordsetPageSize() != params.rsps) {
+                        // console.log('recordsetPageSize changed');
+                        this.recordsetPageSize(parseInt(params.rsps));
+                        pchanged = true;
+                    }
+
+                    var fa = decodeURIComponent(params.fa);
+                    if(this.facetsAppliedString() != fa) {
+                        // console.log('facetsAppliedString changed, old: ' + this.facetsAppliedString() + ', new: ' + params.fa);
+                        this.facetsAppliedString = fa; // had to put this in here as facetsAppliedString() is a dependentObservable and doesn't seem to update like an observable
+                        this.facetsAppliedString(fa);
+                        pchanged = true;
+                    }
+
+                    var so = decodeURIComponent(params.so);
+                    if(this.sortField() != so) {
+                        // console.log('sortsAppliedString changed, old: ' + this.sortsAppliedString() + ', new: ' + params.so);
+                        this.sortsAppliedString = so; // had to put this in here as sortsAppliedString() is a dependentObservable and doesn't seem to update like an observable
+                        this.sortField(so);
+                        pchanged = true;
+                    }
+
+                    if(this.searchCollectionIds() != params.scids) {
+                        // console.log('searchCollectionIds changed');
+                        this.searchCollectionIds(params.scids);
+                        pchanged = true;
+                    }
+
+                    if(this.searchParentId() != params.pid) {
+                        // console.log('searchParentId changed');
+                        this.searchParentId(params.pid);
+                        pchanged = true;
+                    }
+
+                    if(this.searchCount() != params.c) {
+                        // console.log('searchCount changed');
+                        this.searchCount(params.c);
+                        // pchanged = true;
+                    }
+
+                    if(pchanged) {
+                        // console.log('parameters changed');
+                        search(0);
+                    }
+                }
+            }
+            else {
+                // console.log('self.searchParamsString.write SKIPPED: ' + value);
+            }
+        },
+        owner: self }).extend({ throttle: 1 });
+
+    self.facetsAppliedString = ko.computed({
+        read: function () {
+            // console.log('facetsAppliedString read');
+            var fa = '';
+            for(var i = 0; i < this.facetsApplied().length; i++) {
+                var f = this.facetsApplied()[i];
+                fa = fa + f.Field + '^' + f.Facet;
+
+                if(i < this.facetsApplied().length - 1)
+                    fa = fa + '|';
+            }
+            return fa; // encodeURIComponent(fa);
+        },
+        write: function (value) {
+            if((value) && (value != undefined) && (value.length > 0)) {
+                // this.facetsApplied.removeAll();
+                // value = decodeURIComponent(value);
+
+                var facets_array = value.split('|');
+
+                var facets = [];
+
+                for (var i = 0; i < facets_array.length; i++) {
+                    var facet_pair = facets_array[i].split('^');
+                    var facet = { 'Field': facet_pair[0], 'Facet': facet_pair[1]};
+                    facets.push(facet);
+                }
+
+                this.facetsApplied(facets);
+                // console.log('facetsAppliedString write: ' + value);
+            } else {
+                if(this.facetsApplied().length > 0)
+                    this.facetsApplied.removeAll();// = ko.observableArray([]);
+                // console.log('facetsAppliedString removedAll');
+            }
+        },
+        owner: self });
+
+
+    ko.computed(function() {
+        // console.log('setting _searchParentId from searchParentId()');
+        // this._searchParentId = this.searchParentId();
+        var pid = decodeURIComponent(this.searchParentId());
+        // alert('searchParentId set: ' + pid);
+        if(IsFieldNullOrEmpty(pid) == false) { @* need to make sure if coming straight to a child object from a url that we populate the parent info too, else child navigation will not work *@
+            getParentRecord(pid);
+        }
+        else {
+            if(self.recordChildIds().length > 0)
+                self.recordChildIds.removeAll(); // clear all children, get here from viewing a child object, then going back to a parent
+        }
+    }, self);
+
+</script>

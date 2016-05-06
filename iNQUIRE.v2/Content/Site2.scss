@@ -1,0 +1,442 @@
+﻿
+/* Set padding to keep content from hitting the edges
+.body-content {
+    padding-left: 45px;
+    padding-right: 45px;
+} */
+
+/* Override the default bootstrap behavior where horizontal description lists 
+   will truncate terms that are too long to fit in the left column 
+*/
+.dl-horizontal dt {
+    white-space: normal;
+}
+
+
+#search-facets { 
+    overflow-y: auto;
+    overflow-x: hidden;
+    background: rgb(62, 69, 76);
+}
+
+#narrow-search-container h2, #collection-container h2
+{
+    font-size: 1.313em;
+    color: #5AA000;
+    margin: 0;
+    margin-bottom: 10px;
+}
+
+#narrow-search-container h2 {margin: 10px 20px;}
+
+#narrow-search-container h3 {
+  font-weight: bold;
+  font-size: .9em;
+  color: #fff;
+  margin: 0;
+  margin-bottom: 5px;
+}
+
+#narrow-search-container li, #saved-search-container li {
+  display: list-item;
+  list-style-type: none;
+  margin: 0;
+  font-size: .9em;
+  color: #fff;
+  cursor: pointer;
+}
+
+#narrow-search-container nav {
+    margin-bottom: 5px;
+    margin-left: 10px;
+}
+
+.search-box-button {font-size: 1.6rem;}
+
+#metadata-wrapper {
+    overflow: auto;
+}
+
+#metadata-wrapper h3 {
+    color: #44474f;
+    margin: 0;
+}
+
+#metadata-fields {
+  margin: 0;
+  font-size: .9em;
+}
+
+.metadata-field {
+  margin: 0;
+  padding: 0;
+}
+
+.metadata-label{
+    font-weight: bold;
+    margin: 0 5px 0 0;
+    padding: 0;
+}
+
+.metadata-field-text{
+
+}
+
+.metadata-field-text a {
+    display: inline-block;
+    margin: 0;
+    padding: 0 !important;
+}
+
+.metadata-divider {
+  height: 1px;
+  border-bottom: 1px solid #afafaf;
+  margin: 5px 0;
+}
+
+#logindisplay { min-width: 250px !important;}
+.fb-login-button { padding-top: 15px; padding-left: 5px; padding-right: 5px; }
+
+#results-size { padding-left: 5px; padding-right: 5px; }
+
+#results-title {font-size: 1.3em; }
+
+#results-children-back {margin-bottom: 10px;}
+
+.collection-option {
+    padding: 10px 0 10px 10px;
+}
+
+.collection-list-header-button {padding: 0 !important;}
+.collection-list-header-button .btn {padding: 1px 6px; background: none; color: #fff; border: none; outline: none;}
+.collection-list-header-button .btn-default:active, .collection-list-header-button .btn-default.active, .collection-list-header-button .open >  .dropdown-toggle.btn-default {color: #fff; background: none; border: none; outline: none;}
+.collection-list-header-button .btn-group {padding: 0;}
+
+.collection-item { padding-left: 10px;}
+
+.collection-dd-icon { font-size: 1em;}
+.collection-dd { left: -105px;}
+
+.result-list-img { float: left; margin-right: 10px; }
+
+.result-list-text{
+    /*float: left;
+    width: auto;*/
+    float: left;
+    margin-top: 10px;
+    width: 250px;
+    max-width: 1000px;
+}
+
+.result-title {
+    font-size: 1em;
+    padding: 0 5px;
+}
+
+.result-desc {
+    margin-top: 10px;
+    font-size: .9em;
+}
+
+footer {text-align: center;}
+
+/* Loading spinner
+    http://stephanwagner.me/only-css-loading-spinner
+*/
+
+@keyframes spinner {
+    to {transform: rotate(360deg);}
+}
+ 
+@-webkit-keyframes spinner {
+    to {-webkit-transform: rotate(360deg);}
+}
+ 
+.spinner {
+    min-width: 100%;
+    min-height: 100%;
+}
+ 
+.spinner:before {
+    content: 'Loading…';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 24px;
+    height: 24px;
+    margin-top: -13px;
+    margin-left: -13px;
+}
+ 
+.spinner:not(:required):before {
+    content: '';
+    border-radius: 50%;
+    border: 1px solid #ccc;
+    border-top-color: purple;
+    animation: spinner .6s linear infinite;
+    -webkit-animation: spinner .6s linear infinite;
+}
+
+/* End loading spinner*/
+
+/* Start: Collapsable panels */
+.panel-heading.accordion-toggle:after {
+    /* symbol for "opening" panels */
+    font-family:'Glyphicons Halflings';
+    /* essential for enabling glyphicon */
+    content:"\e114";
+    /* adjust as needed, taken from bootstrap.css */
+    float: right;
+    position: relative;
+    bottom: 23px;
+    font-size: 15pt;
+    /* adjust as needed */
+    color: grey;
+    /* adjust as needed */
+}
+.panel-heading.accordion-toggle.collapsed:after {
+    /* symbol for "collapsed" panels */
+    content:"\e080";
+    /* adjust as needed, taken from bootstrap.css */
+}
+
+.panel-heading:hover {
+    cursor: pointer;
+}
+
+.panel-heading:hover h4 {
+    text-decoration: underline;
+}
+/* End: Collapsable panels*/
+
+.row-no-padding {
+  [class*="col-"] {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+}
+
+.no-h-padding {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+.no-v-padding {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+}
+
+.margin-none {margin: 0;}
+
+
+/* new layout stuff 21102015*/
+$nav-anim-time: 0.25s;
+$nav-anim: all $nav-anim-time ease;
+$nav-anim-type: scale(1.25, 1.25);
+$nav-option-bg: rgb(205,205,205);
+$nav-option-color: rgb(255,255,255);
+$mini-nav-height: 260px;
+
+
+/* 
+    #F49AC2 magenta
+    #77DD77 green
+    #836953 brown
+    #AEC6CF blue
+    #FF6961 red
+    #FDFD96 yellow
+*/
+
+@keyframes anim-nav-search {
+    0%   {background-color: $nav-option-bg;}
+    100% {background-color: #77DD77;}
+}
+
+@keyframes anim-nav-facets {
+    0%   {background-color: $nav-option-bg;}
+    100% {background-color: #F49AC2;}
+}
+
+@keyframes anim-nav-tools {
+    0%   {background-color: $nav-option-bg;}
+    100% {background-color: #836953;}
+}
+
+@keyframes anim-nav-help {
+    0%   {background-color: $nav-option-bg;}
+    100% {background-color: #AEC6CF;}
+}
+
+@keyframes anim-nav-login {
+    0%   {background-color: $nav-option-bg;}
+    100% {background-color: #FF6961;}
+}
+
+@keyframes anim-nav-top {
+    0%   {background-color: $nav-option-bg;}
+    100% {background-color: #EDED76;}
+}
+
+
+#mini-nav {
+    width: 48px;
+    height: $mini-nav-height;
+    background: blue;
+    position: fixed;
+    right: 0;
+    z-index: 1001;
+    top: -moz-calc((100% - #{$mini-nav-height})/2);
+    top: -webkit-calc((100% - #{$mini-nav-height})/2);
+    top: calc((100% - #{$mini-nav-height})/2);
+}
+
+#mini-nav a {
+    color: $nav-option-color;
+}
+
+#mini-nav .mini-nav-option {
+    color: #fff;
+    width: 48px;
+    height: 48px;
+    font-size: 32px;
+    background: $nav-option-bg;
+    padding: 8px;
+    -webkit-transition: $nav-anim; /* Safari and Chrome */
+    -moz-transition: $nav-anim; /* Firefox */
+    -o-transition: $nav-anim; /* IE 9 */
+    -ms-transition: $nav-anim; /* Opera */
+    transition: $nav-anim;
+    max-width: 100%;
+}
+
+#mini-nav .mini-nav-option:hover {
+    -webkit-transform: $nav-anim-type; /* Safari and Chrome */
+    -moz-transform: $nav-anim-type; /* Firefox */
+    -ms-transform: $nav-anim-type; /* IE 9 */
+    -o-transform: $nav-anim-type; /* Opera */
+     transform: $nav-anim-type;
+
+    animation-duration: $nav-anim-time;
+    -webkit-animation-fill-mode: forwards; /* Chrome, Safari, Opera */
+    animation-fill-mode: forwards;
+}
+
+#mini-nav #nav-search:hover {
+    animation-name: anim-nav-search;
+}
+
+#mini-nav #nav-facets:hover {
+    animation-name: anim-nav-facets;
+}
+
+#mini-nav #nav-tools:hover {
+    animation-name: anim-nav-tools;
+}
+
+#mini-nav #nav-help:hover {
+    animation-name: anim-nav-help;
+}
+
+#mini-nav #nav-login:hover {
+    animation-name: anim-nav-login;
+}
+
+#mini-nav #nav-top:hover {
+    animation-name: anim-nav-top;
+}
+
+.form-control {
+    width: 400px;
+}
+
+#add-new-collection, #saved-search-list, #metadata-list, #notes-list, #comments-list, #tags-list {
+    padding: 5px 0;
+}
+
+#add-new-collection hr {margin: 5px 0;}
+
+#but-new-collection { cursor: pointer; }
+
+#but-new-collection i { font-size: 1em;}
+
+#email-modal #email-to, #email-modal #email-message {
+     width: 100%;
+}
+
+
+.tag-rem, .recordset-page, .saved-search, #comment-new, #note-new, #tag-new, .saved-search-holder .search-del {
+    cursor: pointer;
+}
+
+.results-count, .results-pager {
+    display: inline-block;
+}
+
+.results-count {
+    vertical-align: top;
+    padding-top: 8px;
+    padding-right: 10px;
+}
+
+#but-small-text {
+    font-size: 0.8em;
+}
+
+#but-med-text {
+    font-size: 1.2em;
+}
+
+.sidebar-header-icon {
+    padding-right: 10px;
+}
+
+#sidebar-header-icon-help {
+    padding-left: 5px;
+    padding-right: 15px;
+}
+
+#sidebar-header-icon-search-history {
+    padding-right: 13px;
+}
+
+/* Start: Recordset page navgator */
+ul.pagination > li > a {
+    color: rgb(62, 69, 76);
+}
+ul.pagination > li > a:focus,
+ul.pagination > li > a:hover,
+ul.pagination > li > span:focus,
+ul.pagination > li > span:hover {
+
+}
+
+/* End: Recordset page navigator */
+
+.fa-remove {
+    font-size: 1.0em;
+}
+
+/*#results .result {  // causes issues with masonry on re-layout, will use an internal zoom anyway
+    z-index: 0;
+    -webkit-transition: $nav-anim;
+    -moz-transition: $nav-anim;
+    -o-transition: $nav-anim; /
+    -ms-transition: $nav-anim;
+    transition: $nav-anim;
+}
+
+$result-anim-type: scale(1.1, 1.1);
+
+#results .result:hover {
+    z-index: 100;
+    -webkit-transform: $result-anim-type;
+    -moz-transform: $result-anim-type;
+    -ms-transform: $result-anim-type;
+    -o-transform: $result-anim-type;
+     transform: $result-anim-type;
+
+    animation-duration: $nav-anim-time;
+    -webkit-animation-fill-mode: forwards;
+    animation-fill-mode: forwards;
+}*/
+/* new layout stuff 21102015*/

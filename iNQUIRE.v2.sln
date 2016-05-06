@@ -1,0 +1,92 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.23107.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "iNQUIRE.v2", "iNQUIRE.v2\iNQUIRE.v2.csproj", "{BF8489C8-332B-4032-8AFE-51523398B272}"
+	ProjectSection(ProjectDependencies) = postProject
+		{82555706-1E69-4ED3-A810-CDAC65936826} = {82555706-1E69-4ED3-A810-CDAC65936826}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DjatokaIIS", "DjatokaIIS\DjatokaIIS\DjatokaIIS.csproj", "{56167E97-9AC6-4BE7-814C-DD1CEDA876E0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "iNQUIRE.Helper", "Helpers\iNQUIRE.Helper.csproj", "{CD3D1368-BABC-4BCC-9596-FF4FE46E68BA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IIPImageIIS", "IIPImageIIS\IIPImageIIS.csproj", "{82555706-1E69-4ED3-A810-CDAC65936826}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IIIFIIS", "IIIFIIS\IIIFIIS.csproj", "{FF71E99C-EB62-4C36-83C7-51967D6B3D78}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		armserv|Any CPU = armserv|Any CPU
+		Debug|Any CPU = Debug|Any CPU
+		inquire.armtest.uk|Any CPU = inquire.armtest.uk|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BF8489C8-332B-4032-8AFE-51523398B272}.armserv|Any CPU.ActiveCfg = armserv|Any CPU
+		{BF8489C8-332B-4032-8AFE-51523398B272}.armserv|Any CPU.Build.0 = armserv|Any CPU
+		{BF8489C8-332B-4032-8AFE-51523398B272}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BF8489C8-332B-4032-8AFE-51523398B272}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BF8489C8-332B-4032-8AFE-51523398B272}.inquire.armtest.uk|Any CPU.ActiveCfg = inquire.armtest.uk|Any CPU
+		{BF8489C8-332B-4032-8AFE-51523398B272}.inquire.armtest.uk|Any CPU.Build.0 = inquire.armtest.uk|Any CPU
+		{BF8489C8-332B-4032-8AFE-51523398B272}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BF8489C8-332B-4032-8AFE-51523398B272}.Release|Any CPU.Build.0 = Release|Any CPU
+		{56167E97-9AC6-4BE7-814C-DD1CEDA876E0}.armserv|Any CPU.ActiveCfg = armserv|Any CPU
+		{56167E97-9AC6-4BE7-814C-DD1CEDA876E0}.armserv|Any CPU.Build.0 = armserv|Any CPU
+		{56167E97-9AC6-4BE7-814C-DD1CEDA876E0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{56167E97-9AC6-4BE7-814C-DD1CEDA876E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{56167E97-9AC6-4BE7-814C-DD1CEDA876E0}.inquire.armtest.uk|Any CPU.ActiveCfg = inquire.armtest.uk|Any CPU
+		{56167E97-9AC6-4BE7-814C-DD1CEDA876E0}.inquire.armtest.uk|Any CPU.Build.0 = inquire.armtest.uk|Any CPU
+		{56167E97-9AC6-4BE7-814C-DD1CEDA876E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{56167E97-9AC6-4BE7-814C-DD1CEDA876E0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CD3D1368-BABC-4BCC-9596-FF4FE46E68BA}.armserv|Any CPU.ActiveCfg = armserv|Any CPU
+		{CD3D1368-BABC-4BCC-9596-FF4FE46E68BA}.armserv|Any CPU.Build.0 = armserv|Any CPU
+		{CD3D1368-BABC-4BCC-9596-FF4FE46E68BA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CD3D1368-BABC-4BCC-9596-FF4FE46E68BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CD3D1368-BABC-4BCC-9596-FF4FE46E68BA}.inquire.armtest.uk|Any CPU.ActiveCfg = inquire.armtest.uk|Any CPU
+		{CD3D1368-BABC-4BCC-9596-FF4FE46E68BA}.inquire.armtest.uk|Any CPU.Build.0 = inquire.armtest.uk|Any CPU
+		{CD3D1368-BABC-4BCC-9596-FF4FE46E68BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CD3D1368-BABC-4BCC-9596-FF4FE46E68BA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{82555706-1E69-4ED3-A810-CDAC65936826}.armserv|Any CPU.ActiveCfg = armserv|Any CPU
+		{82555706-1E69-4ED3-A810-CDAC65936826}.armserv|Any CPU.Build.0 = armserv|Any CPU
+		{82555706-1E69-4ED3-A810-CDAC65936826}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{82555706-1E69-4ED3-A810-CDAC65936826}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{82555706-1E69-4ED3-A810-CDAC65936826}.inquire.armtest.uk|Any CPU.ActiveCfg = inquire.armtest.uk|Any CPU
+		{82555706-1E69-4ED3-A810-CDAC65936826}.inquire.armtest.uk|Any CPU.Build.0 = inquire.armtest.uk|Any CPU
+		{82555706-1E69-4ED3-A810-CDAC65936826}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{82555706-1E69-4ED3-A810-CDAC65936826}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FF71E99C-EB62-4C36-83C7-51967D6B3D78}.armserv|Any CPU.ActiveCfg = armserv|Any CPU
+		{FF71E99C-EB62-4C36-83C7-51967D6B3D78}.armserv|Any CPU.Build.0 = armserv|Any CPU
+		{FF71E99C-EB62-4C36-83C7-51967D6B3D78}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FF71E99C-EB62-4C36-83C7-51967D6B3D78}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FF71E99C-EB62-4C36-83C7-51967D6B3D78}.inquire.armtest.uk|Any CPU.ActiveCfg = inquire.armtest.uk|Any CPU
+		{FF71E99C-EB62-4C36-83C7-51967D6B3D78}.inquire.armtest.uk|Any CPU.Build.0 = inquire.armtest.uk|Any CPU
+		{FF71E99C-EB62-4C36-83C7-51967D6B3D78}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FF71E99C-EB62-4C36-83C7-51967D6B3D78}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 6
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = https://armadillo.visualstudio.com/defaultcollection
+		SccLocalPath0 = .
+		SccProjectUniqueName1 = DjatokaIIS\\DjatokaIIS\\DjatokaIIS.csproj
+		SccProjectName1 = DjatokaIIS/DjatokaIIS
+		SccLocalPath1 = DjatokaIIS\\DjatokaIIS
+		SccProjectUniqueName2 = Helpers\\iNQUIRE.Helper.csproj
+		SccProjectName2 = Helpers
+		SccLocalPath2 = Helpers
+		SccProjectUniqueName3 = IIPImageIIS\\IIPImageIIS.csproj
+		SccProjectName3 = IIPImageIIS
+		SccLocalPath3 = IIPImageIIS
+		SccProjectUniqueName4 = iNQUIRE.v2\\iNQUIRE.v2.csproj
+		SccProjectName4 = iNQUIRE.v2
+		SccLocalPath4 = iNQUIRE.v2
+		SccProjectUniqueName5 = IIIFIIS\\IIIFIIS.csproj
+		SccProjectName5 = IIIFIIS
+		SccLocalPath5 = IIIFIIS
+	EndGlobalSection
+EndGlobal

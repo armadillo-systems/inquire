@@ -1,0 +1,159 @@
+﻿<style>
+
+</style>
+
+<div id="metadata-wrapper" class="panel-group">
+    
+    <div id="metadata-container" class="panel panel-default" data-bind="slideVisible: (resultCurrentIndex() != -1)">
+        <div class="panel-heading accordion-toggle collapsed" data-toggle="collapse" data-target="#metadata-panel"> <!-- data-parent="#metadata-wrapper" -->
+            <header id="metadata-header">
+                <h3 class="panel-title">Metadata</h3> <!-- id="metadata-header-title" -->
+            </header>
+        </div>
+
+        <div id="metadata-panel" class="panel-collapse collapse in">
+            <div class="panel-body">
+                @Html.Partial("Search/_MetadataFields")
+            </div>
+        </div>
+    </div>
+
+    <div id="collection-container" class="panel panel-default" data-bind="slideVisible: (resultCurrentIndex() != -1)">
+        <div class="panel-heading accordion-toggle collapsed" data-toggle="collapse" data-target="#collections-panel"> <!-- data-parent="#metadata-wrapper" -->
+            <header id="metadata-header">
+                <h3 class="panel-title">My Collections</h3> <!-- id="metadata-header-title" -->
+            </header>
+        </div>
+
+        <div id="collections-panel" class="panel-collapse collapse">
+            <div class="panel-body">
+                <div id="collection-settings">
+                    <div id="collection-settings-options">
+                        <div class="triangle-border top">
+                            <p id="but-new-collection">add new collection <span>[+]</span></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="clear"></div>
+                <ol id="collections" data-bind="template: { name: 'collections-template', foreach: collections(), afterRender: afterRenderCollection }"></ol>
+            </div>
+        </div>
+    </div>
+ 
+    <div id="notes-container" class="panel panel-default" data-bind="slideVisible: ((resultCurrentIndex() != -1) || (searchCollectionIds() != ''))">
+        <div class="panel-heading accordion-toggle collapsed" data-toggle="collapse" data-target="#notes-panel"> <!-- data-parent="#metadata-wrapper" -->
+            <header id="notes-header">
+                <h3 class="panel-title">Private Notes <span id="notes-count" data-bind="text: notesCountText"></span></h3> <!-- id="metadata-header-title" -->
+            </header>
+        </div>
+
+        <div id="notes-panel" class="panel-collapse collapse">
+            <div class="panel-body">
+                <div id="notes-fields">
+                    <textarea rows="2" cols="17" id="input-note"></textarea> <span id="note-new"><i class="fa fa-comment fa-lg fontAwe-solid-colour"></i></span>
+                    <ul id="note-list" data-bind="template: { name: 'notes-list-template',
+                                foreach: notesPrivate,
+                                beforeRemove: function(elem) { $(elem).fadeOut(_fadeMsTags, function() { $(elem).remove(); }) },
+                                afterAdd: function(elem) { $(elem).hide().fadeIn(_fadeMsTags) } }"></ul>
+                </div>
+            </div>
+        </div>
+    </div>    
+           
+
+    <div id="tags-container" class="panel panel-default" data-bind="slideVisible: (resultCurrentIndex() != -1)">
+        <div class="panel-heading accordion-toggle collapsed" data-toggle="collapse" data-target="#tags-panel"> <!-- data-parent="#metadata-wrapper" -->
+            <header id="tags-header">
+                <h3 class="panel-title">Tags <span id="tags-count" data-bind="text: tagsCountText"></span></h3> <!-- id="metadata-header-title" -->
+            </header>
+        </div>
+
+        <div id="tags-panel" class="panel-collapse collapse">
+            <div class="panel-body">
+                <div id="tags-fields">
+                    <input id="input-tags" value="Enter new tag" /><span id="tag-new"><i class="fa fa-comment fa-lg fontAwe-solid-colour"></i></span>
+                    <ul id="tag-list" data-bind="template: { name: 'tags-list-template',
+                                                        foreach: resultCurrentTags,
+                                                        beforeRemove: function(elem) { $(elem).fadeOut(_fadeMsTags, function() { $(elem).remove(); }) },
+                                                        afterAdd: function(elem) { $(elem).hide().fadeIn(_fadeMsTags) } }"></ul>
+                    <div class="clear"></div>
+                    <div id="tag-hint"><p>For multiple tags please enter comma separated<br />eg: "tag1, tag two, tag3"</p></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="comments-container" class="panel panel-default" data-bind="slideVisible: (resultCurrentIndex() != -1)">
+        <div class="panel-heading accordion-toggle collapsed" data-toggle="collapse" data-target="#comments-panel"> <!-- data-parent="#metadata-wrapper" -->
+            <header id="comments-header">
+                <h3 class="panel-title">Public Comments <span id="comments-count" data-bind="text: commentsCountText"></span></h3>
+            </header>
+        </div>
+
+        <div id="comments-panel" class="panel-collapse collapse">
+            <div class="panel-body">
+                <div id="comments-fields">
+                    <textarea rows="2" cols="17" id="input-comment"></textarea> <span id="comment-new"><i class="fa fa-comment fa-lg fontAwe-solid-colour"></i></span>
+                    <ul id="comment-list" data-bind="template: { name: 'notes-list-template',
+                                foreach: notesPublic,
+                                beforeRemove: function(elem) { $(elem).fadeOut(_fadeMsTags, function() { $(elem).remove(); }) },
+                                afterAdd: function(elem) { $(elem).hide().fadeIn(_fadeMsTags) } }"></ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="social-media-container" class="panel panel-default" data-bind="slideVisible: (resultCurrentIndex() != -1)">
+        <div class="panel-heading accordion-toggle collapsed" data-toggle="collapse" data-target="#social-media-panel">
+            <!-- data-parent="#metadata-wrapper" -->
+            <header id="social-media-header">
+                <h3 class="panel-title">Share On <i class="fa fa-facebook"></i> <i class="fa fa-twitter"></i></h3>
+            </header>
+        </div>
+
+        <div id="social-media-panel" class="panel-collapse collapse">
+            <div class="panel-body">
+                <div id="social-media-fields">
+                    @*<div data-bind="text: updateViewItemUri"></div>*@
+                    @if (ViewBag.Facebook)
+                    {
+                        <section id="facebook">
+                            <!--  data-bind="slideVisible: (resultCurrentIndex() != -1)" -->
+                            @*<div id="fb_photo">
+                fb photo upload
+                </div>
+                @Facebook.LoginButtonTagOnly()*@
+
+                            <div data-bind="slideVisible: ((resultCurrentIndex() != -1) && _gvm.fbAccessToken)">
+                                <div class="fb-like"
+                                     data-bind="visible: _gvm.fbLoaded, attr: { 'data-href': updateViewItemUri } "
+                                     data-layout="standard"
+                                     data-action="like"
+                                     data-show-faces="true"
+                                     data-width="215">
+                                </div>
+
+                                @*<div id="fb-like">
+                        @Facebook.LikeButton( width: 215 )
+                    </div>*@
+                            </div>
+
+                        </section>
+                    }
+                    @if (ViewBag.Twitter)
+                    {
+                        <section id="twitter" data-bind="slideVisible: (resultCurrentIndex() != -1)">
+                            <div id="tweet">
+                                @TwitterGoodies.TweetButton(tweetText: ViewBag.TweetText)
+                            </div>
+                            @if (!String.IsNullOrEmpty(ViewBag.TwitterActivityCaption))
+                            {
+                                @TwitterGoodies.Search(ViewBag.TwitterHashtag, scrollBar: true, width: 205, height: 150, shellColor: "#EBEDEF", backgroundShellColor: "#44474D", tweetsBackgroundColor: "#EBEDEF", caption: ViewBag.TwitterActivityCaption)
+                            }
+                        </section>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

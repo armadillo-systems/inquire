@@ -1,0 +1,153 @@
+﻿
+    @*<li id="metadata-id" class="metadata-field" data-bind="visible: !IsFieldNullOrEmpty(resultCurrent().ID)">
+        <div>
+            <span class="metadata-label">ID: </span>
+            <span id="metadata-id-text" class="metadata-field-text" data-bind='html: resultCurrent().ID'></span>
+        </div>
+    </li>*@
+
+    <li id="metadata-title" class="metadata-field" data-bind="visible: !IsFieldNullOrEmpty(resultCurrent().Title)">
+        <div>
+            <span class="metadata-label">Title: </span>
+            <span id="metadata-title-text" class="metadata-field-text" data-bind='html: resultCurrent().Title'></span>
+        </div>
+    </li>
+
+    <li id="metadata-iiif-source" class="metadata-field" data-bind="visible: !IsFieldNullOrEmpty(resultCurrent().IIIFSource)">
+        <div>
+            <span class="metadata-label">IIIF Source: </span>
+            <span id="metadata-title-text" class="metadata-field-text" data-bind='html: resultCurrent().IIIFSource'></span>
+        </div>
+    </li>
+
+    <li id="metadata-author" class="metadata-field" data-bind="visible: !IsFieldNullOrEmpty(resultCurrent().Author)">
+        <div>
+            <span class="metadata-label">Author: </span>
+            <span id="metadata-author-text" class="metadata-field-text" data-bind='html: resultCurrent().Author'></span>
+        </div>
+    </li>
+
+    <li id="metadata-date" class="metadata-field" data-bind="visible: !IsFieldNullOrEmpty(resultCurrent().DateStr)">
+        <div>
+            <span class="metadata-label">Date: </span>
+            <span id="metadata-year-text" class="metadata-field-text" data-bind='text: resultCurrent().DateStr'></span>
+        </div>
+    </li>
+
+    <li id="metadata-description" class="metadata-field" data-bind="visible: !IsFieldNullOrEmpty(resultCurrent().Description)">
+        <div>
+            <span class="metadata-label">Description: </span>
+            <span id="metadata-description-text" class="metadata-field-text" data-bind="html: resultCurrent().Description"></span>
+        </div>
+    </li>
+
+    <li id="metadata-type" class="metadata-field" data-bind="visible: !IsFieldNullOrEmpty(resultCurrent().Type)">
+        <div>
+            <span class="metadata-label">Type: </span>
+            <span id="metadata-type-text" class="metadata-field-text" data-bind="html: resultCurrent().Type"></span>
+        </div>
+    </li>
+
+    <li id="metadata-subject" class="metadata-field" data-bind="visible: !IsFieldNullOrEmpty(resultCurrent().Subject)">
+        <div>
+            <span class="metadata-label">Subject: </span>
+            <span id="metadata-subject-text" class="metadata-field-text" data-bind="html: resultCurrent().Subject"></span>
+        </div>
+    </li>
+
+    <li id="metadata-source" class="metadata-field" data-bind="visible: !IsFieldNullOrEmpty(resultCurrent().Source)">
+        <div>
+            <span class="metadata-label">Source: </span>
+            <span id="metadata-source-text" class="metadata-field-text" data-bind="html: resultCurrent().Source"></span>
+        </div>
+    </li>
+
+    <li id="metadata-collection" class="metadata-field" data-bind="visible: !IsFieldNullOrEmpty(resultCurrent().Collection)">
+        <div>
+            <span class="metadata-label">Collection: </span>
+            <span id="metadata-collection-text" class="metadata-field-text" data-bind="html: resultCurrent().Collection"></span>
+        </div>
+    </li>
+
+    <li id="metadata-format" class="metadata-field" data-bind="visible: !IsFieldNullOrEmpty(resultCurrent().Format)">
+        <div>
+            <span class="metadata-label">Format: </span>
+            <span id="metadata-title-text" class="metadata-field-text" data-bind='html: resultCurrent().Format'></span>
+        </div>
+    </li>
+
+    <li id="metadata-repository" class="metadata-field" data-bind="visible: !IsFieldNullOrEmpty(resultCurrent().Repository)">
+        <div>
+            <span class="metadata-label">Repository: </span>
+            <span id="metadata-title-text" class="metadata-field-text" data-bind='html: resultCurrent().Repository'></span>
+        </div>
+    </li>
+
+    <li id="metadata-page" class="metadata-field" data-bind="visible: !IsFieldNullOrEmpty(resultCurrent().Page)">
+        <div>
+            <span class="metadata-label">Page: </span>
+            <span class="metadata-field-text" data-bind="html: resultCurrent().Page"></span>
+        </div>
+    </li>
+
+    <li id="metadata-iiif" class="metadata-field" data-bind="visible: !IsFieldNullOrEmpty(resultCurrent().IIIFManifest)">
+        <div>
+            <span class="metadata-label">IIIF:</span>
+            <span class="metadata-field-text"><a data-bind="attr: {href: resultCurrent().IIIFManifest, target: '_blank'}" >Manifest</a></span>
+        </div>
+    </li>
+
+    <li id="metadata-attribution" class="metadata-field" data-bind="visible: !IsFieldNullOrEmpty(resultCurrent().Attribution)">
+        <div>
+            <span class="metadata-label">Attribution: </span>
+            <span class="metadata-field-text" data-bind="html: resultCurrent().Attribution"></span>
+        </div>
+    </li>
+
+                    @*<div id="metadata-fields">
+
+                        <div id="metadata-id" class="metadata-field" data-bind="visible: !IsFieldNullOrEmpty(resultCurrent().ID)">
+                            <span class="metadata-label">ID: </span>
+                            <span id="metadata-id-text" class="metadata-field-text" data-bind='html: resultCurrent().ID'></span>
+                        </div> 
+
+                        <div id="metadata-title" class="metadata-field" data-bind="visible: !IsFieldNullOrEmpty(resultCurrent().Title)">
+                            <span class="metadata-label">Title: </span>
+                            <span id="metadata-title-text" class="metadata-field-text" data-bind='html: resultCurrent().Title'></span>
+                        </div> 
+
+                        <div id="metadata-author" class="metadata-field" data-bind="visible: !IsFieldNullOrEmpty(resultCurrent().Author)">
+                            <span class="metadata-label">Author: </span>
+                            <span id="metadata-author-text" class="metadata-field-text" data-bind='html: resultCurrent().Author'></span>
+                        </div>
+
+                        <div id="metadata-date" class="metadata-field" data-bind="visible: !IsFieldNullOrEmpty(resultCurrent().Year)">
+                            <span class="metadata-label">Date: </span>
+                            <span id="metadata-year-text" class="metadata-field-text" data-bind='text: resultCurrent().Year'></span>
+                        </div>
+
+                        <div id="metadata-description" class="metadata-field" data-bind="visible: !IsFieldNullOrEmpty(resultCurrent().Description)">
+                            <span class="metadata-label">Description: </span>
+                            <span id="metadata-description-text" class="metadata-field-text" data-bind="html: resultCurrent().Description"></span>
+                        </div>
+
+                        <div id="metadata-type" class="metadata-field" data-bind="visible: !IsFieldNullOrEmpty(resultCurrent().Type)">
+                            <span class="metadata-label">Type: </span>
+                            <span id="metadata-type-text" class="metadata-field-text" data-bind="html: resultCurrent().Type"></span>
+                        </div>
+
+                        <div id="metadata-subject" class="metadata-field" data-bind="visible: !IsFieldNullOrEmpty(resultCurrent().Subject)">
+                            <span class="metadata-label">Subject: </span>
+                            <span id="metadata-subject-text" class="metadata-field-text" data-bind="html: resultCurrent().Subject"></span>
+                        </div>
+
+                        <div id="metadata-source" class="metadata-field" data-bind="visible: !IsFieldNullOrEmpty(resultCurrent().Source)">
+                            <span class="metadata-label">Source: </span>
+                            <span id="metadata-source-text" class="metadata-field-text" data-bind="html: resultCurrent().Source"></span>
+                        </div>
+
+                        <div id="metadata-collection" class="metadata-field" data-bind="visible: !IsFieldNullOrEmpty(resultCurrent().Collection)">
+                            <span class="metadata-label">Collection: </span>
+                            <span id="metadata-collection-text" class="metadata-field-text" data-bind="html: resultCurrent().Collection"></span>
+                        </div>      
+                    </div>*@

@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ordesignerObjectsDiagram dslVersion="1.0.0.0" absoluteBounds="0, 0, 11, 8.5">
+  <DataContextMoniker Name="/DjatokaDataContext" />
+  <nestedChildShapes>
+    <classShape Id="fb39d4ad-f283-4ad4-8dd5-d6024e681697" absoluteBounds="0.75, 0.75, 2, 1.3862939453125">
+      <DataClassMoniker Name="/DjatokaDataContext/DjatokaResource" />
+      <nestedChildShapes>
+        <elementListCompartment Id="1bb55258-53cd-4222-90ec-49b3bb63d97f" absoluteBounds="0.765, 1.21, 1.9700000000000002, 0.8262939453125" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+  </nestedChildShapes>
+</ordesignerObjectsDiagram>

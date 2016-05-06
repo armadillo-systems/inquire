@@ -1,0 +1,200 @@
+﻿@Html.Partial("~/Views/Discover/Search/_SearchJS.cshtml")
+
+@Html.Partial("~/Views/Discover/_DeepZoom.cshtml")
+
+@Html.Partial("~/Views/Discover/Search/_Templates.cshtml")
+
+<div class="row">
+    <div class="col-md-2 col-lg-2">
+        <div id="saved-search-container" data-bind="visible: (savedSearches().length > 0)">
+            <header id="saved-search-header">
+                <h2 id="saved-search-heading">Recent Searches</h2>
+                @*<div class="arrow-holder-active" id="saved-search-arrow"></div>
+                <div class="clear"></div>*@
+            </header>
+            <nav id="saved-searches">
+                <ul id="saved-search-list" data-bind="template: { name: 'saved-search-template', foreach: savedSearches() }"></ul>
+            </nav>
+            @*<div class="clear"></div>*@
+            <div class="metadata-divider"></div>
+        </div>
+
+        <div id="narrow-search-container" data-bind="slideVisible: (IsFieldNullOrEmpty(searchParentId()))">
+            <header id="narrow-search-header">
+                <h2 id="narrow-search-heading">Narrow your search</h2>
+                @*<div class="arrow-holder-active" id="narrow-search-arrow"></div>
+                <div class="clear"></div>*@
+            </header>
+            <div id="facets-holder" data-bind="template: { name: 'facet-field-template', foreach: facets(), as: 'facet' }">
+                <ol id="facets-holder" data-bind="foreach: facets()"></ol>
+                @*<div class="clear"></div>*@
+            </div>
+            <div class="metadata-divider"></div>
+        </div>
+        <div id="collection-container">
+            <div id="collection-header">
+                <h2 id="collection-heading">My Collections</h2>
+                <div class="arrow-holder-active" id="collection-arrow"></div>
+                <div id="collection-settings">
+                    <div id="collection-settings-options">
+                        <div class="triangle-border top">
+                            <p id="but-new-collection">add new collection <span>[+]</span></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="clear"></div>
+            </div>
+            <ol id="collections" data-bind="template: { name: 'collections-template', foreach: collections(), afterRender: afterRenderCollection }"></ol>
+        </div>
+        
+    </div>
+
+    <div class="col-md-7 col-lg-8">
+        <div class="row">
+            <div class="col-xs-12">
+                <nav id="results-children-back" data-bind="visible: backButton">
+                    <button type="button" class="btn btn-default but-back"><i class="fa fa-chevron-left"></i> <b>Back</b></button>
+                </nav>
+                <div id="results-title" data-bind="text: recordsetTitle()"></div>
+            </div>
+            <div class="col-xs-12">
+                <nav id="nav-results-pager" class="text-right">
+                    <ul class="pagination margin-none" data-bind="template: { name: 'results-page-template', foreach: recordsetPages }"></ul>
+                </nav>
+            </div>
+        </div>
+
+
+
+        <div id="results-options" class="row">
+            <div class="col-xs-12 col-sm-4 col-md-7 col-lg-4">
+                <div class="row">
+                    <label class="col-xs-3 col-sm-4 col-md-4 col-lg-4 control-label">Sort by:</label>
+                    <div class="col-xs-9 col-sm-8 col-md-8 col-lg-8">
+                        <select id="recordset-sort-options" class="drop-down form-control" data-bind="options: sortFields, optionsText: 'DisplayField', optionsValue: 'OptionValue', value: sortField"></select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xs-12 col-sm-4 col-md-5 col-lg-4">
+                <div class="row form-group">
+                    <label class="col-xs-3 col-sm-4 col-md-5 col-lg-4 control-label">Display:</label>
+                    <div class="col-xs-9 col-sm-8 col-md-7 col-lg-8">
+                        <select id="recordset-page-size" class="drop-down form-control" data-bind="options: recordsetPageSizes, value: recordsetPageSize"></select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xs-6 col-md-2">
+                <div id="results-options-layout">
+                    <a id="but-masonry" class="active" title="Masonry grid view">Masonry image grid</a><br />
+                    <a id="but-grid" class="active" title="Grid view">Image grid</a><br />
+                    <a id="but-list-image" class="" title="List and image view">Image list</a>
+                    @*<a id="but-list-simple" class="" title="List view">Results list</a>*@
+                </div>
+            </div>
+
+            <div class="col-xs-12 col-sm-3 col-md-4 col-lg-4">
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-default" id="but-small"><i id="but-small-text" class="fa fa-square"></i></button>
+                    <button type="button" class="btn btn-default" id="but-med"><i id="but-med-text"  class="fa fa-square"></i></button>
+                    <button type="button" class="btn btn-default" id="but-large"><i id="but-large-text"  class="fa fa-square"></i></button>
+                </div>
+            </div>
+
+            <div class="col-xs-12 col-sm-9 col-md-8 col-lg-6">
+                <div class="btn-group" role="group">
+                    <button type="button" class="but-tool-open btn btn-default"><i class="fa fa-search-plus"></i></button>
+
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-default dropdown-toggle but-tool-add-to-collection" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fa fa-plus"></i>
+                            <span class="caret"></span>
+                        </button>
+                        <ul id="collection-options" class="dropdown-menu" data-bind="template: { name: 'but-tool-add-to-collection-options-template', foreach: collections }"></ul>
+                    </div>
+
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-default dropdown-toggle but-tool-facebook" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class=" fa fa-facebook"></i>
+                            <span class="caret"></span>
+                        </button>
+                        <div class="dropdown-menu">
+                            @if (ViewBag.Facebook)
+                            {
+                                <div class="fb-login-button" data-max-rows="1" data-size="medium" data-show-faces="false" data-auto-logout-link="true"></div>
+                                @*@Facebook.LoginButtonTagOnly()<!--Please click the button to login to Facebook-->*@
+                            }
+                        </div>
+                    </div>
+
+                    <button type="button" class="but-tool-email btn btn-default"><i class="fa fa-envelope"></i></button>
+                    <button type="button" class="but-tool-download btn btn-default"><i class="fa fa-download"></i></button>
+                    <button type="button" class="but-tool-print btn btn-default"><i class="fa fa-print"></i></button>
+                </div>
+            </div>
+
+        </div>
+
+
+        <div class="row">
+            <div id="results-children" data-bind="visible: childNavigation">
+                <nav id="results-children-nav">
+                    <div id="results-children-pos">
+                        <span data-bind="visible: childAvailable, text: recordCurrentPositionStr"></span>
+                        <span data-bind="visible: childAvailable"> / </span>
+                        <span data-bind="visible: childAvailable, text: recordChildIds().length"></span>
+                    </div>
+
+                    <div data-bind="visible: childAvailable" style="width: 33%; margin-left:auto; margin-right:auto; float: right;">
+                        <div style="float: right; margin-right: 20px;" id="results-children-nav-next" data-bind="visible: childNextAvailable"><a></a></div>
+                        <div style="width: 50%; float: right; margin-right: 20px;" id="results-children-slider" data-bind="jqSlider: recordCurrentPosition, jqOptions: { step: 1, animate: true, min: 0, max: 0 }"></div>
+                        <div style="float: right; margin-right: 20px;" id="results-children-nav-prev" data-bind="visible: childPrevAvailable"><a></a></div>
+                    </div>
+                </nav>
+            </div>
+        </div>
+
+        <header id="results-list-header" style="display: none;" data-bind="slideVisibleAdjustLayout: showResultsListHeader">
+            <div class="list-header-blank"></div>
+            <div class="list-header-title">Title</div>
+            <div class="list-header-author">Author</div>
+            <div class="list-header-type">Media Type</div>
+            <div class="list-header-date">Date</div>
+            <div class="list-header-filetype">File type</div>
+        </header>
+
+        @*<section id="results">
+            <ul class="list-group margin-bottom-none" data-bind="template: { name: resultsLayoutMode, foreach: results, afterAdd: afterRenderResult }"></ul>
+        </section>*@
+        <section id="results" data-bind="template: { name: resultsLayoutMode, foreach: results, afterAdd: afterRenderResult }"></section>
+    </div>
+
+    <a href="#" data-activates="slide-out" class="button-collapse">metadata</a>
+    <div id="slide-out" class="side-nav fixed col-md-3 col-lg-2">
+        @Html.Partial("~/Views/Discover/Search/_MetadataCol.cshtml")
+    </div>
+</div>
+
+
+    <div id="video-overlay"></div>
+
+    <div id="audio-overlay"></div>
+
+    @Html.Partial("~/Views/Discover/Search/_ResultTemplates.cshtml")
+
+    <div id="loading-modal" class="modal fade" data-backdrop="static" data-keyboard="false" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div id="loading-spinner"></div>
+        </div>
+    </div>
+
+    <div id="fade-overlay" style="display: none; width: 100%; height: 100%; background: black; top: 0px; position: absolute; z-index:1;
+        zoom: 1;
+        filter: alpha(opacity=30);
+        opacity: 0.3;">
+    </div>
+
+@Html.Partial("~/Views/Discover/Search/_EmailItems.cshtml")
+
+@Html.Partial("~/Views/Discover/Search/_DownloadItems.cshtml")

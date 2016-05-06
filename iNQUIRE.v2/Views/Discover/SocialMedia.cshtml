@@ -1,0 +1,15 @@
+﻿@{
+    // Layout = "";
+    ViewBag.Title = "SocialMedia";
+}
+
+<h2>SocialMedia</h2>
+
+<div style="background: red;">
+    @Facebook.LoginButtonTagOnly(size: "medium", autoLogoutLink: true, showFaces: false)
+</div>
+
+
+<div>@TwitterGoodies.Search(@ViewBag.TwitterHashtag, caption: "iNQUIRE Latest")</div>
+
+<div>@Facebook.ActivityFeed(site: ViewBag.ViewItemBaseUri, width: 205, height: 150, showHeader: false)</div>

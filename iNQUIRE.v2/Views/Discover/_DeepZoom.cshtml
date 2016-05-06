@@ -1,0 +1,110 @@
+﻿    <script src="@Url.Content("~/Scripts/Seadragon/openseadragon.min.js")" type="text/javascript"></script>
+    <script type="text/javascript">
+        function goOpenSeadragonIIIF(url, dz_div_id, img_w, img_h)
+        {
+            var old_ie;
+            if ($('html').is('.ie6, .ie7, .ie8, .ie9')) {
+                old_ie = true;
+            }
+
+            /*@* Openseadragon buttons are not very response in IE9, sometimes work, most clicks don't, possible to get stuck in full screen *@*/
+            var show_full_page_control = true;
+            if (old_ie) {
+                show_full_page_control = false;
+            }
+
+            // alert(old_ie);
+
+            var navi_max = 100;
+            var ar = img_w / img_h;
+
+            var navi_w = 0;
+            var navi_h = 0;
+
+            if (ar > 1) {
+                navi_h = navi_max;
+                navi_w = navi_h * ar;
+            } else {
+                navi_w = navi_max;
+                navi_h = navi_w / ar;
+            }
+
+            var viewer = null;
+
+            $.getJSON(url + "/info.json",
+                function (data) {
+                    viewer = OpenSeadragon({
+                        id:                 dz_div_id,
+                        prefixUrl:          "@Url.Content("~/Content/images/Seadragon/")",
+                        showRotationControl: true,
+                    showFullPageControl: show_full_page_control,
+                    showNavigator: false,
+                    navigatorPosition: 'BOTTOM_LEFT',
+                    navigatorHeight: navi_h,
+                    navigatorWidth: navi_w,
+                    tileSources: data
+                });
+                })
+                .fail(function (d, textStatus, error) {
+
+                });
+
+            return viewer;
+        }
+
+    function goOpenSeadragon(url, dz_div_id, img_w, img_h) {
+
+        var old_ie;
+        if ($('html').is('.ie6, .ie7, .ie8, .ie9')) {
+            old_ie = true;
+        }
+
+        /*@* Openseadragon buttons are not very response in IE9, sometimes work, most clicks don't, possible to get stuck in full screen *@*/
+        var show_full_page_control = true;
+        if (old_ie) {
+            show_full_page_control = false;
+        }
+
+        // alert(old_ie);
+
+        var navi_max = 100;
+        var ar = img_w / img_h;
+
+        var navi_w = 0;
+        var navi_h = 0;
+
+        if (ar > 1) {
+            navi_h = navi_max;
+            navi_w = navi_h * ar;
+        } else {
+            navi_w = navi_max;
+            navi_h = navi_w / ar;
+        }
+
+        @* if showNavigator is set to true then Search.cshtml "OSD size fix" code must be also be enabled *@
+        var viewer = OpenSeadragon({
+            id: dz_div_id,
+            prefixUrl: "@Url.Content("~/Content/images/Seadragon/")",
+            showRotationControl: true,
+            showFullPageControl: show_full_page_control,
+            showNavigator: false,
+            navigatorPosition: 'BOTTOM_LEFT',
+            navigatorHeight: navi_h,
+            navigatorWidth: navi_w,
+            tileSources:   {
+                Image: {
+                    xmlns:    "http://schemas.microsoft.com/deepzoom/2008",
+                    Url:      url,
+                    Format:   "jpg",
+                    Overlap:  "0",
+                    TileSize: "256",
+                    Size: {
+                        Height: img_h,
+                        Width:  img_w
+                    }
+                }
+            }
+        });
+        return viewer;
+    }
+</script>

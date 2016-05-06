@@ -1,0 +1,184 @@
+﻿<nav class="cd-side-nav">
+    <ul>
+        <li class="has-children overview selected">
+            <!-- active -->
+            <a href="" onclick="return false;"><i class="sidebar-header-icon fa fa-list-ul"></i>Metadata</a>
+            <ul id="metadata-list">
+                @Html.Partial("Search/_MetadataFields")
+            </ul>
+        </li>
+
+
+        <li class="has-children overview" id="saved-searches" data-bind="visible: (savedSearches().length > 0)">
+            <a href="" onclick="return false;"><i class="sidebar-header-icon fa fa-history" id="sidebar-header-icon-search-history"></i>Search History <span id="collections-count" class="count" data-bind="visible: savedSearchesCountText, text: savedSearchesCountText"></span></a>
+            <ul id="saved-search-list" data-bind="template: { name: 'saved-search-template', foreach: savedSearches() }"></ul>
+        </li>
+
+
+        <li class="has-children overview">
+            <a href="" onclick="return false;"><i class="sidebar-header-icon fa fa-list-ol"></i>Collections <span id="collections-count" class="count" data-bind="visible: collectionsCountText, text: collectionsCountText"></span></a>
+           
+            <ul id="add-new-collection">
+                <li>
+                    @*<button id="but-new-collection" type="button" class="btn btn-default btn-xs">Add new collection <i class="fa fa-plus fa-1" aria-hidden="true"></i></button>*@
+                    <div id="but-new-collection">
+                        @*<button type="button" class="btn btn-default btn-xs">Add new collection <i class="fa fa-plus" aria-hidden="true"></i></button>*@
+                        <i class="fa fa-plus" aria-hidden="true"></i> <span>Add new collection</span>
+                    </div>
+                </li>
+
+                <hr>
+            </ul>
+
+            <ul id="collections" data-bind="template: { name: 'collections-template', foreach: collections(), afterRender: afterRenderCollection }"></ul>
+             
+        </li>
+
+        <li class="has-children comments" id="notes">
+            <a href="" onclick="return false;"><i class="sidebar-header-icon fa fa-pencil-square-o"></i>Private Notes <span id="notes-count" class="count" data-bind="visible: notesCountText, text: notesCountText"></span></a>
+            <ul id="notes-list">
+                <li>
+                    <div id="notes-fields">
+                        <textarea rows="2" cols="17" id="input-note"></textarea> <span id="note-new" class="fa fa-comment"></span>
+                        <ul id="note-list" data-bind="template: { name: 'notes-list-template',
+                                        foreach: notesPrivate,
+                                        beforeRemove: function(elem) { $(elem).fadeOut(_fadeMsTags, function() { $(elem).remove(); }) },
+                                        afterAdd: function(elem) { $(elem).hide().fadeIn(_fadeMsTags) } }"></ul>
+                    </div>
+                </li>
+            </ul>
+        </li>
+
+        <!-- <li class="cd-label">Social</li> -->
+
+        <li class="has-children comments" id="tags">
+            <a href="" onclick="return false;"><i class="sidebar-header-icon fa fa-tags"></i>Tags <span id="comments-count" class="count" data-bind="visible: tagsCountText, text: tagsCountText"></span></a>
+            <ul id="tags-list">
+                <li>
+                    <div id="tags-fields">
+                        <input id="input-tags" value="Enter new tag" /> <span id="tag-new" class="fa fa-comment"></span>
+                        <ul id="tag-list" data-bind="template: { name: 'tags-list-template',
+                                                                foreach: resultCurrentTags,
+                                                                beforeRemove: function(elem) { $(elem).fadeOut(_fadeMsTags, function() { $(elem).remove(); }) },
+                                                                afterAdd: function(elem) { $(elem).hide().fadeIn(_fadeMsTags) } }"></ul>
+                        <div class="clear"></div>
+                        <div id="tag-hint">For multiple tags please enter comma separated<br />eg: "tag1, tag two, tag3"</div>
+                    </div>
+                </li>
+            </ul>
+        </li>
+
+        <li class="has-children comments" id="comments">
+            <a href="" onclick="return false;"><i class="sidebar-header-icon fa fa-comments-o"></i>Public Comments <span id="comments-count" class="count" data-bind="visible: commentsCountText, text: commentsCountText"></span></a>
+
+            <ul id="comments-list">
+                <li>
+                    <div id="comments-fields">
+                        <textarea rows="2" cols="17" id="input-comment"></textarea> <span id="comment-new"  class="fa fa-comments"></span>
+                        <ul id="comment-list" data-bind="template: { name: 'notes-list-template',
+                                        foreach: notesPublic,
+                                        beforeRemove: function(elem) { $(elem).fadeOut(_fadeMsTags, function() { $(elem).remove(); }) },
+                                        afterAdd: function(elem) { $(elem).hide().fadeIn(_fadeMsTags) } }"></ul>
+                    </div>
+                </li>
+            </ul>
+        </li>
+
+        @*<li class="has-children bookmarks">
+                <a href="" onclick="return false;">Share <i class="fa fa-facebook"></i> <i class="fa fa-twitter"></i></a>
+
+                <ul>
+                    <!--<li><div data-bind="text: updateViewItemUri"></div></li>-->
+
+                    @if (ViewBag.Facebook)
+                    {
+                        <li>
+                            <a href="" onclick="return false;">
+                                <div id="facebook">
+                                    <div data-bind="slideVisible: ((resultCurrentIndex() != -1) && _gvm.fbAccessToken)">
+                                        <div class="fb-like"
+                                                data-bind="visible: _gvm.fbLoaded, attr: { 'data-href': updateViewItemUri } "
+                                                data-layout="standard"
+                                                data-action="like"
+                                                data-show-faces="true"
+                                                data-width="215">
+                                        </div>
+
+                                        <!--<div id="fb-like">
+                                            @Facebook.LikeButton( width: 215 )
+                                        </div>-->
+                                    </div>
+
+                                </div>
+                            </a>
+                        </li>
+                    }
+
+                    @if (ViewBag.Twitter)
+                    {
+                    <li>
+                        <a href="" onclick="return false;">
+                            <div id="twitter" data-bind="slideVisible: (resultCurrentIndex() != -1)">
+                                <div id="tweet">
+                                    @TwitterGoodies.TweetButton(tweetText: ViewBag.TweetText)
+                                </div>
+                                @if (!String.IsNullOrEmpty(ViewBag.TwitterActivityCaption))
+                                {
+                                @TwitterGoodies.Search(ViewBag.TwitterHashtag, scrollBar: true, width: 205, height: 150, shellColor: "#EBEDEF", backgroundShellColor: "#44474D", tweetsBackgroundColor: "#EBEDEF", caption: ViewBag.TwitterActivityCaption)
+                                }
+                            </div>
+                        </a>
+                    </li>
+                    }
+                </ul>
+            </li>
+        *@
+
+        <li class="has-children overview">
+            <a href="" onclick="return false;"><i class="sidebar-header-icon fa fa-cogs"></i>Preferences</a>
+            <ul id="preferences">
+
+                <li class="has-children overview">
+                    <a href="" onclick="return false;">Results Layout</a>
+                    <ul id="results-options-layout">
+                        <li id="but-masonry"><a href="" onclick="return false;"><i id="" class="fa fa-th-large"></i> Grid</a></li>
+                        <li id="but-list-image"><a href="" onclick="return false;"><i id="" class="fa fa-th-list"></i> List</a></li>
+                    </ul>
+                </li>
+
+                <li class="has-children overview">
+                    <a href="" onclick="return false;">Results Size</a>
+                    <ul id="recordset-size">
+                        <li id="but-small"><a href="" onclick="return false;"><i id="but-small-text" class="fa fa-square"></i> Small</a></li>
+                        <li id="but-med"><a href="" onclick="return false;"><i id="but-med-text" class="fa fa-square"></i> Medium</a></li>
+                        <li id="but-large"><a href="" onclick="return false;"><i id="but-large-text" class="fa fa-square"></i> Large</a></li>
+                    </ul>
+                </li>
+
+                <li class="has-children overview">
+                    <a href="" onclick="return false;">Results Sort Order</a>
+                    <ul id="recordset-sort-options" data-bind="template: { name: 'recordset-sort-option-template', foreach: sortFields }"></ul>
+                </li>
+
+                <li class="has-children overview">
+                    <a href="" onclick="return false;">Results to Display</a>
+                    <ul id="recordset-page-sizes" data-bind="template: { name: 'recordset-size-option-template', foreach: recordsetPageSizes }"></ul>
+                </li>
+
+            </ul>
+        </li>
+
+        <li class="has-children overview">
+            <a href="" onclick="return false;"><i class="sidebar-header-icon fa fa-question" id="sidebar-header-icon-help"></i>Help</a>
+            <ul id="help">
+
+                <li class="">
+                    <a href="" onclick="return false;">Searching</a>
+                    <div>Enter your search term or use the facet filters.</div>
+                </li>
+            </ul>
+        </li>
+    </ul>
+
+    
+</nav>

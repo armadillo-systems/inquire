@@ -1,0 +1,249 @@
+﻿@charset "UTF-8";
+html {
+  height: 100%; }
+
+body {
+  height: 100%;
+  padding-top: 100px;
+  padding-bottom: 20px; }
+
+nav ul, nav li {
+  padding: 0;
+  margin: 0; }
+
+/* Set padding to keep content from hitting the edges */
+.body-content {
+  padding-left: 45px;
+  padding-right: 45px; }
+
+/* Override the default bootstrap behavior where horizontal description lists 
+   will truncate terms that are too long to fit in the left column 
+*/
+.dl-horizontal dt {
+  white-space: normal; }
+
+/* Set width on the form input elements since they're 100% wide by default 
+input,
+select,
+textarea {
+    max-width: 280px;
+}*/
+h1.site-header {
+  color: #fff;
+  font-family: 'Trebuchet MS', Helvetica, sans-serif; }
+
+.vcenter {
+  display: inline-block;
+  vertical-align: middle;
+  float: none; }
+
+#but-small-text {
+  font-size: 10px; }
+
+#but-med-text {
+  font-size: 14px; }
+
+#but-large-text {
+  font-size: 18px; }
+
+.padding-left-none {
+  padding-left: 0; }
+
+.padding-right-none {
+  padding-right: 0; }
+
+.margin-none {
+  margin: 0; }
+
+#search-facets {
+  overflow-y: auto;
+  overflow-x: hidden; }
+
+#narrow-search-container h2, #collection-container h2 {
+  font-family: Arial;
+  font-size: 1.313em;
+  color: #5AA000;
+  margin: 0;
+  margin-bottom: 10px; }
+
+#narrow-search-container h3 {
+  font-family: Arial;
+  font-weight: bold;
+  font-size: .9em;
+  color: #44474d;
+  margin: 0;
+  margin-bottom: 5px; }
+
+#narrow-search-container li {
+  font-family: Arial;
+  display: list-item;
+  list-style-type: none;
+  margin: 0;
+  font-size: .9em;
+  color: #fff;
+  cursor: pointer; }
+
+#narrow-search-container nav {
+  margin-bottom: 5px;
+  margin-left: 10px; }
+
+#metadata-wrapper {
+  overflow: auto; }
+
+#metadata-wrapper h3 {
+  font-family: Arial;
+  color: #44474f;
+  margin: 0; }
+
+#metadata-fields {
+  margin: 0;
+  font-size: .9em;
+  font-family: Arial; }
+
+.metadata-field {
+  margin: 10px 0;
+  padding: 0; }
+
+.metadata-label {
+  font-weight: bold;
+  margin: 0 5px 0 0;
+  padding: 0; }
+
+.metadata-divider {
+  height: 1px;
+  border-bottom: 1px solid #afafaf;
+  margin: 5px 0; }
+
+#logindisplay {
+  min-width: 250px !important; }
+
+.fb-login-button {
+  padding-top: 15px;
+  padding-left: 5px;
+  padding-right: 5px; }
+
+#recordset-page-size {
+  max-width: 45px;
+  display: inline; }
+
+#recordset-sort-options {
+  max-width: 110px;
+  display: inline; }
+
+#results-size {
+  padding-left: 5px;
+  padding-right: 5px; }
+
+section #results {
+  margin-top: 10px; }
+
+#results-title {
+  font-size: 1.3em;
+  font-weight: bold; }
+
+#results-children-back {
+  margin-bottom: 10px; }
+
+.result-list-img {
+  width: 200px;
+  float: left; }
+
+.result-list-text {
+  /*float: left;
+    width: auto;*/
+  float: left;
+  margin-top: 10px;
+  width: 250px;
+  max-width: 1000px; }
+
+.result-title {
+  font-size: 1em;
+  padding: 0 5px; }
+
+.result-desc {
+  margin-top: 10px;
+  font-size: .9em; }
+
+footer {
+  text-align: center; }
+
+@media (min-width: 600px) {
+  .result-list-text {
+    width: 320px;
+    width: calc(100% - 200px);
+    margin-top: 0px;
+    padding-left: 10px; } }
+
+@media (min-width: 768px) {
+  body {
+    padding-top: 100px; } }
+
+/* Loading spinner
+    http://stephanwagner.me/only-css-loading-spinner
+*/
+@keyframes spinner {
+  to {
+    transform: rotate(360deg); } }
+
+@-webkit-keyframes spinner {
+  to {
+    -webkit-transform: rotate(360deg); } }
+
+.spinner {
+  min-width: 100%;
+  min-height: 100%; }
+
+.spinner:before {
+  content: 'Loading…';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 24px;
+  height: 24px;
+  margin-top: -13px;
+  margin-left: -13px; }
+
+.spinner:not(:required):before {
+  content: '';
+  border-radius: 50%;
+  border: 1px solid #ccc;
+  border-top-color: purple;
+  animation: spinner .6s linear infinite;
+  -webkit-animation: spinner .6s linear infinite; }
+
+/* End loading spinner*/
+/* Start: Collapsable panels */
+.panel-heading.accordion-toggle:after {
+  /* symbol for "opening" panels */
+  font-family: 'Glyphicons Halflings';
+  /* essential for enabling glyphicon */
+  content: "\e114";
+  /* adjust as needed, taken from bootstrap.css */
+  float: right;
+  position: relative;
+  bottom: 23px;
+  font-size: 15pt;
+  /* adjust as needed */
+  color: grey;
+  /* adjust as needed */ }
+
+.panel-heading.accordion-toggle.collapsed:after {
+  /* symbol for "collapsed" panels */
+  content: "\e080";
+  /* adjust as needed, taken from bootstrap.css */ }
+
+.panel-heading:hover {
+  cursor: pointer; }
+
+.panel-heading:hover h4 {
+  text-decoration: underline; }
+
+/* End: Collapsable panels*/
+.row-no-padding [class*="col-"] {
+  padding-left: 0 !important;
+  padding-right: 0 !important; }
+
+.no-h-padding {
+  padding-left: 0 !important;
+  padding-right: 0 !important; }
+
