@@ -32,7 +32,7 @@
 
 <div id="results-container">    
     <section id="results" data-bind="visible: !deepZoomVisible(), template: { name: resultsLayoutMode, foreach: results, afterAdd: afterRenderResult }"></section>
-    <section id="dz-wrapper" data-bind="if: deepZoomVisible"></section>
+    <section id="dz-wrapper" data-bind="visible: deepZoomVisible()"></section>
 </div>
 
 @Html.Partial("~/Views/Discover/Search/_ResultsPager.cshtml")
