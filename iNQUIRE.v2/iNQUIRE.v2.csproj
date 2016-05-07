@@ -271,16 +271,7 @@
     <Compile Include="Helpers\ImageHelper.cs" />
     <Compile Include="Helpers\SolrHelper.cs" />
     <Compile Include="Helpers\ZipHelper.cs" />
-    <Compile Include="iNQUIRE.designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>iNQUIRE.dbml</DependentUpon>
-    </Compile>
-    <Compile Include="iNQUIRELite.designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>iNQUIRELite.dbml</DependentUpon>
-    </Compile>
+    <Compile Include="iNQUIRELite.designer.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\ArmDbSolrRepository.cs" />
     <Compile Include="Models\EmailExport.cs" />
@@ -449,16 +440,6 @@
     <Content Include="fonts\fontawesome-webfont.svg" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
-    <Content Include="iNQUIRE.dbml">
-      <Generator>MSLinqToSQLGenerator</Generator>
-      <LastGenOutput>iNQUIRE.designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </Content>
-    <Content Include="iNQUIRELite.dbml">
-      <Generator>MSLinqToSQLGenerator</Generator>
-      <LastGenOutput>iNQUIRELite.designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </Content>
     <Content Include="Djatoka.dbml">
       <Generator>MSLinqToSQLGenerator</Generator>
       <LastGenOutput>Djatoka.designer.cs</LastGenOutput>
@@ -502,12 +483,19 @@
     </Content>
     <Content Include="Content\Site2.scss" />
     <Content Include="Content\_cd-header-properties.scss" />
-    <None Include="Properties\PublishProfiles\ARMSERV.pubxml" />
     <Content Include="iNQUIRE_export.xsl">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="iNQUIRELite.dbml">
+      <Generator>MSLinqToSQLGenerator</Generator>
+      <LastGenOutput>iNQUIRELite1.designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </Content>
+    <None Include="Properties\PublishProfiles\ARMSERV.pubxml" />
     <None Include="Properties\PublishProfiles\inquire.armtest.uk.pubxml" />
     <None Include="Scripts\jquery-2.1.1.intellisense.js" />
+    <Content Include="Properties\PublishProfiles\ARMSERV.pubxml.user" />
+    <Content Include="Properties\PublishProfiles\inquire.armtest.uk.pubxml.user" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="Scripts\jquery-2.1.1.js" />
@@ -634,18 +622,13 @@
     <Service Include="{3259AA49-8AA1-44D3-9025-A0B520596A8C}" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="iNQUIRE.dbml.layout">
-      <DependentUpon>iNQUIRE.dbml</DependentUpon>
+    <None Include="Djatoka.dbml.layout">
+      <DependentUpon>Djatoka.dbml</DependentUpon>
     </None>
   </ItemGroup>
   <ItemGroup>
     <None Include="iNQUIRELite.dbml.layout">
       <DependentUpon>iNQUIRELite.dbml</DependentUpon>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Djatoka.dbml.layout">
-      <DependentUpon>Djatoka.dbml</DependentUpon>
     </None>
   </ItemGroup>
   <PropertyGroup>

@@ -1,0 +1,117 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ordesignerObjectsDiagram dslVersion="1.0.0.0" absoluteBounds="0, 0, 11, 16.875" name="iNQUIRELite">
+  <DataContextMoniker Name="/iNQUIRELiteDataContext" />
+  <nestedChildShapes>
+    <classShape Id="302d04bc-6a78-4168-af75-15c172f768d0" absoluteBounds="3.5, 6.625, 2, 1.9631982421875005">
+      <DataClassMoniker Name="/iNQUIRELiteDataContext/Workspace" />
+      <nestedChildShapes>
+        <elementListCompartment Id="5c208090-40c1-4114-bb08-c360b58191a8" absoluteBounds="3.515, 7.085, 1.9700000000000002, 1.4031982421875" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="5cb1114f-d1dd-4acb-b2e4-86272519a8a4" absoluteBounds="3.5, 9.875, 2, 2.1554996744791666">
+      <DataClassMoniker Name="/iNQUIRELiteDataContext/Tag" />
+      <nestedChildShapes>
+        <elementListCompartment Id="29c68f5a-48c6-4440-bacc-4045d845f62c" absoluteBounds="3.515, 10.335, 1.9700000000000002, 1.5954996744791665" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="93f600b3-7827-4af1-97ce-55ecc6985e9f" absoluteBounds="6.25, 9.5, 2, 3.1170068359375023">
+      <DataClassMoniker Name="/iNQUIRELiteDataContext/WorkspaceItem" />
+      <nestedChildShapes>
+        <elementListCompartment Id="75c2ad0a-9438-4277-a161-d3dcb1fe97bc" absoluteBounds="6.265, 9.96, 1.9700000000000002, 2.5570068359375" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="94955544-6cb6-45c8-a33d-54a1f6f6adda" absoluteBounds="6.25, 13.875, 2, 2.1554996744791666">
+      <DataClassMoniker Name="/iNQUIRELiteDataContext/TaggedItem" />
+      <nestedChildShapes>
+        <elementListCompartment Id="c7f73cd7-42bf-44fb-8c89-220cfcabe8b1" absoluteBounds="6.265, 14.335, 1.9700000000000002, 1.5954996744791665" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="9193fa47-f356-4451-a4cb-5a6ced1e5622" absoluteBounds="6.25, 6, 2, 2.7324039713541666">
+      <DataClassMoniker Name="/iNQUIRELiteDataContext/Note" />
+      <nestedChildShapes>
+        <elementListCompartment Id="313e1f36-f955-42ec-9f29-63bfea759d3c" absoluteBounds="6.265, 6.46, 1.9700000000000002, 2.1724039713541665" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="eced7ec4-299b-4d04-9f67-7936f0a75811" absoluteBounds="0.75, 11.875, 2, 1.1939925130208344">
+      <DataClassMoniker Name="/iNQUIRELiteDataContext/User" />
+      <nestedChildShapes>
+        <elementListCompartment Id="3b86b22a-238b-45d5-907f-68f9c30d0997" absoluteBounds="0.765, 12.335, 1.9700000000000002, 0.63399251302083326" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="6c0cf185-bd96-4f8f-94c2-a0cc28831d0d" absoluteBounds="3.5, 3.625, 2, 1.5785953776041666">
+      <DataClassMoniker Name="/iNQUIRELiteDataContext/UserProfile" />
+      <nestedChildShapes>
+        <elementListCompartment Id="04734a90-ee5d-42af-b2e2-52756906ccb9" absoluteBounds="3.515, 4.085, 1.9700000000000002, 1.0185953776041665" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="9aab225c-170f-4a94-8eed-1832b6d8ad6c" absoluteBounds="3.5, 12.75, 2, 3.8862125651041648">
+      <DataClassMoniker Name="/iNQUIRELiteDataContext/Search" />
+      <nestedChildShapes>
+        <elementListCompartment Id="b8e96d68-0e66-4033-a0ee-544d9bea170c" absoluteBounds="3.515, 13.21, 1.9700000000000002, 3.3262125651041665" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <associationConnector edgePoints="[(1.61908200683594 : 11.875); (1.61908200683594 : 7.60659912109375); (2.35444708902995 : 7.60659912109375 : JumpStart); (2.52111375569661 : 7.60659912109375 : JumpEnd); (3.5 : 7.60659912109375)]" fixedFrom="NotFixed" fixedTo="NotFixed">
+      <AssociationMoniker Name="/iNQUIRELiteDataContext/User/User_Workspace" />
+      <nodes>
+        <classShapeMoniker Id="eced7ec4-299b-4d04-9f67-7936f0a75811" />
+        <classShapeMoniker Id="302d04bc-6a78-4168-af75-15c172f768d0" />
+      </nodes>
+    </associationConnector>
+    <associationConnector edgePoints="[(2.06305584472656 : 11.875); (2.06305584472656 : 10.8437475); (2.35444708902995 : 10.8437475 : JumpStart); (2.52111375569661 : 10.8437475 : JumpEnd); (3.5 : 10.8437475)]" fixedFrom="NotFixed" fixedTo="NotFixed">
+      <AssociationMoniker Name="/iNQUIRELiteDataContext/User/User_Tag" />
+      <nodes>
+        <classShapeMoniker Id="eced7ec4-299b-4d04-9f67-7936f0a75811" />
+        <classShapeMoniker Id="5cb1114f-d1dd-4acb-b2e4-86272519a8a4" />
+      </nodes>
+    </associationConnector>
+    <associationConnector edgePoints="[(5.5 : 8.5881982421875); (5.875 : 8.9631982421875); (5.875 : 11.0585034179688); (6.25 : 11.0585034179688)]" fixedFrom="NotFixed" fixedTo="NotFixed">
+      <AssociationMoniker Name="/iNQUIRELiteDataContext/Workspace/Workspace_WorkspaceItem" />
+      <nodes>
+        <classShapeMoniker Id="302d04bc-6a78-4168-af75-15c172f768d0" />
+        <classShapeMoniker Id="93f600b3-7827-4af1-97ce-55ecc6985e9f" />
+      </nodes>
+    </associationConnector>
+    <associationConnector edgePoints="[(5.5 : 12.0304996744792); (5.875 : 12.4054996744792); (5.875 : 14.9527498372396); (6.25 : 14.9527498372396)]" fixedFrom="NotFixed" fixedTo="NotFixed">
+      <AssociationMoniker Name="/iNQUIRELiteDataContext/Tag/Tag_TaggedItem" />
+      <nodes>
+        <classShapeMoniker Id="5cb1114f-d1dd-4acb-b2e4-86272519a8a4" />
+        <classShapeMoniker Id="94955544-6cb6-45c8-a33d-54a1f6f6adda" />
+      </nodes>
+    </associationConnector>
+    <associationConnector edgePoints="[(2.75 : 12.3902498372396); (6 : 12.3902498372396); (6 : 12.8670068359375); (7.25 : 12.8670068359375); (7.25 : 13.875)]" fixedFrom="NotFixed" fixedTo="NotFixed">
+      <AssociationMoniker Name="/iNQUIRELiteDataContext/User/User_TaggedItem" />
+      <nodes>
+        <classShapeMoniker Id="eced7ec4-299b-4d04-9f67-7936f0a75811" />
+        <classShapeMoniker Id="94955544-6cb6-45c8-a33d-54a1f6f6adda" />
+      </nodes>
+    </associationConnector>
+    <associationConnector edgePoints="[(5.5 : 7.57534662109375); (6.25 : 7.57534662109375)]" fixedFrom="NotFixed" fixedTo="NotFixed">
+      <AssociationMoniker Name="/iNQUIRELiteDataContext/Workspace/Workspace_Note" />
+      <nodes>
+        <classShapeMoniker Id="302d04bc-6a78-4168-af75-15c172f768d0" />
+        <classShapeMoniker Id="9193fa47-f356-4451-a4cb-5a6ced1e5622" />
+      </nodes>
+    </associationConnector>
+    <associationConnector edgePoints="[(1.15328850341797 : 11.875); (1.15328850341797 : 6.28125); (2.35444708902995 : 6.28125 : JumpStart); (2.52111375569661 : 6.28125 : JumpEnd); (6.25 : 6.28125)]" fixedFrom="NotFixed" fixedTo="NotFixed">
+      <AssociationMoniker Name="/iNQUIRELiteDataContext/User/User_Note" />
+      <nodes>
+        <classShapeMoniker Id="eced7ec4-299b-4d04-9f67-7936f0a75811" />
+        <classShapeMoniker Id="9193fa47-f356-4451-a4cb-5a6ced1e5622" />
+      </nodes>
+    </associationConnector>
+    <associationConnector edgePoints="[(2.43778042236328 : 11.875); (2.43778042236328 : 4.41429768880208); (3.5 : 4.41429768880208)]" fixedFrom="NotFixed" fixedTo="NotFixed">
+      <AssociationMoniker Name="/iNQUIRELiteDataContext/User/User_UserProfile" />
+      <nodes>
+        <classShapeMoniker Id="eced7ec4-299b-4d04-9f67-7936f0a75811" />
+        <classShapeMoniker Id="6c0cf185-bd96-4f8f-94c2-a0cc28831d0d" />
+      </nodes>
+    </associationConnector>
+    <associationConnector edgePoints="[(2.22905351777113 : 13.0689925130208); (2.22905351777113 : 14.8526030390625); (3.5 : 14.8526030390625)]" fixedFrom="Caller" fixedTo="Algorithm">
+      <AssociationMoniker Name="/iNQUIRELiteDataContext/User/User_Search" />
+      <nodes>
+        <classShapeMoniker Id="eced7ec4-299b-4d04-9f67-7936f0a75811" />
+        <classShapeMoniker Id="9aab225c-170f-4a94-8eed-1832b6d8ad6c" />
+      </nodes>
+    </associationConnector>
+  </nestedChildShapes>
+</ordesignerObjectsDiagram>

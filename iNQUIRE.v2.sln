@@ -68,25 +68,4 @@ Global
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
-	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 6
-		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
-		SccTeamFoundationServer = https://armadillo.visualstudio.com/defaultcollection
-		SccLocalPath0 = .
-		SccProjectUniqueName1 = DjatokaIIS\\DjatokaIIS\\DjatokaIIS.csproj
-		SccProjectName1 = DjatokaIIS/DjatokaIIS
-		SccLocalPath1 = DjatokaIIS\\DjatokaIIS
-		SccProjectUniqueName2 = Helpers\\iNQUIRE.Helper.csproj
-		SccProjectName2 = Helpers
-		SccLocalPath2 = Helpers
-		SccProjectUniqueName3 = IIPImageIIS\\IIPImageIIS.csproj
-		SccProjectName3 = IIPImageIIS
-		SccLocalPath3 = IIPImageIIS
-		SccProjectUniqueName4 = iNQUIRE.v2\\iNQUIRE.v2.csproj
-		SccProjectName4 = iNQUIRE.v2
-		SccLocalPath4 = iNQUIRE.v2
-		SccProjectUniqueName5 = IIIFIIS\\IIIFIIS.csproj
-		SccProjectName5 = IIIFIIS
-		SccLocalPath5 = IIIFIIS
-	EndGlobalSection
 EndGlobal

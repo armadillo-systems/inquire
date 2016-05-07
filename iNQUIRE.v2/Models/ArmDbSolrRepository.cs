@@ -22,31 +22,33 @@ namespace iNQUIRE.Models
 
         public override bool UpdateFileFieldToJpeg2000(string id, string value)
         {
+            throw new Exception("No longer implemented");
+
             // for data coming from sql server (eg BL crimea) need to update the media table with the new djatoka id
             // otherwise when data is re-imported from sql server to solr, the djatoka id will be lost from solr, and
             // the system will think the image is not a jp2 anymore
             
             // should not need to call dispose on DataContext object below (ie use "using" or "finally"), as resources are not held open
-            try
-            {
-                var db = new iNQUIREDataContext();
+            //try
+            //{
+            //    var db = new iNQUIREDataContext();
 
-                // check to see if tag already exists
-                var media = db.Medias.SingleOrDefault(m => m.Filename == id); // will throw an error if more than 1 record found
+            //    // check to see if tag already exists
+            //    var media = db.Medias.SingleOrDefault(m => m.Filename == id); // will throw an error if more than 1 record found
 
-                if ((media == null) || (media.MediaID == Guid.Empty)) // if none found
-                    throw new Exception(String.Format("Error, no Media item found with this existing filename to update {0}", media.MediaID));
+            //    if ((media == null) || (media.MediaID == Guid.Empty)) // if none found
+            //        throw new Exception(String.Format("Error, no Media item found with this existing filename to update {0}", media.MediaID));
 
-                media.Filename = value;
-                db.SubmitChanges();
-                LogHelper.StatsLog(null, "ArmDbSolrRepository.UpdateFileFieldToJpeg2000() OK", String.Format("Existing file {0}, new value {1}", id, value), null, null);
-            }
-            catch (Exception ex)
-            {
-                LogHelper.StatsLog(null, "ArmDbSolrRepository.UpdateFileFieldToJpeg2000() failed", String.Format("Failed for existing file {0}, new value {1}, reason: {2}", id, value, ex.Message), null, null);
-            }
+            //    media.Filename = value;
+            //    db.SubmitChanges();
+            //    LogHelper.StatsLog(null, "ArmDbSolrRepository.UpdateFileFieldToJpeg2000() OK", String.Format("Existing file {0}, new value {1}", id, value), null, null);
+            //}
+            //catch (Exception ex)
+            //{
+            //    LogHelper.StatsLog(null, "ArmDbSolrRepository.UpdateFileFieldToJpeg2000() failed", String.Format("Failed for existing file {0}, new value {1}, reason: {2}", id, value, ex.Message), null, null);
+            //}
 
-            return base.UpdateFileFieldToJpeg2000(id, value);
+            //return base.UpdateFileFieldToJpeg2000(id, value);
         }
 
 

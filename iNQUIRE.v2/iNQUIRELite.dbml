@@ -1,0 +1,117 @@
+﻿<?xml version="1.0" encoding="utf-8"?><Database Name="INQUIRE_Lite" Class="iNQUIRELiteDataContext" xmlns="http://schemas.microsoft.com/linqtosql/dbml/2007">
+  <Connection Mode="WebSettings" ConnectionString="Data Source=ARMSERV;Initial Catalog=INQUIRE_Lite;Persist Security Info=True;User ID=dreuser2" SettingsObjectName="System.Configuration.ConfigurationManager.ConnectionStrings" SettingsPropertyName="INQUIREConnectionString" Provider="System.Data.SqlClient" />
+  <Table Name="dbo.Workspaces" Member="Workspaces">
+    <Type Name="Workspace">
+      <Column Name="WorkspaceID" Type="System.Guid" DbType="UniqueIdentifier NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="UserID" Type="System.String" DbType="NVarChar(128) NOT NULL" CanBeNull="false" />
+      <Column Name="Title" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="LastEdited" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="Created" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="ApplicationID" Type="System.Guid" DbType="UniqueIdentifier NOT NULL" CanBeNull="false" />
+      <Association Name="Workspace_WorkspaceItem" Member="WorkspaceItems" ThisKey="WorkspaceID" OtherKey="WorkspaceID" Type="WorkspaceItem" />
+      <Association Name="Workspace_Note" Member="Note" ThisKey="WorkspaceID" OtherKey="NoteID" Type="Note" Cardinality="One" />
+      <Association Name="User_Workspace" Member="User" AccessModifier="Internal" ThisKey="UserID" OtherKey="Id" Type="User" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Tags" Member="Tags">
+    <Type Name="Tag">
+      <Column Name="TagID" Type="System.Guid" DbType="UniqueIdentifier NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="UserID" Type="System.String" DbType="nvarchar(128) NOT NULL" CanBeNull="false" />
+      <Column Name="Title" Type="System.String" DbType="NVarChar(255) NOT NULL" CanBeNull="false" />
+      <Column Name="LanguageID" Type="System.String" DbType="NChar(3) NOT NULL" CanBeNull="false" />
+      <Column Name="Approved" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="Created" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="ApplicationID" Type="System.Guid" DbType="UniqueIdentifier NOT NULL" CanBeNull="false" />
+      <Association Name="Tag_TaggedItem" Member="TaggedItems" ThisKey="TagID" OtherKey="TagID" Type="TaggedItem" />
+      <Association Name="User_Tag" Member="User" AccessModifier="Internal" ThisKey="UserID" OtherKey="Id" Type="User" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.ObjectsToWorkspaces" Member="WorkspaceItems">
+    <Type Name="WorkspaceItem">
+      <Column Name="ObjectWorkspaceID" Type="System.Guid" DbType="UniqueIdentifier NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="ObjectID" Type="System.String" DbType="NVarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="WorkspaceID" Type="System.Guid" DbType="UniqueIdentifier NOT NULL" CanBeNull="false" />
+      <Column Name="LanguageID" Type="System.String" DbType="NChar(3) NOT NULL" CanBeNull="false" />
+      <Column Name="Notes" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
+      <Column Name="PosX" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="PosY" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Keywords" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
+      <Column Name="SearchTerm" Type="System.String" DbType="NVarChar(255)" CanBeNull="true" />
+      <Column Name="LastEdited" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="Position" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="Title" Type="System.String" DbType="NVarChar(255)" CanBeNull="true" />
+      <Association Name="Workspace_WorkspaceItem" Member="Workspace" AccessModifier="Internal" ThisKey="WorkspaceID" OtherKey="WorkspaceID" Type="Workspace" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.ObjectsToTags" Member="TaggedItems">
+    <Type Name="TaggedItem">
+      <Column Name="ObjectToTagID" Type="System.Guid" DbType="UniqueIdentifier NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="ObjectID" Type="System.String" DbType="NVarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="TagID" Type="System.Guid" DbType="UniqueIdentifier NOT NULL" CanBeNull="false" />
+      <Column Name="UserID" Type="System.String" DbType="nvarchar(128) NOT NULL" CanBeNull="false" />
+      <Column Name="LastEdited" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="LanguageID" Type="System.String" DbType="NChar(3)" CanBeNull="true" />
+      <Column Name="ApplicationID" Type="System.Guid" DbType="UniqueIdentifier NOT NULL" CanBeNull="false" />
+      <Association Name="Tag_TaggedItem" Member="Tag" ThisKey="TagID" OtherKey="TagID" Type="Tag" IsForeignKey="true" />
+      <Association Name="User_TaggedItem" Member="User" AccessModifier="Internal" ThisKey="UserID" OtherKey="Id" Type="User" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Notes" Member="Notes">
+    <Type Name="Note">
+      <Column Name="NoteID" Type="System.Guid" DbType="UniqueIdentifier NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="UserID" Type="System.String" DbType="nvarchar(128) NOT NULL" CanBeNull="false" />
+      <Column Name="LanguageID" Type="System.String" DbType="NChar(3) NOT NULL" CanBeNull="false" />
+      <Column Name="PublicNote" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="ParentID" Type="System.String" DbType="NVarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="Text" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
+      <Column Name="Approved" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="Created" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="LastEdited" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="ApplicationID" Type="System.Guid" DbType="UniqueIdentifier NOT NULL" CanBeNull="false" />
+      <Association Name="Workspace_Note" Member="Workspace" AccessModifier="Internal" ThisKey="NoteID" OtherKey="WorkspaceID" Type="Workspace" IsForeignKey="true" />
+      <Association Name="User_Note" Member="User" AccessModifier="Internal" ThisKey="UserID" OtherKey="Id" Type="User" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.AspNetUsers" Member="Users">
+    <Type Name="User">
+      <Column Name="Id" Storage="_UserId" Type="System.String" DbType="NVarChar(128) NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="UserName" Type="System.String" DbType="NVarChar(256) NOT NULL" CanBeNull="false" />
+      <Association Name="User_Workspace" Member="Workspaces" ThisKey="Id" OtherKey="UserID" Type="Workspace" />
+      <Association Name="User_Tag" Member="Tags" ThisKey="Id" OtherKey="UserID" Type="Tag" />
+      <Association Name="User_TaggedItem" Member="TaggedItems" ThisKey="Id" OtherKey="UserID" Type="TaggedItem" />
+      <Association Name="User_Note" Member="Notes" ThisKey="Id" OtherKey="UserID" Type="Note" />
+      <Association Name="User_UserProfile" Member="UserProfile" ThisKey="Id" OtherKey="UserId" Type="UserProfile" Cardinality="One" />
+      <Association Name="User_Search" Member="Searches" ThisKey="Id" OtherKey="UserId" Type="Search" />
+    </Type>
+  </Table>
+  <Table Name="dbo.UserProfiles" Member="UserProfiles">
+    <Type Name="UserProfile">
+      <Column Name="UserId" Type="System.String" DbType="nvarchar(128) NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="ResultsLayout" Type="System.String" DbType="NChar(10)" CanBeNull="true" />
+      <Column Name="ResultsRows" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="ResultsPageSize" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Association Name="User_UserProfile" Member="User" AccessModifier="Internal" ThisKey="UserId" OtherKey="Id" Type="User" IsForeignKey="true" DeleteRule="CASCADE" DeleteOnNull="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Searches" Member="Searches">
+    <Type Name="Search">
+      <Column Name="SearchID" Type="System.Guid" DbType="UniqueIdentifier NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="ApplicationID" Type="System.Guid" DbType="UniqueIdentifier NOT NULL" CanBeNull="false" />
+      <Column Name="UserId" Type="System.String" DbType="nvarchar(128) NOT NULL" CanBeNull="false" />
+      <Column Name="DisplayName" Type="System.String" DbType="NVarChar(255)" CanBeNull="true" />
+      <Column Name="Term" Type="System.String" DbType="NVarChar(255)" CanBeNull="true" />
+      <Column Name="IDs" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
+      <Column Name="Rows" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="RowStart" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="NumFound" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="ParentID" Type="System.String" DbType="NVarChar(255)" CanBeNull="true" />
+      <Column Name="SortFields" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
+      <Column Name="FacetConstraints" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
+      <Column Name="SearchDate" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="Deleted" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="Empty" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="Hidden" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Association Name="User_Search" Member="User" ThisKey="UserId" OtherKey="Id" Type="User" IsForeignKey="true" DeleteRule="CASCADE" DeleteOnNull="true" />
+    </Type>
+  </Table>
+</Database>
