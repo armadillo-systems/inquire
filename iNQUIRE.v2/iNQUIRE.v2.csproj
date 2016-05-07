@@ -491,11 +491,7 @@
       <LastGenOutput>iNQUIRELite1.designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </Content>
-    <None Include="Properties\PublishProfiles\ARMSERV.pubxml" />
-    <None Include="Properties\PublishProfiles\inquire.armtest.uk.pubxml" />
     <None Include="Scripts\jquery-2.1.1.intellisense.js" />
-    <Content Include="Properties\PublishProfiles\ARMSERV.pubxml.user" />
-    <Content Include="Properties\PublishProfiles\inquire.armtest.uk.pubxml.user" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="Scripts\jquery-2.1.1.js" />
@@ -590,14 +586,10 @@
     <Content Include="Scripts\Seadragon\openseadragon.min.js.map" />
     <Content Include="Views\Shared\_LayoutPrint.cshtml" />
     <Content Include="Views\Shared\_Logo.cshtml" />
-    <None Include="Web.armserv.config">
-      <DependentUpon>Web.config</DependentUpon>
-    </None>
-    <None Include="Web.inquire.armtest.uk.config">
-      <DependentUpon>Web.config</DependentUpon>
-    </None>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Properties\PublishProfiles\" />
+  </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
   </ItemGroup>
