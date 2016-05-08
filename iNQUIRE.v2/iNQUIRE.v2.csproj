@@ -402,6 +402,10 @@
     <Content Include="Content\cd-rsn.scss" />
     <Content Include="Content\cd-3dnav.scss" />
     <Content Include="App_Data\INQUIRE_Lite.dacpac" />
+    <Content Include="ConnectionStrings.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="AppSettingsSecrets.config" />
     <None Include="Content\simple-sidebar.scss" />
     <Content Include="Content\reset.css" />
     <Content Include="Content\simple-sidebar.css">
