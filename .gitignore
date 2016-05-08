@@ -210,9 +210,13 @@ FakesAssemblies/
 GeneratedArtifacts/
 _Pvt_Extensions/
 ModelManifest.xml
-/iNQUIRE.v2/changelog.txt
-/iNQUIRE.v2/Todo Aug2015.txt
-/iNQUIRE.v2/Web.inquire.armtest.uk.config
-/iNQUIRE.v2/Web.armserv.config
+
+# Files with secrets
+Web.inquire.armtest.uk.config
+Web.armserv.config
 AppSettingsSecrets.config
 ConnectionStrings.config
+
+# Other files
+/iNQUIRE.v2/changelog.txt
+/iNQUIRE.v2/Todo Aug2015.txt
