@@ -350,24 +350,27 @@
                                 var val = d.Results[j][cs_name];
                                 var hl_val = kvp.Value; // h[rid][hprop]
 
-                                if(!val_is_array) { /*@* single value property so can overwrite *@*/
-                                    //val = hl_val[0];
-                                    if (val != null) {
-                                        d.Results[j][cs_name] = d.Results[j][cs_name].replace(reg, reg_replace);
+                                if(cs_name != "IIIFImageRoot")
+                                {
+                                    if(!val_is_array) { /*@* single value property so can overwrite *@*/
+                                        //val = hl_val[0];
+                                        if (val != null) {
+                                            d.Results[j][cs_name] = d.Results[j][cs_name].replace(reg, reg_replace);
+                                        }
                                     }
-                                }
-                                else { /*@* need to overwrite only the correct multi-value value *@*/
-                                    for(var z = 0; z < val.length; z++) {
-                                        var val_plain = stripHtml(val[z]);
+                                    else { /*@* need to overwrite only the correct multi-value value *@*/
+                                        for(var z = 0; z < val.length; z++) {
+                                            var val_plain = stripHtml(val[z]);
 
-                                        /*@* Nov2014: this needs testing, can't remember where to find a multi value field... *@*/
-                                        for(var y = 0; y < hl_val.length; y++) {
-                                            if(val_plain.localeCompare(stripHtml(hl_val[y])) == 0) {
-                                                //val[z] = hl_val[y];
-                                                if (d.Results[j][cs_name][z] != null) {
-                                                    d.Results[j][cs_name][z] = d.Results[j][cs_name][z].replace(reg, reg_replace);
+                                            /*@* Nov2014: this needs testing, can't remember where to find a multi value field... *@*/
+                                            for(var y = 0; y < hl_val.length; y++) {
+                                                if(val_plain.localeCompare(stripHtml(hl_val[y])) == 0) {
+                                                    //val[z] = hl_val[y];
+                                                    if (d.Results[j][cs_name][z] != null) {
+                                                        d.Results[j][cs_name][z] = d.Results[j][cs_name][z].replace(reg, reg_replace);
+                                                    }
+                                                    break;
                                                 }
-                                                break;
                                             }
                                         }
                                     }
