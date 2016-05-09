@@ -192,7 +192,7 @@
         }
 
         self.clearContent = function () {
-            // alert('clearContent()');
+            console.log ('clearContent(), vi: ' + self.viewItem());
             $(self.resultsSelector).remove();
             self.zoomFrameClear();
             self.deepZoomVisible(false);
@@ -2218,6 +2218,7 @@
                     setupSlider(self.recordChildIds().length);
 
                     if(self.searchParentId() != item_id) {
+                        // self.searchCollectionIds('');
                         self.searchParentId(item_id);
                         self.refreshSearch();
                     }
@@ -2263,7 +2264,12 @@
             return ((self.resultsLayout().indexOf('masonry') > -1) && (self.resultSize().indexOf('-sm') > -1));
         }, self);
 
+
+        self.childNavigationDummy = ko.observable('');
         self.childNavigation = ko.computed(function() {
+            //var str = 'childNavigation: ' + !IsFieldNullOrEmpty(self.searchParentId()) && !IsFieldNullOrEmpty(self.viewItem());
+            //console.log(str);
+            self.childNavigationDummy();
             return !IsFieldNullOrEmpty(self.searchParentId()) && !IsFieldNullOrEmpty(self.viewItem());
         }, self);
 
@@ -2463,110 +2469,6 @@
             },
             owner: self });
 
-
-        @*self.searchParamsString = ko.pureComputed({
-            read: function () {
-                // var params_str = 't+' + encodeURIComponent(self.searchTerm()) + ',rsrs+' + self.recordsetRowStart() + ',rsps+' + self.recordsetPageSize() + ',fa+' + encodeURIComponent(self.facetsAppliedString()) + ',so+' + encodeURIComponent(self.sortsAppliedString()) + ',scids+' + self.searchCollectionIds() + ',pid+' + self.searchParentId() + ',vi+' + self.viewItem();
-                var params_str = 't+' + self.searchTerm() + ',rsrs+' + self.recordsetRowStart() + ',rsps+' + self.recordsetPageSize();
-                console.log('searchParamsString read: ' + params_str);
-                return params_str;
-            },
-            write: function (value) {
-                if(self.searchParamsString() != value) {
-                    console.log('searchParamsString write: ' + value);
-
-                    if(IsFieldNullOrEmpty(value))
-                        value = 't+,rsrs+0,rsps+' + self.recordsetPageSize() + ',fa+,scids+,pid+,vi+'; /**/
-
-                    var params_array = value.split(',');
-                    var params = {};
-                    for(var i = 0; i < params_array.length; i++) {
-                        var param = params_array[i].split('+');
-                        params[param[0]] = param[1];
-                    }
-
-                    if(self.viewItem() != params.vi) {
-                        if(self.searchParentId() != params.pid) {
-                            self.searchParentId(params.pid);
-                        }
-                        // alert('viewItem changed: ' + params.vi);
-                        self.viewItem(params.vi); // not triggering view item
-
-                        if (self.recordChildIds().length > 0) { // if in child view mode need to find which position this child is at so can display the child object navigation and slider correctly
-                            var p = self.recordChildIds.indexOf(params.vi);
-                            if (p != self.recordCurrentPosition())
-                                self.recordCurrentPosition(p)
-                        }
-
-                        if(IsFieldNullOrEmpty(params.vi)) /**/
-                            search();
-                    }
-                    else {
-                        var pchanged = false;
-                        var term_changed = false;
-
-                        var t = decodeURIComponent(params.t);
-                        if(self.searchTerm() != t) {
-                            // opera.postError('searchTerm changed');
-                            self.searchTerm(t);
-                            self.recordsetRowStart(0);
-                            clearSearch(true, true);
-                            pchanged = true;
-                            term_changed = true;
-                        }
-
-                        if(self.recordsetRowStart() != params.rsrs) {
-                            // opera.postError('recordsetRowStart changed');
-                            self.recordsetRowStart(params.rsrs);
-                            pchanged = true;
-                        }
-
-                        if(self.recordsetPageSize() != params.rsps) {
-                            // opera.postError('recordsetPageSize changed');
-                            self.recordsetPageSize(parseInt(params.rsps));
-                            pchanged = true;
-                        }
-
-                        //var fa = decodeURIComponent(params.fa);
-                        //if(self.facetsAppliedString() != fa) {
-                        //    // opera.postError('facetsAppliedString changed, old: ' + self.facetsAppliedString() + ', new: ' + params.fa);
-                        //    self._facetsAppliedString = fa; // had to put this in here as facetsAppliedString() is a dependentObservable and doesn't seem to update like an observable
-                        //    self.facetsAppliedString(fa);
-                        //    pchanged = true;
-                        //}
-
-                        //var so = decodeURIComponent(params.so);
-                        //if(self.sortField() != so) {
-                        //    // opera.postError('sortsAppliedString changed, old: ' + self.sortsAppliedString() + ', new: ' + params.so);
-                        //    self._sortsAppliedString = so; // had to put this in here as sortsAppliedString() is a dependentObservable and doesn't seem to update like an observable
-                        //    self.sortField(so);
-                        //    pchanged = true;
-                        //}
-
-                        //if(self.searchCollectionIds() != params.scids) {
-                        //    // opera.postError('searchCollectionIds changed');
-                        //    self.searchCollectionIds(params.scids);
-                        //    pchanged = true;
-                        //}
-
-                        //if(self.searchParentId() != params.pid) {
-                        //    // opera.postError('searchParentId changed');
-                        //    self.searchParentId(params.pid);
-                        //    pchanged = true;
-                        //}
-
-                        //if(pchanged) {
-                        //    // opera.postError('parameters changed');
-                        //    search(0);
-                        //}
-                    }
-                }
-                else {
-                    // opera.postError('self.searchParamsString.write SKIPPED: ' + value);
-                }
-            },
-            owner: self }).extend({ rateLimit: 100 });*@
-
         ko.pureComputed(function() {
             var id = decodeURIComponent(self.viewItem());
             // alert('viewItem set: ' + id);
@@ -2610,7 +2512,16 @@
 
             // console.log('search: '  + "term: " + self.searchTerm + ", row_start: " + self.recordsetRowStart  + ", rows: " + self.recordsetPageSize +  ", facets: " + self.facetsAppliedString +  ", sorts: " + self.sortsAppliedString + ", parent_id: " + self._searchParentId + ", collection_ids: " + self.searchCollectionIds);
 
-            self.searchRequest = $.get("@Url.Content("~/Discover/SearchAjax")", { "user_id": self.userID, "term": self.searchTerm(), "rows": self.recordsetPageSize(), "row_start": self.recordsetRowStart(), "sort_orders": self.sortField(), "facet_constraints": self.facetsAppliedString(),"collection_ids": self.searchCollectionIds(), "parent_id": self.searchParentId(), "lang_id": self.languageID },
+            // one caveat to searching, if user is trying to view child items of a parent item which is in a collection we need to not filter this request by the collection id
+            // else we get no child results (as it's not the children that are in the collection). we also don't want to delete the collection id, which would work, but
+            // then on hitting back the collection id is lost, so the user ends up back at general search, rather than in the collection they were in.
+            // so let's try disabling the collection search if we find we have a parent id parameter defined.
+            var scids = self.searchCollectionIds();
+            if (!IsFieldNullOrEmpty(self.searchParentId())) {
+                scids = '';
+            }
+
+            self.searchRequest = $.get("@Url.Content("~/Discover/SearchAjax")", { "user_id": self.userID, "term": self.searchTerm(), "rows": self.recordsetPageSize(), "row_start": self.recordsetRowStart(), "sort_orders": self.sortField(), "facet_constraints": self.facetsAppliedString(),"collection_ids": scids, "parent_id": self.searchParentId(), "lang_id": self.languageID },
                 function (data) {
                     var d = data.SearchResults;
                     self.applyHighlights(d);
@@ -2752,6 +2663,11 @@
                     // parent item id
                     if(self.searchParentId() != ps.pid) {
                         self.searchParentId(ps.pid);
+                    }
+
+                    // view item id
+                    if(self.viewItem() != ps.vi) {
+                        self.viewItem(ps.vi);
                     }
 
                     self.search();
