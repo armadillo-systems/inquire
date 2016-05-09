@@ -2152,11 +2152,11 @@
                         self.searchParentId(pn[0]); // this._searchParentId
                     }
 
-                    if ($( "#results-options" ).is(':visible')) {
+                    @*if ($( "#results-options" ).is(':visible')) {
                         $( "#results-options" ).slideUp(_fadeMsMax, _animType);
-                    }
+                    }*@
 
-                    $('.nav-results-pager').fadeOut(_fadeMsMax, _animType);
+                    //$('.nav-results-pager').fadeOut(_fadeMsMax, _animType);
 
                     var f = self.resultCurrent().IIIFImageRoot; //self.resultCurrent().File;
 
@@ -2599,8 +2599,8 @@
             self.searchInProgress(true);
             self.resultCurrentIndex(-1);
 
-            $('#results-options').slideDown(_fadeMsMax, _animType);
-            $('.nav-results-pager').fadeIn(_fadeMsMax, _animType);
+            @*$('#results-options').slideDown(_fadeMsMax, _animType);*@
+           // $('.nav-results-pager').fadeIn(_fadeMsMax, _animType);
 
             self.clearContent();
 

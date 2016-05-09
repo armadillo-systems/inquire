@@ -31,6 +31,7 @@
 </div>
 
 <div id="results-container">    
+    <p style="display: none;" data-bind="visible:recordsetRecords() <= 0 && !searchInProgress()">No records found</p>
     <section id="results" data-bind="visible: !deepZoomVisible(), template: { name: resultsLayoutMode, foreach: results, afterAdd: afterRenderResult }"></section>
     <section id="dz-wrapper" data-bind="visible: deepZoomVisible()"></section>
 </div>
