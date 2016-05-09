@@ -39,8 +39,11 @@ namespace iNQUIRE.Models
             set { _date = value; }
         }
 
-        [SolrField("Date")]
+        [SolrField("DateStr")]
         public override string DateStr { get; set; }
+
+        [SolrField("Date")]
+        public Int32 DateInt { get; set; }
 
         public override ImageMetadata ImageMetadata { get; set; }
 

@@ -187,6 +187,8 @@
             if (location.hash != ('#' + params)) {
                 location.hash = params;
             }
+
+            window.scrollTo(0, 0);
         }
 
         self.clearContent = function () {

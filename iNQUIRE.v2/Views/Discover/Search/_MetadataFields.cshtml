@@ -27,7 +27,14 @@
         </div>
     </li>
 
-    <li id="metadata-date" class="metadata-field" data-bind="visible: !IsFieldNullOrEmpty(resultCurrent().DateStr)">
+    <li id="metadata-year" class="metadata-field" data-bind="visible: !IsFieldNullOrEmpty(resultCurrent().DateInt) && (resultCurrent().DateInt > -999999)">
+        <div>
+            <span class="metadata-label">Year: </span>
+            <span id="metadata-year-text" class="metadata-field-text" data-bind='text: resultCurrent().DateInt'></span>
+        </div>
+    </li>
+
+    <li id="metadata-date" class="metadata-field" data-bind="visible: !IsFieldNullOrEmpty(resultCurrent().DateStr) && (resultCurrent().DateStr != resultCurrent().DateInt)">
         <div>
             <span class="metadata-label">Date: </span>
             <span id="metadata-year-text" class="metadata-field-text" data-bind='text: resultCurrent().DateStr'></span>
