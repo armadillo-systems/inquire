@@ -5,3 +5,9 @@ Some old documentation can be found here, this is for non-IIIF configuration, an
 http://armtest.uk/inquire-installation/install.htm
 
 Updated documentation is in progress and will appear soon.
+
+You can see iNQUIRE running at Digital Bodleian:
+http://digital.bodleian.ox.ac.uk/
+
+and a beta demonstration of a IIIF manifest mashup can be found here:
+http://inquire.armtest.uk
