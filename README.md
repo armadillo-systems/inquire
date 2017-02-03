@@ -12,4 +12,7 @@ http://digital.bodleian.ox.ac.uk/
 and a beta demonstration of a IIIF manifest mashup can be found here:
 http://inquire.armtest.uk
 
+A presentation about the above mashup site can be found here:
+https://www.youtube.com/watch?v=FjR7hZIj0IU
+
 iNQUIRE is released as open source software under the MIT License.
