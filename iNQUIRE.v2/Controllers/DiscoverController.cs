@@ -452,6 +452,7 @@ namespace iNQUIRE.Controllers
             //XmlDataHelper.SearchXml(Request.GetBaseUri(Url), term, new List<string>(ids), collection_search)
             var res = _IRepository.Search(sq, Facets, FacetRanges);
 
+            forceHttps(ref res);
             addImageMetaData(ref res);
 
             // save all searches, even if user not logged in (for complete stats). if start row == 0 assume new search (and not a seach page nav click)
@@ -470,6 +471,19 @@ namespace iNQUIRE.Controllers
 
             var results_vm = new SearchAjaxViewModel(res) { Rows = rows, RowStart = row_start };
             return Json(results_vm, JsonRequestBehavior.AllowGet);
+        }
+
+        protected void forceHttps(ref SolrSearchResults solr_results)
+        {
+            foreach (IInqItem k in solr_results.Results)
+            {
+                var k2 = k as InqItemIIIFBase;
+                if (k2 != null)
+                {
+                    k2.IIIFImageRoot = k2.IIIFImageRoot.Replace("http://", "https://");
+                    k2.IIIFManifest = k2.IIIFManifest.Replace("http://", "https://");
+                }
+            }
         }
 
         protected void addImageMetaData(ref SolrSearchResults solr_results)
@@ -562,6 +576,7 @@ namespace iNQUIRE.Controllers
                 return null;
 
             var res = _IRepository.GetRecord(id);
+            forceHttps(ref res);
             addImageMetaData(ref res);
             var results_vm = new SearchAjaxViewModel(res) { Rows = 1, RowStart = 0 };
             return Json(results_vm, JsonRequestBehavior.AllowGet);

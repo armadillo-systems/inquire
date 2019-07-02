@@ -126,7 +126,7 @@ namespace iNQUIRE
             // throw new Exception("moo!");
             // SolrHelper.Setup();
 
-            System.Diagnostics.Debugger.Break();
+            // System.Diagnostics.Debugger.Break();
             _emailQueue = new Queue<EmailExport>();
             var email_worker = new BackgroundWorker(); // email generation background thread, shared by all users, application scope
             email_worker.DoWork += email_DoWork;
@@ -137,7 +137,7 @@ namespace iNQUIRE
 
         void email_DoWork(object sender, DoWorkEventArgs e)
         {
-            System.Diagnostics.Debugger.Break();
+            // System.Diagnostics.Debugger.Break();
             while (true)
             {
                 Thread.Sleep(_emailQueueProcessDelayMS);

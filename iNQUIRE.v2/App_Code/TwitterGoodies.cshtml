@@ -100,14 +100,14 @@
     var languageAttribute = new HtmlString(!GetLanguageCode(language).IsEmpty() ? string.Format(" data-lang=\"{0}\"", GetLanguageCode(language)) : "");
     var usernameAttribute = new HtmlString(!username.IsEmpty() ? string.Format(" data-via=\"{0}\"", username) : "");
     var relatedAttribute = new HtmlString(!relatedUsername.IsEmpty() ? string.Format(" data-related=\"{0}{1}\"", relatedUsername, !relatedUserDescription.IsEmpty() ? ":" + relatedUserDescription : "") : "");
-<a href="http://twitter.com/share" class="twitter-share-button"@tweetTextAttribute@urlAttribute@languageAttribute@usernameAttribute@relatedAttribute data-count="@dataCount.ToString().ToLower()">Tweet</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
+<a href="https://twitter.com/share" class="twitter-share-button"@tweetTextAttribute@urlAttribute@languageAttribute@usernameAttribute@relatedAttribute data-count="@dataCount.ToString().ToLower()">Tweet</a><script type="text/javascript" src="https://platform.twitter.com/widgets.js"></script>
 }
 
 @helper FollowButton(
             string username,
             FollowStyles followStyle = FollowStyles.Text,
             FollowColors followColor = FollowColors.Blue) {
-<a href="http://www.twitter.com/@username"><img src="http://twitter-badges.s3.amazonaws.com/@(GetFollowButtonImageUrl(followStyle, followColor)).png" alt="Follow @username on Twitter"/></a>
+<a href="https://www.twitter.com/@username"><img src="https://twitter-badges.s3.amazonaws.com/@(GetFollowButtonImageUrl(followStyle, followColor)).png" alt="Follow @username on Twitter"/></a>
 }
 
 @helper Profile(
@@ -161,7 +161,7 @@ new TWTR.Widget({
 </script>
 }
 
-@* Advanced queries: http://search.twitter.com/operators *@
+@* Advanced queries: https://search.twitter.com/operators *@
 @helper Search(
             string searchQuery,
             int width = 250,
