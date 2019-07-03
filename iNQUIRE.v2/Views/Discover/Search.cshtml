@@ -32,7 +32,7 @@
 
 <div id="results-container">    
     <p style="display: none;" data-bind="visible:recordsetRecords() <= 0 && !searchInProgress()">No records found</p>
-    <section id="results" data-bind="visible: !deepZoomVisible(), template: { name: resultsLayoutMode, foreach: results, afterAdd: afterRenderResult }"></section>
+    <section id="results" data-bind="visible: !deepZoomVisible() && !videoVisible() && !audioVisible(), template: { name: resultsLayoutMode, foreach: results, afterAdd: afterRenderResult }"></section>
     <section id="dz-wrapper" data-bind="visible: deepZoomVisible()"></section>
 </div>
 
@@ -56,9 +56,9 @@
 </script>
 
 
-<div id="video-overlay"></div>
+<div id="video-overlay" data-bind="visible: videoVisible()"></div>
 
-<div id="audio-overlay"></div>
+<div id="audio-overlay" data-bind="visible: audioVisible()"></div>
 
 @Html.Partial("~/Views/Discover/Search/_ResultTemplates.cshtml")
 

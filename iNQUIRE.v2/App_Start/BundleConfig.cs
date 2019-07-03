@@ -55,7 +55,7 @@ namespace iNQUIRE
                       "~/Content/jquery-ui.theme.min.css",
                       "~/Content/openid.css",
                       "~/Content/openid-shadow.css",
-                      "~/Content/overlay-apple.css",
+                      //"~/Content/overlay-apple.css",
                       "~/Content/cd-rsn.css",
                       "~/Content/cd-3dnav.css",
                       "~/Content/Site2.css",

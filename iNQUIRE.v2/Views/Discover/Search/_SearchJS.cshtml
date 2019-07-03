@@ -26,7 +26,7 @@
     var _mediaDirectory = '@Url.Content(String.Format("~{0}", ViewBag.MediaDirectory))';
     var _JP2Resolver = '@ViewBag.JP2Resolver';
     var _jpeg2000Namespace = '@ViewBag.Jpeg2000Namespace';
-    var _videoFileExt = new Array(".wmv", ".mov", ".m4v", ".ogv");
+    var _videoFileExt = new Array(".wmv", ".mov", ".m4v", ".ogv", ".mp4");
     var _audioFileExt = new Array(".mp3", ".oga", ".wav");
     var _textMore = '...';
 
@@ -108,6 +108,9 @@
         // _viewItem: '@ViewBag.ViewItemID',
         self.viewItem = ko.observable('@ViewBag.ViewItemID');
         self.deepZoomVisible = ko.observable(false);
+
+        self.audioVisible = ko.observable(false);
+        self.videoVisible = ko.observable(false);
 
         self.zoomFrameSelector = 'dz-container';
         self.mediaPlayerSelector = 'media-player';
@@ -197,6 +200,8 @@
             self.zoomFrameClear();
             self.deepZoomVisible(false);
             // mediaPlayerClear();
+            self.videoVisible(false);
+            self.audioVisible(false);
         }
 
         self.goChild = function (id) {
@@ -2159,8 +2164,11 @@
                     //$('.nav-results-pager').fadeOut(_fadeMsMax, _animType);
 
                     var f = self.resultCurrent().IIIFImageRoot; //self.resultCurrent().File;
-
-                    if(fileIsVideo(f) || fileIsAudio(f)) {
+                    if(id == '08ae99b9-6538-49c8-bf2b-0d1c007ee265')
+                        showMedia('video.mp4');
+                    else if(id == '808bed03-6755-4483-9d52-3cacdc0779d6')
+                        showMedia('audio.mp3');
+                    else if(fileIsVideo(f) || fileIsAudio(f)) {
                         showMedia(f);//alert('showMedia: ' + f); //
                     }
                     else {
@@ -2783,6 +2791,26 @@
     $(function () {
         _vm = new InquireViewModel();
         ko.applyBindings(_vm, document.body);
+        
+        _vm.videoVisible.subscribe(function(value) {
+            if(value)
+                playVideo();
+            else
+            {
+                stopVideo();
+                clearMedia('#video-player', '#video-overlay');  
+            }
+        });
+
+        _vm.audioVisible.subscribe(function(value) {
+            if(value)
+                playAudio();
+            else
+            {
+                stopAudio();
+                clearMedia('#audio-player', '#audio-overlay');  
+            }
+        });
 
         _vm.searchInProgress.subscribe(function(searching) {
             if(searching) {
@@ -3524,7 +3552,7 @@
         var f = encodeURIComponent(fn);
         var f_thumb = f.substr(0, f.lastIndexOf('.')) + '.jpg';
         var img_src = _mediaDirectory + f_thumb + '.ashx?maxwidth=' + w + '&amp;maxheight=' + h;
-
+        img_src = 'http://localhost/' + f_thumb;
         var o;
 
         if(fileIsVideo(fn))
@@ -3535,8 +3563,8 @@
             return;
 
         if(o) {
-            $(o).removeData('overlay');
-            $(o).overlay({ effect: 'apple', mask: { color: '#000' }, closeOnClick: false, load: true });
+            //$(o).removeData('overlay');
+            //$(o).overlay({ effect: 'apple', mask: { color: '#000' }, closeOnClick: false, load: true });
             // $(o).data("overlay").load();
         }
     }
@@ -3544,53 +3572,60 @@
     function showVideo(fn, w, h, img_src) {
         var o = $("#video-overlay").get(0);
 
-        if($(o).css('display') != 'none') {
+        /*if($(o).css('display') != 'none') {
             $(o).overlay().close();
             return;
-        }
+        }*/
 
         clearMedia('#video-player', '#video-overlay');
 
-        $(o).append('<video id="video-player" controls="controls" preload="metadata">Your browser does not support the video tag.</video>');
+        $(o).append('<video style="width: 100%;" id="video-player" controls="controls" preload="metadata">Your browser does not support the video tag.</video>');
 
         var p = $('#video-player').get(0);
         $(p).attr('poster', img_src);
-        p.insertBefore(createSource(makeOGV(fn), 'video/ogg'), p.firstChild);
-        p.insertBefore(createSource(makeMP4(fn), 'video/mp4'), p.firstChild.nextSibling);
+        //p.insertBefore(createSource(makeOGV(fn), 'video/ogg'), p.firstChild);
+        //p.insertBefore(createSource(makeMP4(fn), 'video/mp4'), p.firstChild.nextSibling);
+        p.insertBefore(createSource('http://localhost/' + fn, 'video/mp4'), p.firstChild.nextSibling);
         p.load();
 
         var width = w + 'px';
         var height = h + 'px';
 
-        $(p).css('width', width);
+        /*$(p).css('width', width);
         $(o).css('width', width);
 
         $(p).css('height', height);
         $(o).css('height', height);
 
+        $('#results-container').css('display', 'none');
+        $(o).css('display', 'block');
+        $(o).load();*/
+
+        _vm.videoVisible(true);
         return o;
     }
 
     function showAudio(fn, w, h, img_src) {
         var o = $("#audio-overlay").get(0);
 
-        if($(o).css('display') != 'none') {
+        /*if($(o).css('display') != 'none') {
             $(o).overlay().close();
             return;
-        }
+        }*/
 
         clearMedia('#audio-player', '#audio-overlay');
 
-        $(o).append('<img id="audio_image" alt="Audio Image" src="" /><audio id="audio-player" controls="controls">Your browser does not support the audio tag.</audio>');
+        $(o).append('<img id="audio_image" alt="Audio Image" src="" /><audio style="width: 100%;" id="audio-player" controls="controls">Your browser does not support the audio tag.</audio>');
 
         var img = $('#audio_image').get(0);
         $(img).attr('src', img_src);
 
         var p = $('#audio-player').get(0);
-        p.insertBefore(createSource(makeOGA(fn), 'audio/ogg'), p.firstChild);
-        p.insertBefore(createSource(makeMP3(fn), 'audio/mpeg'), p.firstChild.nextSibling);
+        //p.insertBefore(createSource(makeOGA(fn), 'audio/ogg'), p.firstChild);
+        //p.insertBefore(createSource(makeMP3(fn), 'audio/mpeg'), p.firstChild.nextSibling);
+        p.insertBefore(createSource('http://localhost/' + fn, 'audio/mpeg'), p.firstChild.nextSibling);
 
-        var width = w + 'px';
+        /*var width = w + 'px';
         var height = h + 'px';
 
         $(p).css('width', width);
@@ -3598,7 +3633,9 @@
         $(img).css('width', width);
 
         $(o).css('height', height);
-        $(img).css('height', height);
+        $(img).css('height', height);*/
+
+        _vm.audioVisible(true);
 
         return o;
     }
