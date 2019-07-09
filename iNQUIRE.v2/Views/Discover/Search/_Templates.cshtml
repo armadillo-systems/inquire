@@ -143,7 +143,7 @@
             <!-- /ko -->
             <span> said </span>
             <span data-bind="text: ('&quot;' + Text + '&quot;')"></span>
-            <span class="note-date" data-bind="text: dateFormat(LastEdited)"></span>
+            <span class="note-date" data-bind="text: _formatCSharpDateString(LastEdited)"></span>
 
             <!-- ko if: (_vm.userID == UserID) -->
             <span class="note-rem" data-bind="attr: { 'data-public': PublicNote, 'data-note_id': NoteID }"><i class="fa fa-remove"></i></span>

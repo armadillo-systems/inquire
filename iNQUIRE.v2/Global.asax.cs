@@ -80,15 +80,22 @@ namespace iNQUIRE
             Controllers.DiscoverController.ExportFilename = ConfigurationManager.AppSettings["ExportFilename"];
             Controllers.DiscoverController.ExportImageWidth = Convert.ToInt32(ConfigurationManager.AppSettings["ExportImageWidth"]);
             Controllers.DiscoverController.ExportImageHeight = Convert.ToInt32(ConfigurationManager.AppSettings["ExportImageHeight"]);
+            Controllers.DiscoverController.ExportMaxImages = Convert.ToInt32(ConfigurationManager.AppSettings["ExportMaxImages"]);
             Controllers.DiscoverController.SavedSearchesDisplayMax = Convert.ToInt32(ConfigurationManager.AppSettings["SavedSearchesDisplayMax"]);
             Controllers.DiscoverController.TouchDoubleClickDelayMs = Convert.ToInt32(ConfigurationManager.AppSettings["TouchDoubleClickDelayMs"]);
             Controllers.DiscoverController.OpenDeepZoomTouchIcon = ConfigurationManager.AppSettings["OpenDeepZoomTouchIcon"];
             Controllers.DiscoverController.AlwaysShowOpenDeepZoomTouchIcon = Convert.ToBoolean(ConfigurationManager.AppSettings["AlwaysShowOpenDeepZoomTouchIcon"]);
+            Controllers.DiscoverController.FacebookShareHashtag = ConfigurationManager.AppSettings["FacebookShareHashtag"];
 
             Helper.EmailHelper.FromAddress = ConfigurationManager.AppSettings["FromEmailAddress"];
             Helper.EmailHelper.Subject = ConfigurationManager.AppSettings["ExportEmailSubject"];
             Helper.EmailHelper.SmtpHost = ConfigurationManager.AppSettings["SMTPHost"];
-            Helper.EmailHelper.SmtpPort = Convert.ToInt32(ConfigurationManager.AppSettings["SMTPPort"]);
+            var port = ConfigurationManager.AppSettings["SMTPPort"];
+            int port_num = 0;
+            if (string.IsNullOrEmpty(port) == false)
+                port_num = Convert.ToInt32(port);
+
+            Helper.EmailHelper.SmtpPort = port_num;
             _emailQueueProcessDelayMS = Convert.ToInt32(ConfigurationManager.AppSettings["EmailQueueProcessDelayMS"]);
 
             SolrRepository.HyperlinkTargetBlank = Convert.ToBoolean(ConfigurationManager.AppSettings["HyperlinkTargetBlank"]);

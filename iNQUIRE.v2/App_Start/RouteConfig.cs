@@ -28,6 +28,10 @@ namespace iNQUIRE
                 "{controller}/{action}/{id}", // URL with parameters
                 new { controller = "Home", action = "Index", id = UrlParameter.Optional } // Parameter defaults
             );
+
+            routes.MapRoute(name: "signin-google", url: "signin-google", defaults: new { controller = "Account", action = "ExternalLoginCallback" });
+            routes.MapRoute(name: "signin-microsoft", url: "signin-microsoft", defaults: new { controller = "Account", action = "ExternalLoginCallback" });
+            routes.MapRoute(name: "signin-twitter", url: "signin-twitter", defaults: new { controller = "Account", action = "ExternalLoginCallback" });
         }
     }
 }

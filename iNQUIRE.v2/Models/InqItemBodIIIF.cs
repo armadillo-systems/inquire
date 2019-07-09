@@ -26,7 +26,7 @@ namespace iNQUIRE.Models
                     {
                         try
                         {
-                            _date = new DateTime(Convert.ToInt32(DateStr), 0, 0);
+                            _date = new DateTime(Convert.ToInt32(DateStr), 1, 1);
                         }
                         catch (Exception)
                         {
@@ -107,8 +107,8 @@ namespace iNQUIRE.Models
             if (!String.IsNullOrEmpty(Collection))
                 html.Append(String.Format("<div><span class=\"label\">Collection:</span> {0}</div>", Collection));
 
-            if (!String.IsNullOrEmpty(Date.ToString()))
-                html.Append(String.Format("<div><span class=\"label\">Date:</span> {0}</div>", Date));
+            if (!String.IsNullOrEmpty(DateStr.ToString()))
+                html.Append(String.Format("<div><span class=\"label\">Date:</span> {0}</div>", DateStr));
 
             if (!String.IsNullOrEmpty(Source))
                 html.Append(String.Format("<div><span class=\"label\">Source:</span> {0}</div>", Source));
@@ -152,11 +152,5 @@ namespace iNQUIRE.Models
 
         [SolrField("Page")]
         public string Page { get; set; }
-
-        [SolrField("Width")]
-        public Int32 Width { get; set; }
-
-        [SolrField("Height")]
-        public Int32 Height { get; set; }
     }
 }

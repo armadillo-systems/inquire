@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    @Html.Partial("~/Views/Shared/_fbMeta.cshtml")
     <title>@ViewBag.Title - iNQUIRE v2.0</title>
     @Styles.Render("~/Content/css")
     @Scripts.Render("~/bundles/modernizr")
@@ -122,9 +123,9 @@
 
                                 @if (ViewBag.Facebook)
                                 {
-                                    <li><a href="#" class="but-tool-facebook"><i class="fa fa-facebook"></i> Post to Facebook</a></li>
+                                    <li><a href="javascript:;" class="but-tool-facebook"><i class="fa fa-facebook"></i> Post to Facebook</a></li>
 
-                                    <li id="facebook-container" style="padding-left: 10px; padding-top: 12px; height: 52px;">
+                                    <li id="facebook-container" style="padding-left: 10px; padding-top: 12px; padding-bottom: 12px; height: 52px;">
                                                 <div data-bind="visible: (resultCurrentIndex() != -1)"> <!--  && _gvm.fbAccessToken -->
                                                     <div class="fb-like"
                                                          data-bind="visible: _gvm.fbLoaded, attr: { 'data-href': updateViewItemUri } "
@@ -137,7 +138,7 @@
                                     </li>
                                 }
 
-                                @if (ViewBag.Twitter)
+                                @*@if (ViewBag.Twitter)
                                 {
                                     <li id="twitter" style="padding-left: 10px; padding-top: 17px; height: 52px;">
                                                 <div id="tweet">
@@ -148,7 +149,7 @@
                                                     @TwitterGoodies.Search(ViewBag.TwitterHashtag, scrollBar: true, width: 205, height: 150, shellColor: "#EBEDEF", backgroundShellColor: "#44474D", tweetsBackgroundColor: "#EBEDEF", caption: ViewBag.TwitterActivityCaption)
                                                 }
                                     </li>
-                                }                            
+                                }*@                            
                                 <li><a href="" onclick="return false;" class="but-tool-download"><i class="fa fa-download"></i> Download</a></li>
                                 <li><a href="" onclick="return false;" class="but-tool-email"><i class="fa fa-envelope"></i> Email</a></li>
                                 <li><a href="" onclick="return false;" class="but-tool-print"><i class="fa fa-print"></i> Print</a></li>

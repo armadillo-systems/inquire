@@ -28,11 +28,13 @@ namespace iNQUIRE.Controllers
         public static string ExportFilename { get; set; }
         public static int ExportImageWidth { get; set; }
         public static int ExportImageHeight { get; set; }
+        public static int ExportMaxImages { get; set; }
         // public static string ViewItemUri { get; set; }
         public static int SavedSearchesDisplayMax { get; set; }
         public static int TouchDoubleClickDelayMs { get; set; }
         public static string OpenDeepZoomTouchIcon { get; set; }
         public static Boolean AlwaysShowOpenDeepZoomTouchIcon { get; set; }
+        public static string FacebookShareHashtag { get; set; }
 
         private readonly Helper.IJP2Helper _IJP2Helper;
         private readonly IRepository _IRepository;
@@ -175,17 +177,25 @@ namespace iNQUIRE.Controllers
             var results = getItemsFromIDStringList(id_str, false);
 
             var export_items = new List<ExportItem>();
+            var count = 0;
             foreach (IInqItem r in results)
             {
-                var img_src = _IJP2Helper.GetImageUri(r.ImageMetadata, MediaDirectoryFullUri, _IJP2Helper.ResolverUri, ExportImageWidth, ExportImageHeight);
+                var img_src = GetImageUri(r, ExportImageWidth, ExportImageHeight);
+                // var img_src = _IJP2Helper.GetImageUri(r.ImageMetadata, MediaDirectoryFullUri, _IJP2Helper.ResolverUri, ExportImageWidth, ExportImageHeight);
                 export_items.Add(new ExportItem(r, img_src));
+                count++;
+
+                if (count >= ExportMaxImages)
+                    break;
             }
 
             var export = new EmailExport(email_to, message, export_items, ImageNotFound);
             var queue = HttpContext.Application["email_queue"] as Queue<EmailExport>;
             queue.Enqueue(export);
+
             //var res = _IRepository.GetRecord(_IRepository.GetBaseUri(Request, Url), id);
             //var results_vm = new SearchAjaxViewModel(res) { Rows = 1, RowStart = 0 };
+
             return Json("ok", JsonRequestBehavior.AllowGet);
         }
 
@@ -331,22 +341,21 @@ namespace iNQUIRE.Controllers
                 #region images
                 if (inc_asset)
                 {
+                    var count = 0;
+
                     foreach (IInqItem r in results)
                     {
-                        //if (r.GetType().IsSubclassOf(typeof(InqItemIIIFBase)) == false)
-                        //{
-                            // images
-                            var img_src = _IJP2Helper.GetImageUri(r.ImageMetadata, MediaDirectoryFullUri, _IJP2Helper.ResolverUri, ExportImageWidth, ExportImageHeight);
+                        string img_src = GetImageUri(r, ExportImageWidth, ExportImageHeight);
 
-                            using (Stream fs = ImageHelper.GetImageStream(img_src, ImageNotFound))
-                            {
-                                ZipHelper.ZipAdd(Response, zipOutputStream, String.Format("{0}.jpg", r.ID), fs);
-                            }
-                        //}
-                        //else
-                        //{
-                        //    // do something for IIIF images
-                        //}
+                        // images
+                        using (Stream fs = ImageHelper.GetImageStream(img_src, ImageNotFound))
+                        {
+                            ZipHelper.ZipAdd(Response, zipOutputStream, String.Format("{0}.jpg", r.ID), fs);
+                        }
+                        count++;
+
+                        if (count >= ExportMaxImages)
+                            break;
                     }
                 }
                 #endregion
@@ -358,15 +367,70 @@ namespace iNQUIRE.Controllers
             }
         }
 
+        public string GetImageUri(IInqItem r, int max_width, int max_height)
+        {
+            string img_src;
+            var r_iiif = r as InqItemIIIFBase;
+
+            if (r == null)
+                img_src = _IJP2Helper.GetImageUri(r.ImageMetadata, MediaDirectoryFullUri, _IJP2Helper.ResolverUri, max_width, max_height);
+            else
+                img_src = r_iiif.GetImageUri(ExportImageWidth, ExportImageHeight);
+
+            return img_src;
+        }
+
         public void SetupSearchViewBag(string id)
         {
             ViewBag.ViewItemID = id;
-
+            
             ApplicationUser user = _UserManager.FindById(User.Identity.GetUserId());
 
             ViewBag.UserID = User.Identity.GetUserId();
             ViewBag.UserEmail = (user != null) ? user.Email : "";
 
+            if (!string.IsNullOrEmpty(id))
+            {
+                var res = GetSolrRecord(id); 
+
+                if (res.Results.Count == 1)
+                {
+                    var r = res.Results[0] as InqItemIIIFBase;
+
+                    if (r != null)
+                    {
+                        var fb_img_w = 1200;
+                        var fb_img_h = 650;
+
+                        ViewBag.ogUrl = Request.Url.OriginalString; //string.Format("{0}://{1}{2}", "https", Request.Url.Authority, Url.Content("~"));
+                        ViewBag.ogType = "website";
+                        ViewBag.ogTitle = r.Title;
+                        ViewBag.ogDescription = r.Description;
+                        ViewBag.ogImage = r.GetImageUri(fb_img_w, fb_img_h);
+
+                        var preview_img_w = 0;
+                        var preview_img_h = 0;
+
+                        if (r.AspectRatio > 1)
+                        {
+                            preview_img_w = fb_img_w;
+                            preview_img_h = Convert.ToInt32(fb_img_w / r.AspectRatio);
+                        }
+                        else
+                        {
+                            preview_img_h = fb_img_h;
+                            preview_img_w = Convert.ToInt32(fb_img_h * r.AspectRatio);
+                        }
+
+                        ViewBag.ogImageWidth = preview_img_w;
+                        ViewBag.ogImageHeight = preview_img_h;
+
+                        ViewBag.Title = r.Title;
+                    }
+                }
+            }
+
+            ViewBag.FacebookShareHashtag = FacebookShareHashtag;
             ViewBag.JP2Resolver = _IJP2Helper.ResolverReverseProxy;
             ViewBag.ZoomViewerHeightPx = _IJP2Helper.ZoomViewerHeightPx;
             ViewBag.MediaDirectory = _IJP2Helper.MediaDirectory;
@@ -436,7 +500,7 @@ namespace iNQUIRE.Controllers
 
             var r = res.Results[0];
 
-            ViewBag.ImageUri = _IJP2Helper.GetImageUri(r.ImageMetadata, MediaDirectoryFullUri, _IJP2Helper.ResolverReverseProxy, (double)w, (double)h);
+            ViewBag.ImageUri = GetImageUri(r, (int)w, (int)h);//  _IJP2Helper.GetImageUri(r.ImageMetadata, MediaDirectoryFullUri, _IJP2Helper.ResolverReverseProxy, (double)w, (double)h);
             return View(r);
         }
 
@@ -450,10 +514,7 @@ namespace iNQUIRE.Controllers
                 user_id = Guid.Empty.ToString();
 
             //XmlDataHelper.SearchXml(Request.GetBaseUri(Url), term, new List<string>(ids), collection_search)
-            var res = _IRepository.Search(sq, Facets, FacetRanges);
-
-            forceHttps(ref res);
-            addImageMetaData(ref res);
+            var res = SearchSolr(sq);
 
             // save all searches, even if user not logged in (for complete stats). if start row == 0 assume new search (and not a seach page nav click)
             var kvp = new KeyValuePair<Guid, String>(Guid.Empty, null);
@@ -471,6 +532,22 @@ namespace iNQUIRE.Controllers
 
             var results_vm = new SearchAjaxViewModel(res) { Rows = rows, RowStart = row_start };
             return Json(results_vm, JsonRequestBehavior.AllowGet);
+        }
+
+        private SolrSearchResults GetSolrRecord(string id)
+        {
+            var results = _IRepository.GetRecord(id);
+            forceHttps(ref results);
+            addImageMetaData(ref results);
+            return results;
+        }
+
+        private SolrSearchResults SearchSolr(SearchQuery sq)
+        {
+            var results = _IRepository.Search(sq, Facets, FacetRanges);
+            forceHttps(ref results);
+            addImageMetaData(ref results);
+            return results;
         }
 
         protected void forceHttps(ref SolrSearchResults solr_results)
@@ -591,56 +668,66 @@ namespace iNQUIRE.Controllers
             return Json(access_token, JsonRequestBehavior.AllowGet);
         }*/
 
-        public ActionResult fbUploadPhotoAjax(string id_str, string access_token)
-        {
-            string r = "?";
-            var results = getItemsFromIDStringList(id_str, false);
-            if (results.Count == 1)
-            {
-                var result = results[0];
-                var client = new FacebookClient(access_token);
-                //Create a new dictionary of objects, with string keys
-                Dictionary<string, object> parameters = new Dictionary<string, object>();
-                var ImageName = String.Format("{0}.jpg", result.Title);
-                var ImagePath = String.Format(@"F:\Shared Documents\Test Images\{0}", ImageName);
+        // This type of direct posting is deprecated from the Facebook API 1 Aug 2018,
+        // now have to use Javascript share method (only shares a link, not post a photo)
+        //public ActionResult fbUploadPhotoAjax(string id_str, string access_token)
+        //{
+        //    string r = "?";
+        //    var results = getItemsFromIDStringList(id_str, false);
+        //    if (results.Count == 1)
+        //    {
+        //        var result = results[0];
+        //        var client = new FacebookClient(access_token);
+        //        //Create a new dictionary of objects, with string keys
+        //        Dictionary<string, object> parameters = new Dictionary<string, object>();
+        //        var ImageName = String.Format("{0}.jpg", result.Title);
+        //        var ImagePath = String.Format(@"F:\Shared Documents\Test Images\{0}", ImageName);
 
-                string strDescription = result.Title;
+        //        string strDescription = result.Title;
 
-                //Add elements to the dictionary
-                if (string.IsNullOrEmpty(ImagePath) == false)
-                {
-                    //There is an Image to add to the parameters                
-                    var media = new FacebookMediaObject
-                    {
-                        FileName = ImageName,
-                        ContentType = "image/jpeg"
-                    };
+        //        //Add elements to the dictionary
+        //        if (string.IsNullOrEmpty(ImagePath) == false)
+        //        {
+        //            //There is an Image to add to the parameters                
+        //            var media = new FacebookMediaObject
+        //            {
+        //                FileName = ImageName,
+        //                ContentType = "image/jpeg"
+        //            };
 
-                    var img_src = _IJP2Helper.GetImageUri(result.ImageMetadata, MediaDirectoryFullUri, _IJP2Helper.ResolverUri, ExportImageWidth, ExportImageHeight);
-                    media.SetValue(ImageHelper.GetImageBytes(img_src, ImageNotFound));
+        //            string img_src = null;
 
-                    parameters.Add("source", media);
-                    parameters.Add("message", strDescription);
+        //            var iiif_result = result as InqItemIIIFBase;
 
-                    try
-                    {
-                        //client.PostCompleted += fbPostCompleted;
-                        //dynamic result = client.PostTaskAsync("/me/photos", parameters);
-                        dynamic post_result = client.Post("/me/photos", parameters);
-                        r = "ok";
-                        Helper.LogHelper.StatsLog(null, "fbUploadPhotoAjax() [async] ", r, null, null);
-                    }
-                    catch (Exception ex)
-                    {
-                        r = ex.Message;
-                    }
-                }
-            }
-            else
-                r = "Error finding item";
+        //            if (iiif_result != null)
+        //                img_src = iiif_result.GetImageUri(ExportImageWidth, ExportImageHeight);
+        //            else
+        //                img_src = _IJP2Helper.GetImageUri(result.ImageMetadata, MediaDirectoryFullUri, _IJP2Helper.ResolverUri, ExportImageWidth, ExportImageHeight);
 
-            return Json(r, JsonRequestBehavior.AllowGet);
-        }
+        //            media.SetValue(ImageHelper.GetImageBytes(img_src, ImageNotFound));
+
+        //            parameters.Add("source", media);
+        //            parameters.Add("message", strDescription);
+
+        //            try
+        //            {
+        //                //client.PostCompleted += fbPostCompleted;
+        //                //dynamic result = client.PostTaskAsync("/me/photos", parameters);
+        //                dynamic post_result = client.Post("/me/photos", parameters);
+        //                r = "ok";
+        //                Helper.LogHelper.StatsLog(null, "fbUploadPhotoAjax() [async] ", r, null, null);
+        //            }
+        //            catch (Exception ex)
+        //            {
+        //                r = ex.Message;
+        //            }
+        //        }
+        //    }
+        //    else
+        //        r = "Error finding item";
+
+        //    return Json(r, JsonRequestBehavior.AllowGet);
+        //}
 
         /*void fbPostCompleted(object sender, FacebookApiEventArgs e)
         {
@@ -709,7 +796,8 @@ namespace iNQUIRE.Controllers
                 return null;
 
             var r = _IUserNoteRepository.GetPublicNotesForItem(ApplicationIdInquire, item_id, approved);
-            return Json(r, JsonRequestBehavior.AllowGet);
+            var j = Json(r, JsonRequestBehavior.AllowGet);
+            return j;
         }
         #endregion
 

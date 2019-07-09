@@ -12,6 +12,7 @@ namespace iNQUIRE
         public static string FacebookAppId { get; set; }
         public static bool FacebookLike { get; set; }
         public static bool FacebookUploadPhoto { get; set; }
+        public static string FacebookShareHashtag { get; set; }
         public static string TwitterText { get; set; }
         public static string TwitterHashtag { get; set; }
         public static string TwitterActivityCaption { get; set; }

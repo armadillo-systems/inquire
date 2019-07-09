@@ -1,4 +1,11 @@
 ﻿<script type="text/javascript">
+    // need this fix because facebook login returns /Discover/Search/#_=_ and this messes up our Sammy routing
+    if (window.location.hash === "#_=_") {
+        history.replaceState
+            ? history.replaceState(null, null, window.location.href.split("#")[0])
+            : window.location.hash = "";
+    }
+
     ko.computed(function() {
         //alert('at: ' + this.fbAccessToken());
         var t = this.fbAccessToken();
@@ -591,15 +598,37 @@
 
 
         self.butToolFacebookClick = function () {
-            if(_gvm.fbConnected()) {
-                self.fbPhotoUpload();
+            self.fbShare();
+            //if(_gvm.fbConnected()) {
+            //    // self.fbPhotoUpload();
+            //    self.fbShare();
+            //}
+            //else {
+            //    $('#results-options-export #but-tool-facebook-login').fadeToggle("slow");
+            //}
+        }
+
+        self.fbShare = function () {
+            if (!IsFieldNullOrEmpty(_gvm.fbAccessToken())) {
+                FB.ui({
+                    method: 'share',
+                    href: _vm.resultCurrent().ViewItemUrl,
+                    hashtag: '@ViewBag.FacebookShareHashtag',
+                    quote: _vm.resultCurrent().Title,
+                }, function (response) {
+                    if (response.error_message) {
+                        console.log('fbShare() error: ' + response.error_message);
+                        // alert(response.error_message);
+                    }
+                });
             }
             else {
-                $('#results-options-export #but-tool-facebook-login').fadeToggle("slow");
+                alert('Please login to Facebook first')
             }
         }
 
-        self.fbPhotoUpload = function () {
+        @*deprecated from the Facebook API 01 Aug 2018 
+            self.fbPhotoUpload = function () {
             var t = _gvm.fbAccessToken();
             if( !IsFieldNullOrEmpty(t) ) {
                 //alert('fbPhotoUpload()');
@@ -618,7 +647,7 @@
             } else {
                 // not connected to facebook
             }
-        }
+        }*@
 
         self.butDownloadClick = function  (id) {
             self.exportId = id;
@@ -2434,7 +2463,14 @@
 
         self.searchParamsString = ko.pureComputed(function () {
             // var params_str = 't+' + encodeURIComponent(self.searchTerm()) + ',rsrs+' + self.recordsetRowStart() + ',rsps+' + self.recordsetPageSize() + ',fa+' + encodeURIComponent(self.facetsAppliedString()) + ',so+' + encodeURIComponent(self.sortsAppliedString()) + ',scids+' + self.searchCollectionIds() + ',pid+' + self.searchParentId() + ',vi+' + self.viewItem();
-            var params_str = 't+' + encodeURIComponent(self.searchTerm()) + ',rsrs+' + self.recordsetRowStart() + ',rsps+' + self.recordsetPageSize() + ',fa+' + encodeURIComponent(self.facetsAppliedString()) + ',so+' + encodeURIComponent(self.sortField()) + ',scids+' + self.searchCollectionIds() + ',pid+' + self.searchParentId() + ',vi+' + self.viewItem();
+            //if (self.searchTerm() === undefined) {
+            //    self.clearSearchClick();
+            //}
+
+            // if visiting a shared fb link you can get a scenario where the sortField() gets set to an object, so check for that here and fix
+            // how it ends up as an object needs to be invstigated
+            var sort_str = (self.sortField().OptionValue) ? self.sortField().OptionValue : self.sortField();
+            var params_str = 't+' + encodeURIComponent(self.searchTerm()) + ',rsrs+' + self.recordsetRowStart() + ',rsps+' + self.recordsetPageSize() + ',fa+' + encodeURIComponent(self.facetsAppliedString()) + ',so+' + encodeURIComponent(sort_str) + ',scids+' + self.searchCollectionIds() + ',pid+' + self.searchParentId() + ',vi+' + self.viewItem();
             // console.log('searchParamsString read: ' + params_str);
             return params_str;
         }).extend({ rateLimit: 100 });
@@ -2952,7 +2988,7 @@
         ms = ms.replace('/Date(', '');
         ms = ms.replace(')/', '');
         var d = new Date(parseInt(ms));
-        return d.getDate() + '/' + d.getMonth() + '/' + d.getYear();
+        return d.getDate() + '/' + d.getMonth() + '/' + d.getFullYear();
     }
 
 
@@ -3552,7 +3588,7 @@
         var f = encodeURIComponent(fn);
         var f_thumb = f.substr(0, f.lastIndexOf('.')) + '.jpg';
         var img_src = _mediaDirectory + f_thumb + '.ashx?maxwidth=' + w + '&amp;maxheight=' + h;
-        img_src = 'http://localhost/' + f_thumb;
+        img_src = '@Url.Content("~/")' + f_thumb;
         var o;
 
         if(fileIsVideo(fn))
@@ -3585,7 +3621,7 @@
         $(p).attr('poster', img_src);
         //p.insertBefore(createSource(makeOGV(fn), 'video/ogg'), p.firstChild);
         //p.insertBefore(createSource(makeMP4(fn), 'video/mp4'), p.firstChild.nextSibling);
-        p.insertBefore(createSource('http://localhost/' + fn, 'video/mp4'), p.firstChild.nextSibling);
+        p.insertBefore(createSource('@Url.Content("~/")' + fn, 'video/mp4'), p.firstChild.nextSibling);
         p.load();
 
         var width = w + 'px';
@@ -3623,7 +3659,7 @@
         var p = $('#audio-player').get(0);
         //p.insertBefore(createSource(makeOGA(fn), 'audio/ogg'), p.firstChild);
         //p.insertBefore(createSource(makeMP3(fn), 'audio/mpeg'), p.firstChild.nextSibling);
-        p.insertBefore(createSource('http://localhost/' + fn, 'audio/mpeg'), p.firstChild.nextSibling);
+        p.insertBefore(createSource('@Url.Content("~/")' + fn, 'audio/mpeg'), p.firstChild.nextSibling);
 
         /*var width = w + 'px';
         var height = h + 'px';

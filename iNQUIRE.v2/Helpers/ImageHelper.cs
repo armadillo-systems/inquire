@@ -7,6 +7,7 @@ using System.Windows.Media.Imaging;
 using System.Linq;
 using System.Net;
 using iNQUIRE.Helper;
+using iNQUIRE.Models;
 
 namespace iNQUIRE.Helpers
 {

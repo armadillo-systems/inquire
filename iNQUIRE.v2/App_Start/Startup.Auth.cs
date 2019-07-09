@@ -8,6 +8,7 @@ using Owin;
 using iNQUIRE.Models;
 using System.Configuration;
 using Owin.Security.Providers.Yahoo;
+using Microsoft.Owin.Security.MicrosoftAccount;
 
 namespace iNQUIRE
 {
@@ -20,6 +21,15 @@ namespace iNQUIRE
             app.CreatePerOwinContext(ApplicationDbContext.Create);
             app.CreatePerOwinContext<ApplicationUserManager>(ApplicationUserManager.Create);
             app.CreatePerOwinContext<ApplicationSignInManager>(ApplicationSignInManager.Create);
+
+            app.Use((context, next) =>
+            {
+                if (context.Request.Headers["x-forwarded-proto"] == "https")
+                {
+                    context.Request.Scheme = "https";
+                }
+                return next();
+            });
 
             // Enable the application to use a cookie to store information for the signed in user
             // and to use a cookie to temporarily store information about a user logging in with a third party login provider
@@ -55,22 +65,26 @@ namespace iNQUIRE
 
             if ((!String.IsNullOrEmpty(ms_client_id)) && (!String.IsNullOrEmpty(ms_client_secret)))
             {
-                app.UseMicrosoftAccountAuthentication(
-                    clientId: ms_client_id,
-                    clientSecret: ms_client_secret);
+                var mo = new MicrosoftAccountAuthenticationOptions
+                {
+                    ClientId = ms_client_id,
+                    ClientSecret = ms_client_secret,
+                };
+                mo.Scope.Add("wl.basic");
+                mo.Scope.Add("wl.emails");
+                app.UseMicrosoftAccountAuthentication(mo);
             }
 
+            //// Twitter
+            //var t_consumer_key = ConfigurationManager.AppSettings["TwitterConsumerKey"];
+            //var t_consumer_secret = ConfigurationManager.AppSettings["TwitterConsumerSecret"];
 
-            // Twitter
-            var t_consumer_key = ConfigurationManager.AppSettings["TwitterConsumerKey"];
-            var t_consumer_secret = ConfigurationManager.AppSettings["TwitterConsumerSecret"];
-
-            if ((!String.IsNullOrEmpty(t_consumer_key)) && (!String.IsNullOrEmpty(t_consumer_secret)))
-            {
-                app.UseTwitterAuthentication(
-                   consumerKey: t_consumer_key,
-                   consumerSecret: t_consumer_secret);
-            }
+            //if ((!String.IsNullOrEmpty(t_consumer_key)) && (!String.IsNullOrEmpty(t_consumer_secret)))
+            //{
+            //    app.UseTwitterAuthentication(
+            //       consumerKey: t_consumer_key,
+            //       consumerSecret: t_consumer_secret);
+            //}
 
 
             // Facebook
@@ -99,14 +113,14 @@ namespace iNQUIRE
             }
 
 
-            // Yahoo
-            var y_client_key = ConfigurationManager.AppSettings["YahooClientKey"];
-            var y_client_secret = ConfigurationManager.AppSettings["YahooClientSecret"];
+            //// Yahoo
+            //var y_client_key = ConfigurationManager.AppSettings["YahooClientKey"];
+            //var y_client_secret = ConfigurationManager.AppSettings["YahooClientSecret"];
 
-            if ((!String.IsNullOrEmpty(y_client_key)) && (!String.IsNullOrEmpty(y_client_secret)))
-            {
-                app.UseYahooAuthentication(y_client_key, y_client_secret);
-            }
+            //if ((!String.IsNullOrEmpty(y_client_key)) && (!String.IsNullOrEmpty(y_client_secret)))
+            //{
+            //    app.UseYahooAuthentication(y_client_key, y_client_secret);
+            //}
         }
     }
 }
