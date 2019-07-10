@@ -15,4 +15,7 @@ http://inquire.armtest.uk
 A presentation about the above mashup site can be found here:
 https://www.youtube.com/watch?v=FjR7hZIj0IU
 
+iNQUIRE running on a large touchscreen device (Microsoft Surface Studio):
+https://www.youtube.com/watch?v=HX12B2oR9Ok
+
 iNQUIRE is released as open source software under the MIT License.
