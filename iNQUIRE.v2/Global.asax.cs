@@ -127,7 +127,7 @@ namespace iNQUIRE
             // this is annoying, Solr .net throws an error if you try to supply it with an interface or abstract class, so can't use eg ninject DI?
             // Startup.Init<InqItemXml>(ConfigurationManager.AppSettings["SolrUriXml"]);
             //SolrNet.Startup.Init<InqItemArmNode>(ConfigurationManager.AppSettings["SolrUri"]);
-            SolrNet.Startup.Init<InqItemBodIIIF>(ConfigurationManager.AppSettings["SolrUri"]);
+            SolrNet.Startup.Init<InqItemRKD>(ConfigurationManager.AppSettings["SolrUri"]);
             // Startup.Init<InqItemBod>(ConfigurationManager.AppSettings["SolrUri"]);
 
             // throw new Exception("moo!");

@@ -143,6 +143,9 @@
     <Reference Include="System.Net.Http.Primitives">
       <HintPath>..\packages\Microsoft.Net.Http.2.2.29\lib\net45\System.Net.Http.Primitives.dll</HintPath>
     </Reference>
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=4.0.4.1, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.4.5.2\lib\netstandard1.0\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    </Reference>
     <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
     <Reference Include="System.Web.ApplicationServices" />
@@ -281,6 +284,8 @@
     <Compile Include="Models\InqItemBase.cs" />
     <Compile Include="Models\InqItemBod.cs" />
     <Compile Include="Models\InqItemIIIFBase.cs" />
+    <Compile Include="Models\InqItemImageMetadataWidthAndHeightBase.cs" />
+    <Compile Include="Models\InqItemRKD.cs" />
     <Compile Include="Models\InqItemXml.cs" />
     <Compile Include="Models\InqItemBodIIIF.cs" />
     <Compile Include="Models\IRepository.cs" />
@@ -332,8 +337,8 @@
     <Content Include="Content\images\cd-arrow.svg" />
     <Content Include="Content\images\cd-nav-icons.svg" />
     <Content Include="Content\images\cd-search.svg" />
-    <Content Include="Content\images\inquire_120x32.png" />
-    <Content Include="Content\images\inquire_34x40.png" />
+    <Content Include="Content\images\logo_120x32.png" />
+    <Content Include="Content\images\logo_34x40.png" />
     <Content Include="Content\images\openid-providers-en.png" />
     <Content Include="Content\images\rings_loader_128.gif" />
     <Content Include="Content\images\Seadragon\fullpage_grouphover.png" />
@@ -389,6 +394,8 @@
     <Content Include="Content\jquery-ui.structure.min.css" />
     <Content Include="Content\jquery-ui.theme.css" />
     <Content Include="Content\jquery-ui.theme.min.css" />
+    <Content Include="Content\RKD\logos\RKD_header.jpg" />
+    <Content Include="Content\RKD\logos\RKD_HOOFDLOGO_218x310.jpg" />
     <Content Include="Content\materialize\css\materialize.css" />
     <Content Include="Content\materialize\css\materialize.min.css" />
     <Content Include="Content\materialize\font\material-design-icons\LICENSE.txt" />
@@ -413,6 +420,13 @@
     </Content>
     <None Include="Content\simple-sidebar.scss" />
     <Content Include="Content\reset.css" />
+    <None Include="Content\RKD\_rkd-cd-properties.scss" />
+    <Content Include="Content\RKD\_rkd-cd-properties.css">
+      <DependentUpon>_rkd-cd-properties.scss</DependentUpon>
+    </Content>
+    <Content Include="Content\RKD\_rkd-cd-properties.min.css">
+      <DependentUpon>_rkd-cd-properties.css</DependentUpon>
+    </Content>
     <Content Include="Content\simple-sidebar.css">
       <DependentUpon>simple-sidebar.scss</DependentUpon>
     </Content>
@@ -439,8 +453,9 @@
     <Content Include="Content\UserDefined2.min.css">
       <DependentUpon>UserDefined2.css</DependentUpon>
     </Content>
+    <Content Include="Content\RKD\RKD_Theme.css" />
     <Content Include="Content\_cd-header-properties.css">
-      <DependentUpon>_cd-header-properties.scss</DependentUpon>
+      <DependentUpon>_cd-properties.scss</DependentUpon>
     </Content>
     <Content Include="Content\_cd-header-properties.min.css">
       <DependentUpon>_cd-header-properties.css</DependentUpon>
@@ -487,11 +502,11 @@
     <Content Include="Content\bootstrap.css.map" />
     <Content Include="Content\Site.scss" />
     <None Include="compilerconfig.json" />
-    <Content Include="compilerconfig.json.defaults">
+    <None Include="compilerconfig.json.defaults">
       <DependentUpon>compilerconfig.json</DependentUpon>
-    </Content>
+    </None>
     <Content Include="Content\Site2.scss" />
-    <Content Include="Content\_cd-header-properties.scss" />
+    <Content Include="Content\_cd-properties.scss" />
     <Content Include="iNQUIRE_export.xsl">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -600,6 +615,7 @@
     <None Include="Web.armserv.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
+    <Content Include="Web.config_default" />
     <None Include="Web.inquire.armtest.uk.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

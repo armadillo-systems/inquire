@@ -1,4 +1,4 @@
-﻿@import '_cd-header-properties.scss';
+﻿@import '_cd-properties.scss';
 
 $cd-width-sm: 480px;
 $cd-width-md: 768px;
@@ -7,12 +7,17 @@ $cd-width-lg: 1170px;
 $cd-side-nav-width-md: 230px;
 $cd-side-nav-width-lg: 300px;
 $cd-side-nav-bg: #2c3136; /*rgb(225, 225, 225);*/
+$cd-side-nav-bg-selected: #33383e;
 $cd-side-nav-border: rgb(200, 200, 200) solid 1px;
+$cd-side-nav-children-selected: #ffd800;
 $cd-font-size: 1.6rem;
 $cd-font-family: "Roboto", sans-serif;
 $bg-highlight-colour: #ff7e66;
 
 $bg-colour-main: #3e454c;
+
+@import 'RKD/_rkd-cd-properties.scss'; /* line can be removed if this file not found, it's custom css settings */
+
 
 .nav-desc {
     display: none;
@@ -145,14 +150,15 @@ Header
 }
 
 .cd-main-header {
-  z-index: 2;
-  height: $cd-main-header-h;
-  width: 100%;
-  background: $bg-colour-main;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+    z-index: 2;
+    height: $cd-main-header-h;
+    width: 100%;
+    background: $bg-colour-main;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
+
 .cd-main-header::after {
   clear: both;
   content: "";
@@ -160,13 +166,14 @@ Header
 }
 
 .cd-logo {
-  color: #fff;
-  float: left;
-  display: block;
-  margin: 8px 0 0 5%;
-  background: url(images/inquire_34x40.png) no-repeat 0 0;
-  width: 34px;
-  height: 40px;
+    background-size: cover;
+    color: #fff;
+    float: left;
+    display: block;
+    margin: 8px 0 0 5%;
+    background: $cd-logo-sm no-repeat 0 0;
+    width: 34px;
+    height: 40px;
 }
 
 .cd-logo #cd-logo-text {
@@ -193,8 +200,9 @@ Header
 @media only screen and (min-width: $cd-width-lg) {
 
   .cd-logo {
+      background-size:cover;
       margin: 12px 0 0 20px;
-      background: url(images/inquire_120x32.png) no-repeat 0 0;
+      background: $cd-logo-lg no-repeat 0 0;
       width: 120px;
       height: 32px;
   }
@@ -391,11 +399,11 @@ Top Navigation
 -------------------------------- */
 
 @media only screen and (min-width: $cd-width-md) {
-  .cd-nav {
-    display: block;
-    float: right;
-    height: 100%;
-  }
+    .cd-nav {
+        display: block;
+        float: right;
+        height: 100%;
+    }
 }
 
 /*.cd-top-nav > li > a::before {
@@ -733,7 +741,7 @@ Sidebar
       .cd-side-nav .active > a {
         /* current page */
         box-shadow: inset 3px 0 0 #1784c7;
-        background-color: #33383e;
+        background-color: $cd-side-nav-bg-selected;
       }
       .cd-side-nav .action-btn a {
         margin: 1em 10% 0;
@@ -773,7 +781,7 @@ Sidebar
         padding: 0;
       }
       .cd-side-nav > ul > li:not(.action-btn):hover > a {
-        background-color: #33383e;
+        background-color: $cd-side-nav-bg-selected;
       }
       .cd-side-nav > ul > li > a {
         padding: 1em 1em 1em 20px;
@@ -869,7 +877,7 @@ Sidebar
 }
 
 .cd-side-nav .has-children.selected > a {
-    color: #ffd800;
+    color: $cd-side-nav-children-selected;
 }
 
 @media only screen and (min-width: $cd-width-md) {
@@ -902,7 +910,7 @@ Sidebar
 
   .cd-side-nav .has-children.selected > a {
     /* focus state -> show sub pages */
-    background-color: #33383e;
+    background-color: $cd-side-nav-bg-selected;
   }
 }
 @media only screen and (min-width: $cd-width-lg) {

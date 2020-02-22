@@ -100,7 +100,7 @@ namespace iNQUIRE.Models
         public string Source { get; set; }
 
         [SolrField("Collection")]
-        public string Collection { get; set; }
+        public override string Collection { get; set; }
 
         [SolrField("Genre")]
         public string Genre { get; set; }
@@ -160,13 +160,11 @@ namespace iNQUIRE.Models
             }
         }
 
-        /*[SolrField("Width")]
-        public int Width { get; set; }
+        [SolrField("Width")]
+        public override int Width { get; set; }
 
         [SolrField("Height")]
-        public int Height { get; set; }*/
-
-        public override ImageMetadata ImageMetadata { get; set; }
+        public override int Height { get; set; }
 
         public override XElement ExportXml()
         {

@@ -1,8 +1,8 @@
 ﻿<script id="result-list-image-template" type="text/html">
-    <div data-bind="attr: { 'data-lastrow': LastRow, class: $root.makeResultClassName() + ' clearfix', 'data-id': ID, 'data-index': $index, 'data-file': IIIFImageRoot, 'data-children-count': resultChildrenCount(ChildNodes), 'data-children': ((ChildNodes) ? ChildNodes : '') }">     
+    <div data-bind="attr: { 'data-lastrow': LastRow, class: $root.makeResultClassName() + ' clearfix', 'data-id': ID, 'data-index': $index, 'data-file': File, 'data-children-count': resultChildrenCount(ChildNodes), 'data-children': ((ChildNodes) ? ChildNodes : '') }">     
     <article>
         <div class="result-list-img" data-bind="style: {width: $root.maxResultImgW() + 'px'}">
-            <img data-bind="attr: { class: $root.classNameThumbnail + ' ' + $root.makeResultImageClassName() + ' shadow left', 'data-width': Width, 'data-height': Height, 'data-levels': 0, alt: stripHtml(Title) }" src="@Url.Content("~/Content/images/white_square_1x1.gif")" />
+            <img data-bind="attr: { class: $root.classNameThumbnail + ' ' + $root.makeResultImageClassName() + ' shadow left', 'data-width': Width, 'data-height': Height, 'data-levels': Levels, alt: stripHtml(Title) }" src="@Url.Content("~/Content/images/white_square_1x1.gif")" />
         </div>
         <div class="result-list-text">
             <div class="result-title" data-bind="html: Title"></div>
@@ -31,7 +31,7 @@
       </div>
 </script>
 
-<script id='result-grid-template' type='text/html'><li data-bind="attr: { 'data-lastrow': LastRow, class: $root.makeResultClassName() + ' clearfix', 'data-id': ID, 'data-index': $index, 'data-file': IIIFImageRoot, 'data-title': Title, 'data-author': Author, 'data-children-count': resultChildrenCount(ChildNodes), 'data-children': ((ChildNodes) ? ChildNodes : '') }" style="display: block">
+<script id='result-grid-template' type='text/html'><li data-bind="attr: { 'data-lastrow': LastRow, class: $root.makeResultClassName() + ' clearfix', 'data-id': ID, 'data-index': $index, 'data-file': File, 'data-title': Title, 'data-author': Author, 'data-children-count': resultChildrenCount(ChildNodes), 'data-children': ((ChildNodes) ? ChildNodes : '') }" style="display: block">
         <article>
             <div data-bind="visible: (ChildNodes)">
                 <div data-bind="attr: { class: $root.makeResultChildNodesClassName() }">
@@ -39,7 +39,7 @@
                 </div>
                 <div class="clear"></div>
             </div>
-            <img data-bind="attr: { class: $root.classNameThumbnail + ' ' + $root.makeResultImageClassName() + ' shadow', 'data-width': Width, 'data-height': Height, 'data-levels': 0, alt: stripHtml(Title) }" src="@Url.Content("~/Content/images/white_square_1x1.gif")" />
+            <img data-bind="attr: { class: $root.classNameThumbnail + ' ' + $root.makeResultImageClassName() + ' shadow', 'data-width': Width, 'data-height': Height, 'data-levels': Levels, alt: stripHtml(Title) }" src="@Url.Content("~/Content/images/white_square_1x1.gif")" />
 
             <div data-bind="attr: { class: $root.makeResultHeaderClassName() }">
                 <header>
@@ -54,14 +54,14 @@
     </li>
 </script>
 
-<script id='result-masonry-template' type='text/html'><div data-bind="attr: { 'data-lastrow': LastRow, class: $root.makeResultClassName(), 'data-id': ID, 'data-index': $index, 'data-file': IIIFImageRoot, 'data-title': Title, 'data-author': Author, 'data-children-count': resultChildrenCount(ChildNodes), 'data-children': ((ChildNodes) ? ChildNodes : '') }">
+<script id='result-masonry-template' type='text/html'><div data-bind="attr: { 'data-lastrow': LastRow, class: $root.makeResultClassName(), 'data-id': ID, 'data-index': $index, 'data-file': File, 'data-title': Title, 'data-author': Author, 'data-children-count': resultChildrenCount(ChildNodes), 'data-children': ((ChildNodes) ? ChildNodes : '') }">
     @*<div data-bind="visible: (ChildNodes)">
         <div data-bind="attr: { class: $root.makeResultChildNodesClassName() }">
             <a class="but-view-children" title="View">View</a> <span data-bind="text: resultChildrenStr(ChildNodes)"></span>
         </div>
         <div class="clear"></div>
     </div>*@
-    <img data-bind="attr: { class: $root.classNameThumbnail + ' ' + $root.makeResultImageClassName() + ' shadow', 'data-width': Width, 'data-height': Height, 'data-levels': 0, alt: stripHtml(Title) }" src="@Url.Content("~/Content/images/white_square_1x1.gif")" style="width: 50px; height: 100px;" />
+    <img data-bind="attr: { class: $root.classNameThumbnail + ' ' + $root.makeResultImageClassName() + ' shadow', 'data-width': Width, 'data-height': Height, 'data-levels': Levels, alt: stripHtml(Title) }" src="@Url.Content("~/Content/images/white_square_1x1.gif")" style="width: 50px; height: 100px;" />
     <div class="result-title result-title-inset">
         <span data-bind="visible: (_alwaysShowOpenDeepZoomTouchIcon || _isAndroidOriOS), attr: { class: 'openDeepZoom fa fa-' + $root.classNameOpenDeepZoomIcon }"></span>
         <span data-bind="visible: ($root.isLayoutMasonrySmall() == false), html: $root.resultStr(Title,true)"></span>

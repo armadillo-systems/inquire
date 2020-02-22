@@ -1,4 +1,6 @@
 ﻿/*rgb(225, 225, 225);*/
+/*rgb(225, 225, 225);*/
+/* line can be removed if this file not found, it's custom css settings */
 .nav-desc {
   display: none; }
 
@@ -16,7 +18,7 @@ ul, ol, li {
   font-size: 2.2rem; }
 
 .result-option-selected {
-  background: #ff7e66; }
+  background: #AACC45; }
 
 /* -------------------------------- 
 
@@ -32,7 +34,7 @@ html {
 body {
   font-size: 1.6rem;
   font-family: "Roboto", sans-serif;
-  color: #3e454c;
+  color: #AACC45;
   background-color: #ffffff; }
 
 body::after {
@@ -101,14 +103,14 @@ Header
   z-index: 10;
   top: 0;
   left: 0;
-  height: 100px;
+  height: 165px;
   width: 100%; }
 
 .cd-main-header {
   z-index: 2;
-  height: 55px;
+  height: 120px;
   width: 100%;
-  background: #3e454c;
+  background: #AACC45;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale; }
@@ -119,11 +121,12 @@ Header
   display: table; }
 
 .cd-logo {
+  background-size: cover;
   color: #fff;
   float: left;
   display: block;
   margin: 8px 0 0 5%;
-  background: url(images/inquire_34x40.png) no-repeat 0 0;
+  background: url("") no-repeat 0 0;
   width: 34px;
   height: 40px; }
 
@@ -135,7 +138,7 @@ Header
 
 @media only screen and (min-width: 768px) {
   #cd-header-wrapper {
-    height: 55px; }
+    height: 120px; }
   .cd-logo {
     margin: 8px 0 0 20px; }
   .cd-logo #cd-logo-text {
@@ -143,8 +146,9 @@ Header
 
 @media only screen and (min-width: 1170px) {
   .cd-logo {
+    background-size: cover;
     margin: 12px 0 0 20px;
-    background: url(images/inquire_120x32.png) no-repeat 0 0;
+    background: url("") no-repeat 0 0;
     width: 120px;
     height: 32px; } }
 
@@ -300,7 +304,7 @@ Header
     border: none;
     /*padding-left: 2.6em;*/
     border-radius: 0;
-    background-color: #3e454c;
+    background-color: #AACC45;
     color: #ffffff;
     border: solid 1px #fff; }
   .cd-search input::-webkit-input-placeholder {
@@ -368,7 +372,7 @@ Top Navigation
 .cd-top-nav .has-children > a {
   height: 100%;
   padding: 0 calc(1.8em + 22px) 0 calc(1.8em + 26px) !important;
-  line-height: 55px; }
+  line-height: 120px; }
 
 .cd-top-nav .has-children > a::after {
   display: block;
@@ -393,7 +397,7 @@ Top Navigation
 
 @media only screen and (min-width: 768px) {
   .cd-top-nav {
-    background: #3e454c; }
+    background: #AACC45; }
   .cd-top-nav > li {
     margin-right: 1em; } }
 
@@ -414,8 +418,8 @@ Sidebar
   left: 0;
   top: 0;
   width: 100%;
-  margin: 100px 0 0;
-  background-color: #2c3136;
+  margin: 165px 0 0;
+  background-color: #717c52;
   visibility: hidden;
   opacity: 0;
   max-height: 100vh;
@@ -527,7 +531,7 @@ Sidebar
   transform: translateY(-50%);
   right: calc(5% + 16px + 0.4em);
   padding: 0.2em 0.4em;
-  background-color: #ff7e66;
+  background-color: #AACC45;
   border-radius: .25em;
   color: #ffffff;
   font-weight: bold;
@@ -584,7 +588,7 @@ Sidebar
     position: fixed;
     float: left;
     /*top: auto;*/
-    top: 55px;
+    top: 120px;
     width: 230px;
     min-height: calc(100% - 55px);
     margin-top: 0;
@@ -618,7 +622,7 @@ Sidebar
   .cd-side-nav .active > a {
     /* current page */
     box-shadow: inset 3px 0 0 #1784c7;
-    background-color: #33383e; }
+    background-color: #AACC45; }
   .cd-side-nav .action-btn a {
     margin: 1em 10% 0; }
   .cd-side-nav .count {
@@ -648,7 +652,7 @@ Sidebar
   .cd-side-nav > ul {
     padding: 0; }
   .cd-side-nav > ul > li:not(.action-btn):hover > a {
-    background-color: #33383e; }
+    background-color: #AACC45; }
   .cd-side-nav > ul > li > a {
     padding: 1em 1em 1em 20px;
     /*text-align: left;*/
@@ -729,7 +733,7 @@ Sidebar
   transform: translateY(-50%) rotate(180deg); }
 
 .cd-side-nav .has-children.selected > a {
-  color: #ffd800; }
+  color: #ffffff; }
 
 @media only screen and (min-width: 768px) {
   .has-children {
@@ -753,7 +757,7 @@ Sidebar
   }*/
   .cd-side-nav .has-children.selected > a {
     /* focus state -> show sub pages */
-    background-color: #33383e; } }
+    background-color: #AACC45; } }
 
 @media only screen and (min-width: 1170px) {
   /*.has-children > ul {
@@ -775,4 +779,3 @@ Sidebar
     opacity: 1;
     visibility: visible;
   }*/ }
-

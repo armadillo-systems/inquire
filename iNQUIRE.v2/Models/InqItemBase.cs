@@ -16,11 +16,16 @@ namespace iNQUIRE.Models
         public abstract string Title { get; set; }
         public abstract string Author { get; set; }
         public abstract string Description { get; set; }
+        public abstract string Collection { get; set; }
         public abstract string File { get; set; } // has a set accessor as solr record needs to be updated if jpeg converted to jpeg2000
         public abstract string DateStr { get; set; }
         public abstract ICollection<string> ParentNodes { get; set; }
         public abstract ICollection<string> ChildNodes { get; set; }
-        public abstract ImageMetadata ImageMetadata { get; set; }
+
+        public ImageMetadata ImageMetadata { get; set; }
+
+        public abstract int Width { get; set; }
+        public abstract int Height { get; set; }
 
         public abstract string ExportRis();
         public abstract XElement ExportXml();

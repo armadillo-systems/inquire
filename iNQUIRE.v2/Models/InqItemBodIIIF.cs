@@ -45,8 +45,6 @@ namespace iNQUIRE.Models
         [SolrField("Date")]
         public Int32 DateInt { get; set; }
 
-        public override ImageMetadata ImageMetadata { get; set; }
-
         [SolrField("ParentNodes")]
         public string ParentNode { get; set; }
 
@@ -67,7 +65,6 @@ namespace iNQUIRE.Models
         [SolrField("ChildNodes")]
         public override ICollection<string> ChildNodes { get; set; }
 
-        public override string File { get; set; }
         public override string Author { get; set; }
         //public override string Description { get; set; }
 
@@ -145,7 +142,7 @@ namespace iNQUIRE.Models
         public string Accessrights { get; set; }
 
         [SolrField("Collection")]
-        public string Collection { get; set; }
+        public override string Collection { get; set; }
 
         [SolrField("Identifier")]
         public string Identifier { get; set; }

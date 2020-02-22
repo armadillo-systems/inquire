@@ -2074,25 +2074,27 @@
             }
 
             var ext = file.split('.').pop();
-
-            // for .mp3 and .mov files so jpg icon can be located
-            if((ext == 'mp3') || (ext == 'mov') || (ext == 'wmv') || (ext == 'webm') || (ext == 'ogg') || (ext == 'ogv') || (ext == 'oga') ) {
-                file = file.substr(0, file.lastIndexOf('.')) + '.jpg';
-            }
-
             var img = $(element).find('.' + self.classNameThumbnail);
 
-            if(file.indexOf("yale.edu") > -1 ||file.indexOf("gallica.bnf.fr") > -1 )
-            {
-                img_src = file + "/full/" + w_img+ ",/0/native.jpg";
-                $(img).attr('src', img_src);
-            }
-            else
-            {
-                img_src = file + "/full/" + w_img+ ",/0/default.jpg";
-                $(img).attr('src', img_src);
-            }
-            return;
+            // Start: IIIF
+            //// for .mp3 and .mov files so jpg icon can be located
+            //if((ext == 'mp3') || (ext == 'mov') || (ext == 'wmv') || (ext == 'webm') || (ext == 'ogg') || (ext == 'ogv') || (ext == 'oga') ) {
+            //    file = file.substr(0, file.lastIndexOf('.')) + '.jpg';
+            //}
+
+
+            //if(file.indexOf("yale.edu") > -1 ||file.indexOf("gallica.bnf.fr") > -1 )
+            //{
+            //    img_src = file + "/full/" + w_img+ ",/0/native.jpg";
+            //    $(img).attr('src', img_src);
+            //}
+            //else
+            //{
+            //    img_src = file + "/full/" + w_img+ ",/0/default.jpg";
+            //    $(img).attr('src', img_src);
+            //}
+            //return;
+            // END: IIIF
 
 
             /*var w = result.ImageMetadata.Width;

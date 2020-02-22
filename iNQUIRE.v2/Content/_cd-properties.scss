@@ -1,0 +1,22 @@
+﻿$cd-main-header-h: 55px;
+$cd-sub-header-h: 45px;
+$cd-header-h: $cd-main-header-h + $cd-sub-header-h;
+
+$cd-logo-sm: url("logos/logo_34x40.png");
+$cd-logo-lg: url("logos/logo_120x32.png");
+
+$cd-width-sm: 480px;
+$cd-width-md: 768px;
+$cd-width-md-no-button-labels: 990px;
+$cd-width-lg: 1170px;
+$cd-side-nav-width-md: 230px;
+$cd-side-nav-width-lg: 300px;
+$cd-side-nav-bg: #2c3136; /*rgb(225, 225, 225);*/
+$cd-side-nav-bg-selected: #33383e;
+$cd-side-nav-border: rgb(200, 200, 200) solid 1px;
+$cd-side-nav-children-selected: #ffd800;
+$cd-font-size: 1.6rem;
+$cd-font-family: "Roboto", sans-serif;
+$bg-highlight-colour: #ff7e66;
+
+$bg-colour-main: #3e454c;

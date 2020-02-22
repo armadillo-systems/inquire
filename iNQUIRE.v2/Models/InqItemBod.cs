@@ -10,11 +10,9 @@ using iNQUIRE.Helpers;
 
 namespace iNQUIRE.Models
 {
-    public class InqItemBod : InqItemBase
+    public class InqItemBod : InqItemImageMetadataWidthAndHeightBase
     {
         #region IInqItem properties implementation
-        public override ImageMetadata ImageMetadata { get; set; }
-
         public override string ID { get { return id; } set { } }
 
         public override string Title
@@ -206,6 +204,8 @@ namespace iNQUIRE.Models
 
         [SolrField("dcterms:publisher")]
         public ICollection<string> dcterms_publisher { get; set; }
+
+        public override string Collection { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
         #endregion
 
 
