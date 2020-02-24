@@ -65,7 +65,8 @@
     <div class="result-title result-title-inset">
         <span data-bind="visible: (_alwaysShowOpenDeepZoomTouchIcon || _isAndroidOriOS), attr: { class: 'openDeepZoom fa fa-' + $root.classNameOpenDeepZoomIcon }"></span>
         <span data-bind="visible: ($root.isLayoutMasonrySmall() == false), html: $root.resultStr(Title,true)"></span>
-        <span data-bind="visible: (ChildNodes)">@*<a class="but-view-children" title="View">View</a>*@ <span data-bind="text: resultChildrenStr(ChildNodes)"></span></span>
+        <span data-bind="visible: (ChildNodes !== null && ChildNodes.length > 0)">@*<a class="but-view-children" title="View">View</a>*@ <span data-bind="text: resultChildrenStr(ChildNodes)"></span></span>
+        @*<pre data-bind="text: ko.toJSON($data, null, 2)"></pre>*@
     </div>
     @*  result-title: title displayed under the result image
     result-title-inset: title displayed on top of the result image *@

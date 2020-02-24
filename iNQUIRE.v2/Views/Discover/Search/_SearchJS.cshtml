@@ -1766,8 +1766,8 @@
                 adjustLayout(); *@
 
             var dz_url = "@Url.Content(String.Format("{0}?{1}=", ViewBag.DeepZoomViewer, "DeepZoom"))" + id + "_files/";
-            _dzViewer = goOpenSeadragonIIIF(id, self.zoomFrameSelector, img_w, img_h);
-            // _dzViewer = goOpenSeadragon(id, self.zoomFrameSelector, img_w, img_h);
+            //_dzViewer = goOpenSeadragonIIIF(id, self.zoomFrameSelector, img_w, img_h);
+             _dzViewer = goOpenSeadragon(dz_url, self.zoomFrameSelector, img_w, img_h);
         }
 
         self.resizeDeepZoom = function (timeout) {
@@ -2194,7 +2194,7 @@
 
                     //$('.nav-results-pager').fadeOut(_fadeMsMax, _animType);
 
-                    var f = self.resultCurrent().IIIFImageRoot; //self.resultCurrent().File;
+                    var f = self.resultCurrent().File;
                     if(id == '08ae99b9-6538-49c8-bf2b-0d1c007ee265')
                         showMedia('video.mp4');
                     else if(id == '808bed03-6755-4483-9d52-3cacdc0779d6')

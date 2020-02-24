@@ -1,4 +1,5 @@
 ﻿$cd-main-header-h: 55px;
+$cd-main-header-h-sm: 55px; /* used when */
 $cd-sub-header-h: 45px;
 $cd-header-h: $cd-main-header-h + $cd-sub-header-h;
 
@@ -18,5 +19,9 @@ $cd-side-nav-children-selected: #ffd800;
 $cd-font-size: 1.6rem;
 $cd-font-family: "Roboto", sans-serif;
 $bg-highlight-colour: #ff7e66;
-
 $bg-colour-main: #3e454c;
+
+$cd-top-nav-padding-top: 0;
+$cd-top-nav-button-padding: 1em;
+
+$cd-search-padding-top: 0;

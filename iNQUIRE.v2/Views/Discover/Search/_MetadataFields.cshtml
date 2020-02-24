@@ -1,4 +1,6 @@
-﻿
+﻿@* use the <pre> line below to view/debug the search result metadata *@
+    @*<pre data-bind="text: ko.toJSON(resultCurrent(), null, 2)"></pre>*@
+
     @*<li id="metadata-id" class="metadata-field" data-bind="visible: !IsFieldNullOrEmpty(resultCurrent().ID)">
         <div>
             <span class="metadata-label">ID: </span>
@@ -41,12 +43,12 @@
         </div>
     </li>
 
-    <li id="metadata-description" class="metadata-field" data-bind="visible: !IsFieldNullOrEmpty(resultCurrent().Description)">
+    @*<li id="metadata-description" class="metadata-field" data-bind="visible: !IsFieldNullOrEmpty(resultCurrent().Description)">
         <div>
             <span class="metadata-label">Description: </span>
             <span id="metadata-description-text" class="metadata-field-text" data-bind="html: resultCurrent().Description"></span>
         </div>
-    </li>
+    </li>*@
 
     <li id="metadata-type" class="metadata-field" data-bind="visible: !IsFieldNullOrEmpty(resultCurrent().Type)">
         <div>

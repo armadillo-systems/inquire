@@ -1,21 +1,4 @@
 ﻿@import '_cd-properties.scss';
-
-$cd-width-sm: 480px;
-$cd-width-md: 768px;
-$cd-width-md-no-button-labels: 990px;
-$cd-width-lg: 1170px;
-$cd-side-nav-width-md: 230px;
-$cd-side-nav-width-lg: 300px;
-$cd-side-nav-bg: #2c3136; /*rgb(225, 225, 225);*/
-$cd-side-nav-bg-selected: #33383e;
-$cd-side-nav-border: rgb(200, 200, 200) solid 1px;
-$cd-side-nav-children-selected: #ffd800;
-$cd-font-size: 1.6rem;
-$cd-font-family: "Roboto", sans-serif;
-$bg-highlight-colour: #ff7e66;
-
-$bg-colour-main: #3e454c;
-
 @import 'RKD/_rkd-cd-properties.scss'; /* line can be removed if this file not found, it's custom css settings */
 
 
@@ -110,7 +93,7 @@ Main Page Content
 
   .cd-main-content .content-wrapper {
     margin-left: $cd-side-nav-width-md;
-    padding-top: 60px;
+    padding-top: $cd-main-header-h;
   }
   .cd-main-content .content-wrapper h1 {
     padding: 4em 0;
@@ -386,6 +369,12 @@ Header
   }
 }
 
+@media only screen and (min-width: $cd-width-md) {
+    .cd-search {
+        padding-top: $cd-search-padding-top;
+    }
+}
+
 @media only screen and (min-width: $cd-width-lg) {
   .cd-search {
     width: 300px;
@@ -403,6 +392,7 @@ Top Navigation
         display: block;
         float: right;
         height: 100%;
+        padding-top: $cd-top-nav-padding-top;
     }
 }
 
@@ -440,7 +430,7 @@ Top Navigation
     margin-right: 0;
 }
 .cd-top-nav > li a {
-    padding: 1em .6em !important;
+    padding: $cd-top-nav-button-padding .6em !important;
 }
 
 .cd-top-nav img {
@@ -680,12 +670,20 @@ Sidebar
 }
 
 @media only screen and (min-width: $cd-width-sm) {
+ .cd-main-header,  #cd-header-wrapper {
+        height: $cd-main-header-h-sm;
+    }
+
     #results-children-slider-container {
         max-width: calc(100% - 290px);
     }
 }
 
 @media only screen and (min-width: $cd-width-md) {
+    .cd-main-header, #cd-header-wrapper {
+        height: $cd-main-header-h;
+    }
+
       .cd-side-nav div {
           text-align: center;
       }

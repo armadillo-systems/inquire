@@ -583,7 +583,7 @@ namespace iNQUIRE.Controllers
                         if (!String.IsNullOrEmpty((ImageHelper.Jpeg2000NamespaceReplace)) && k.File.Contains(ImageHelper.Jpeg2000NamespaceReplace)) // see Jpeg2000NamespaceReplace for explanation
                             k.File = k.File.Replace(ImageHelper.Jpeg2000NamespaceReplace, ImageHelper.Jpeg2000Namespace);
 
-                        if ((!JP2HelperBase.IsAudioOrVideo(k.File)) && (!String.IsNullOrEmpty(ImageHelper.ImageFilenameAppend)))
+                        if (!JP2HelperBase.IsAudioOrVideo(k.File) && !String.IsNullOrEmpty(ImageHelper.ImageFilenameAppend) && !k.File.EndsWith(ImageHelper.ImageFilenameAppend))
                             k.File = string.Format("{0}{1}", k.File, ImageHelper.ImageFilenameAppend);
 
                         if (k.File.Contains(ImageHelper.Jpeg2000Namespace)) // file is a jpeg2000 image
