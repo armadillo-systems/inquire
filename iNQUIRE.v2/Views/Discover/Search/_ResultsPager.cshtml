@@ -30,6 +30,6 @@
 </script>
 
 <nav class="nav-results-pager text-right" style="display: none;" data-bind="visible: showResultsPager">
-    <div class="results-count">Results <span data-bind="text: (recordsetRowStart() + 1)"></span> to <span data-bind="text: Math.min(recordsetRecords(), (recordsetRowStart() + 1 + recordsetPageSize()))"></span> of <span data-bind="text: recordsetRecords"></span></div>
+    <div class="results-count">Results <span data-bind="text: (recordsetRowStart() + 1)"></span> to <span data-bind="text: Math.min(recordsetRecords(), (recordsetRowStart() + recordsetPageSize()))"></span> of <span data-bind="text: recordsetRecords"></span></div>
     <ul class="results-pager pagination pagination-sm no-v-padding margin-none" data-bind="template: { name: 'results-page-template', foreach: recordsetPages }"></ul>
 </nav>

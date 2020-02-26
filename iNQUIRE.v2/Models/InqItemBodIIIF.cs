@@ -48,6 +48,7 @@ namespace iNQUIRE.Models
         [SolrField("ParentNodes")]
         public string ParentNode { get; set; }
 
+        // use this to maintain ParentNodes override as a collection, just make the single result in to a collection
         private ICollection<string> _privateNodes;
         public override ICollection<string> ParentNodes {
             get

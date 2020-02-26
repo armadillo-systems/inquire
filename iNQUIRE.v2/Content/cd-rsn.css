@@ -77,7 +77,7 @@ Main Page Content
 @media only screen and (min-width: 768px) {
   .cd-main-content .content-wrapper {
     margin-left: 230px;
-    padding-top: 125px; }
+    padding-top: 120px; }
   .cd-main-content .content-wrapper h1 {
     padding: 4em 0;
     font-size: 3.2rem;
@@ -103,12 +103,12 @@ Header
   z-index: 10;
   top: 0;
   left: 0;
-  height: 170px;
+  height: 165px;
   width: 100%; }
 
 .cd-main-header {
   z-index: 2;
-  height: 125px;
+  height: 120px;
   width: 100%;
   background: #AACC45;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
@@ -138,7 +138,7 @@ Header
 
 @media only screen and (min-width: 768px) {
   #cd-header-wrapper {
-    height: 125px; }
+    height: 120px; }
   .cd-logo {
     margin: 8px 0 0 20px; }
   .cd-logo #cd-logo-text {
@@ -334,7 +334,7 @@ Top Navigation
     display: block;
     float: right;
     height: 100%;
-    padding-top: 80px; } }
+    padding-top: 75px; } }
 
 /*.cd-top-nav > li > a::before {
 
@@ -377,7 +377,7 @@ Top Navigation
 .cd-top-nav .has-children > a {
   height: 100%;
   padding: 0 calc(1.8em + 22px) 0 calc(1.8em + 26px) !important;
-  line-height: 125px; }
+  line-height: 120px; }
 
 .cd-top-nav .has-children > a::after {
   display: block;
@@ -423,7 +423,7 @@ Sidebar
   left: 0;
   top: 0;
   width: 100%;
-  margin: 170px 0 0;
+  margin: 165px 0 0;
   background-color: #717c52;
   visibility: hidden;
   opacity: 0;
@@ -590,14 +590,14 @@ Sidebar
 
 @media only screen and (min-width: 768px) {
   .cd-main-header, #cd-header-wrapper {
-    height: 125px; }
+    height: 120px; }
   .cd-side-nav div {
     text-align: center; }
   .cd-side-nav {
     position: fixed;
     float: left;
     /*top: auto;*/
-    top: 125px;
+    top: 120px;
     width: 230px;
     min-height: calc(100% - 55px);
     margin-top: 0;

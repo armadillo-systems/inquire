@@ -615,7 +615,6 @@
     <None Include="Web.armserv.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
-    <Content Include="Web.config_default" />
     <None Include="Web.inquire.armtest.uk.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
