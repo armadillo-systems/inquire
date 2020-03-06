@@ -18,18 +18,18 @@
 <body>
 
     <script type="text/javascript">
-    function IsFieldNullOrEmpty(obj) {
-        return !((obj) && (obj.toString().length > 0));
-    }
+        function IsFieldNullOrEmpty(obj) {
+            return !((obj) && (obj.toString().length > 0));
+        }
 
-    var _gvm = {
-        fbLoaded: ko.observable(false),
-        fbAccessToken: ko.observable('')
-    };
+        var _gvm = {
+            fbLoaded: ko.observable(false),
+            fbAccessToken: ko.observable('')
+        };
 
-    _gvm.fbConnected = ko.computed(function () {
-        return !IsFieldNullOrEmpty(this.fbAccessToken());
-    }, _gvm);
+        _gvm.fbConnected = ko.computed(function () {
+            return !IsFieldNullOrEmpty(this.fbAccessToken());
+        }, _gvm);
     </script>
 
     @if (ViewBag.Facebook)
@@ -102,60 +102,64 @@
                 <!--<a href="#0" class="cd-3d-nav-trigger">Facets<span></span></a>-->
 
                 <nav class="cd-nav">
+                    <ul id="cd-top-lang" data-bind="foreach: languages">
+                        <li><a data-bind="attrib: {'href' : code }, text: name, click: $root.languageClick, css: { 'strong': ($root.languageId() === code) }"></a></li>
+                    </ul>
                     <ul class="cd-top-nav">
                         <li data-bind="visible: backButton()"><a href="" onclick="return false;" id="nav-back"><span class="glyphicon glyphicon-circle-arrow-left"></span><span class="nav-desc"> Back</span></a></li>
                         @*<li data-bind="visible: childPrevAvailable()"><a href="" onclick="return false;" id="nav-prev"><span class="glyphicon glyphicon-arrow-left"></span><span class="nav-desc"> Prev</span></a></li>
-                        <li data-bind="visible: childNextAvailable()"><a href="" onclick="return false;" id="nav-next"><span class="glyphicon glyphicon-arrow-right"></span><span class="nav-desc"> Next</span></a></li>*@
-                        
+                            <li data-bind="visible: childNextAvailable()"><a href="" onclick="return false;" id="nav-next"><span class="glyphicon glyphicon-arrow-right"></span><span class="nav-desc"> Next</span></a></li>*@
+
                         <li class="dropdown" data-bind="visible: (resultCurrentIndex() != -1) && collections().length > 0">
                             <span class="dropdown-toggle" type="button" id="dropdownCollections" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
                                 <a href="" onclick="return false;" id="nav-share"><span class="fa fa-plus"></span><span class="nav-desc"> Collection</span></a>
                             </span>
                             <ul id="collection-options" class="dropdown-menu" aria-labelledby="dropdownCollections" data-bind="template: { name: 'but-tool-add-to-collection-options-template', foreach: collections }"></ul>
                         </li>
-                        
+
                         <li class="dropdown" data-bind="visible: (resultCurrentIndex() != -1)">
                             <span class="dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                                <a href="" onclick="return false;" id="nav-share"><span class="fa fa-share-alt" ></span><span class="nav-desc"> Share</span></a>
+                                <a href="" onclick="return false;" id="nav-share"><span class="fa fa-share-alt"></span><span class="nav-desc"> Share</span></a>
                             </span>
                             <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
                                 @*<li><a href="#" class="but-tool-facebook"><i class="fa fa-facebook"></i> Post to Facebook</a></li>
-                                <li><a href="#" class="but-tool-twitter"><i class="fa fa-twitter"></i> Post to Twitter</a></li>*@
+                                    <li><a href="#" class="but-tool-twitter"><i class="fa fa-twitter"></i> Post to Twitter</a></li>*@
 
                                 @if (ViewBag.Facebook)
                                 {
                                     <li><a href="javascript:;" class="but-tool-facebook"><i class="fa fa-facebook"></i> Post to Facebook</a></li>
 
                                     <li id="facebook-container" style="padding-left: 10px; padding-top: 12px; padding-bottom: 12px; height: 52px;">
-                                                <div data-bind="visible: (resultCurrentIndex() != -1)"> <!--  && _gvm.fbAccessToken -->
-                                                    <div class="fb-like"
-                                                         data-bind="visible: _gvm.fbLoaded, attr: { 'data-href': updateViewItemUri } "
-                                                         data-layout="standard"
-                                                         data-action="like"
-                                                         data-show-faces="true"
-                                                         data-width="215">
-                                                    </div>
-                                                </div>
+                                        <div data-bind="visible: (resultCurrentIndex() != -1)">
+                                            <!--  && _gvm.fbAccessToken -->
+                                            <div class="fb-like"
+                                                 data-bind="visible: _gvm.fbLoaded, attr: { 'data-href': updateViewItemUri } "
+                                                 data-layout="standard"
+                                                 data-action="like"
+                                                 data-show-faces="true"
+                                                 data-width="215">
+                                            </div>
+                                        </div>
                                     </li>
                                 }
 
                                 @*@if (ViewBag.Twitter)
-                                {
-                                    <li id="twitter" style="padding-left: 10px; padding-top: 17px; height: 52px;">
-                                                <div id="tweet">
-                                                    @TwitterGoodies.TweetButton(tweetText: ViewBag.TweetText)
-                                                </div>
-                                                @if (!String.IsNullOrEmpty(ViewBag.TwitterActivityCaption))
-                                                {
-                                                    @TwitterGoodies.Search(ViewBag.TwitterHashtag, scrollBar: true, width: 205, height: 150, shellColor: "#EBEDEF", backgroundShellColor: "#44474D", tweetsBackgroundColor: "#EBEDEF", caption: ViewBag.TwitterActivityCaption)
-                                                }
-                                    </li>
-                                }*@                            
+                                    {
+                                        <li id="twitter" style="padding-left: 10px; padding-top: 17px; height: 52px;">
+                                                    <div id="tweet">
+                                                        @TwitterGoodies.TweetButton(tweetText: ViewBag.TweetText)
+                                                    </div>
+                                                    @if (!String.IsNullOrEmpty(ViewBag.TwitterActivityCaption))
+                                                    {
+                                                        @TwitterGoodies.Search(ViewBag.TwitterHashtag, scrollBar: true, width: 205, height: 150, shellColor: "#EBEDEF", backgroundShellColor: "#44474D", tweetsBackgroundColor: "#EBEDEF", caption: ViewBag.TwitterActivityCaption)
+                                                    }
+                                        </li>
+                                    }*@
                                 <li><a href="" onclick="return false;" class="but-tool-download"><i class="fa fa-download"></i> Download</a></li>
                                 <li><a href="" onclick="return false;" class="but-tool-email"><i class="fa fa-envelope"></i> Email</a></li>
                                 <li><a href="" onclick="return false;" class="but-tool-print"><i class="fa fa-print"></i> Print</a></li>
                             </ul>
-                        
+
                         </li>
                         <li id="nav-facets-button"><a href="" onclick="return false;" id="nav-facets"><span class="glyphicon glyphicon-filter"></span><span class="nav-desc"> Filter</span></a></li>
                         <!-- <li><a href="" onclick="return false;" id="nav-help"><span class="fa fa-question"></span><span class="nav-desc"> Help</span></a></li> -->
@@ -191,9 +195,9 @@
             <div id="search-facets">
                 <div class="row">
                     <div class="col-xs-12" id="narrow-search-container">
-                            <header id="narrow-search-header">
-                                <h2 id="narrow-search-heading">Narrow your search</h2>
-                            </header>
+                        <header id="narrow-search-header">
+                            <h2 id="narrow-search-heading">Narrow your search</h2>
+                        </header>
 
                         <nav class="row" id="facets-holder" data-bind="template: { name: 'facet-field-template', foreach: facets(), as: 'facet' }"></nav>
                     </div>

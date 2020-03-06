@@ -1,34 +1,55 @@
 ﻿<script id="result-list-image-template" type="text/html">
-    <div data-bind="attr: { 'data-lastrow': LastRow, class: $root.makeResultClassName() + ' clearfix', 'data-id': ID, 'data-index': $index, 'data-file': File, 'data-children-count': resultChildrenCount(ChildNodes), 'data-children': ((ChildNodes) ? ChildNodes : '') }">     
-    <article>
-        <div class="result-list-img" data-bind="style: {width: $root.maxResultImgW() + 'px'}">
-            <img data-bind="attr: { class: $root.classNameThumbnail + ' ' + $root.makeResultImageClassName() + ' shadow left', 'data-width': Width, 'data-height': Height, 'data-levels': Levels, alt: stripHtml(Title) }" src="@Url.Content("~/Content/images/white_square_1x1.gif")" />
-        </div>
-        <div class="result-list-text">
-            <div class="result-title" data-bind="html: Title"></div>
-            <div class="result-desc" data-bind="html: Description"></div>
-            <div class="result-desc"><strong>Date:</strong> <span data-bind="text: DateStr"></span></div>
-        </div>
-    </article>
-    @*<div>
+    @*<pre data-bind="text: ko.toJSON($data, null, 2)"></pre>*@
+    <div data-bind="attr: { 'data-lastrow': LastRow, class: $root.makeResultClassName() + ' clearfix', 'data-id': ID, 'data-index': $index, 'data-file': File, 'data-children-count': resultChildrenCount(ChildNodes), 'data-children': ((ChildNodes) ? ChildNodes : '') }">
         <article>
-            
-                  <div class="header-list-image">
-                      <header>
-                          <h3>
-                              <span data-bind="text: resultChildrenStr(ChildNodes)"></span>
-                              <span data-bind="if: ($root._alwaysShowOpenDeepZoomTouchIcon || $root._isAndroidOriOS)">
-                                  <span data-bind="attr: { class: 'opendeepzoom fa fa-' + $root.classnameopendeepzoomicon }"></span>
-                              </span>
-                              <span class="result-title" data-bind="html: Title"></span>
-                          </h3>
-                      </header>
-                  </div>
-                  <div class="desc-list-image" data-bind="html: Description"></div>
-                  <div class="date-list-image"><strong>Date:</strong> <span data-bind="text: Year"></span></div>
-              </article>
-    </div>*@
-      </div>
+            <div class="result-list-img" data-bind="style: {width: $root.maxResultImgW() + 'px'}">
+                <img data-bind="attr: { class: $root.classNameThumbnail + ' ' + $root.makeResultImageClassName() + ' shadow left', 'data-width': Width, 'data-height': Height, 'data-levels': Levels, alt: stripHtml(Title) }" src="@Url.Content("~/Content/images/white_square_1x1.gif")" />
+            </div>
+            <div class="result-list-text">
+                <div class="result-title" data-bind="visible: $data.Title, html: $data.Title"></div>
+                <div class="result-author" data-bind="visible: $data.Author, html: $data.Author"></div>
+                <div class="result-attribution" data-bind="visible: $data.Attribution, html: $data.Attribution">
+                    <span class="metadata-label">Attribution: </span>
+                    <ul class="keywords metadata-field-text" data-bind="foreach: $data.Attribution">
+                        <li class="keyword"><a data-bind="html: $data, click: $root.keywordClick" class="keyword"></a></li>
+                    </ul>
+                </div>
+                <div class="result-datestr" data-bind="visible: $data.DateStr, html: $data.DateStr"></div>
+                <div class="result-type" data-bind="visible: $data.Type, html: $data.Type"></div>
+                <div class="result-category" data-bind="visible: $data.Category, html: $data.Category"></div>
+                <div class="result-medium" data-bind="visible: $data.Medium, html: $data.Medium"></div>
+                <div class="result-support" data-bind="visible: $data.Support, html: $data.Support"></div>
+                <div class="result-subject" data-bind="visible: $data.Subject, html: $data.Subject"></div>
+                <div class="result-source" data-bind="visible: $data.Source, html: $data.Source"></div>
+                <div class="result-collection" data-bind="visible: $data.Collection, html: $data.Collection"></div>
+                <div class="result-desc" data-bind="visible: $data.Type, html: Description"></div>
+                <div class="result-keywords" data-bind="visible: $data.Keywords, html: $data.Keywords">
+                    <span class="metadata-label">Attribution: </span>
+                    <ul class="keywords metadata-field-text" data-bind="foreach: $data.Keywords">
+                        <li class="keyword"><a data-bind="html: $data, click: $root.keywordClick" class="keyword"></a></li>
+                    </ul>
+                </div>
+            </div>
+        </article>
+        @*<div>
+                <article>
+
+                          <div class="header-list-image">
+                              <header>
+                                  <h3>
+                                      <span data-bind="text: resultChildrenStr(ChildNodes)"></span>
+                                      <span data-bind="if: ($root._alwaysShowOpenDeepZoomTouchIcon || $root._isAndroidOriOS)">
+                                          <span data-bind="attr: { class: 'opendeepzoom fa fa-' + $root.classnameopendeepzoomicon }"></span>
+                                      </span>
+                                      <span class="result-title" data-bind="html: Title"></span>
+                                  </h3>
+                              </header>
+                          </div>
+                          <div class="desc-list-image" data-bind="html: Description"></div>
+                          <div class="date-list-image"><strong>Date:</strong> <span data-bind="text: Year"></span></div>
+                      </article>
+            </div>*@
+    </div>
 </script>
 
 <script id='result-grid-template' type='text/html'><li data-bind="attr: { 'data-lastrow': LastRow, class: $root.makeResultClassName() + ' clearfix', 'data-id': ID, 'data-index': $index, 'data-file': File, 'data-title': Title, 'data-author': Author, 'data-children-count': resultChildrenCount(ChildNodes), 'data-children': ((ChildNodes) ? ChildNodes : '') }" style="display: block">

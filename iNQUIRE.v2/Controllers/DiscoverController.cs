@@ -16,6 +16,7 @@ using System.Web.Script.Serialization;
 using Facebook;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
+using System.Reflection;
 
 namespace iNQUIRE.Controllers
 {
@@ -23,6 +24,8 @@ namespace iNQUIRE.Controllers
 
     public class DiscoverController : Controller
     {
+        public static string MultilingualPropertyPrefix = "_ml"; 
+
         public static Guid ApplicationIdAspNet { get; set; }
         public static Guid ApplicationIdInquire { get; set; }
         public static string ExportFilename { get; set; }
@@ -153,7 +156,7 @@ namespace iNQUIRE.Controllers
 
         public ActionResult Index(string id)
         {
-            if(!String.IsNullOrEmpty(id))
+            if (!String.IsNullOrEmpty(id))
                 return RedirectToAction("Search", "Discover", new { term = String.Format("p=c+1,t+,rsrs+0,rsps+10,fa+,so+score%5Edesc,scids+,pid+,vi+{0}", id) });
 
             return View();
@@ -164,7 +167,7 @@ namespace iNQUIRE.Controllers
             return View();
         }
 
-        public ActionResult EmailExportAjax(string email_to, string message, string id_str)
+        public ActionResult EmailExportAjax(string email_to, string message, string id_str, string lang_id)
         {
             // setResolvers();
 
@@ -182,7 +185,7 @@ namespace iNQUIRE.Controllers
             {
                 var img_src = GetImageUri(r, ExportImageWidth, ExportImageHeight);
                 // var img_src = _IJP2Helper.GetImageUri(r.ImageMetadata, MediaDirectoryFullUri, _IJP2Helper.ResolverUri, ExportImageWidth, ExportImageHeight);
-                export_items.Add(new ExportItem(r, img_src));
+                export_items.Add(new ExportItem(r, img_src, lang_id));
                 count++;
 
                 if (count >= ExportMaxImages)
@@ -243,7 +246,7 @@ namespace iNQUIRE.Controllers
             return results;
         }
 
-        public ActionResult Download(string id_str, string formats_str = "xml", bool inc_asset = true)
+        public ActionResult Download(string id_str, string lang_id, string formats_str = "xml", bool inc_asset = true)
         {
             // setResolvers();
 
@@ -274,10 +277,10 @@ namespace iNQUIRE.Controllers
                 if (formats.Contains(DownloadFormat.RIS))
                 {
                     using (var ris_mem = new MemoryStream())
-                    using (var writer = new StreamWriter(ris_mem ))
+                    using (var writer = new StreamWriter(ris_mem))
                     {
                         foreach (IInqItem inq in results)
-                            writer.Write(inq.ExportRis());
+                            writer.Write(inq.ExportRis(lang_id));
 
                         writer.Flush();
                         ris_mem.Position = 0;
@@ -289,7 +292,7 @@ namespace iNQUIRE.Controllers
                 {
                     var xml = new XElement("items");
                     foreach (IInqItem inq in results)
-                        xml.Add(inq.ExportXml());
+                        xml.Add(inq.ExportXml(lang_id));
 
                     var xdoc = new XDocument(new XProcessingInstruction("xml-stylesheet", String.Format("type='text/xsl' href='{0}'", xslt_fn)), xml);
                     using (Stream xmls = new MemoryStream())
@@ -372,10 +375,10 @@ namespace iNQUIRE.Controllers
             string img_src;
             var r_iiif = r as InqItemIIIFBase;
 
-            if (r == null)
+            if (r_iiif == null)
                 img_src = _IJP2Helper.GetImageUri(r.ImageMetadata, MediaDirectoryFullUri, _IJP2Helper.ResolverUri, max_width, max_height);
             else
-                img_src = r_iiif.GetImageUri(ExportImageWidth, ExportImageHeight);
+                img_src = r_iiif.GetImageUri(max_width, max_height);
 
             return img_src;
         }
@@ -383,7 +386,7 @@ namespace iNQUIRE.Controllers
         public void SetupSearchViewBag(string id)
         {
             ViewBag.ViewItemID = id;
-            
+
             ApplicationUser user = _UserManager.FindById(User.Identity.GetUserId());
 
             ViewBag.UserID = User.Identity.GetUserId();
@@ -391,11 +394,11 @@ namespace iNQUIRE.Controllers
 
             if (!string.IsNullOrEmpty(id))
             {
-                var res = GetSolrRecord(id); 
+                var res = GetSolrRecord(id);
 
                 if (res.Results.Count == 1)
                 {
-                    var r = res.Results[0] as InqItemIIIFBase;
+                    var r = res.Results[0] as InqItemBase;
 
                     if (r != null)
                     {
@@ -405,8 +408,9 @@ namespace iNQUIRE.Controllers
                         ViewBag.ogUrl = Request.Url.OriginalString; //string.Format("{0}://{1}{2}", "https", Request.Url.Authority, Url.Content("~"));
                         ViewBag.ogType = "website";
                         ViewBag.ogTitle = r.Title;
+
                         ViewBag.ogDescription = r.Description;
-                        ViewBag.ogImage = r.GetImageUri(fb_img_w, fb_img_h);
+                        ViewBag.ogImage = GetImageUri(r, fb_img_w, fb_img_h);
 
                         var preview_img_w = 0;
                         var preview_img_h = 0;
@@ -514,23 +518,23 @@ namespace iNQUIRE.Controllers
                 user_id = Guid.Empty.ToString();
 
             //XmlDataHelper.SearchXml(Request.GetBaseUri(Url), term, new List<string>(ids), collection_search)
-            var res = SearchSolr(sq);
+            var results = SearchSolr(sq, lang_id);
 
             // save all searches, even if user not logged in (for complete stats). if start row == 0 assume new search (and not a seach page nav click)
             var kvp = new KeyValuePair<Guid, String>(Guid.Empty, null);
             if (row_start == 0)
-                kvp = _IUserSearchRepository.SearchSave(ApplicationIdInquire, lang_id, user_id, sq, res.NumFound);
+                kvp = _IUserSearchRepository.SearchSave(ApplicationIdInquire, lang_id, user_id, sq, results.NumFound);
 
-            res.SearchID = kvp.Key; // if search was saved this will NOT be Guid.Empty, so then add it to users list as a newly saved search
+            results.SearchID = kvp.Key; // if search was saved this will NOT be Guid.Empty, so then add it to users list as a newly saved search
             sq.SearchID = kvp.Key;
 
-            res.SearchDisplayName = kvp.Value;
+            results.SearchDisplayName = kvp.Value;
             sq.DisplayName = kvp.Value;
 
-            sq.NumFound = res.NumFound;
-            res.SearchQuery = sq;
+            sq.NumFound = results.NumFound;
+            results.SearchQuery = sq;
 
-            var results_vm = new SearchAjaxViewModel(res) { Rows = rows, RowStart = row_start };
+            var results_vm = new SearchAjaxViewModel(results) { Rows = rows, RowStart = row_start };
             return Json(results_vm, JsonRequestBehavior.AllowGet);
         }
 
@@ -542,11 +546,12 @@ namespace iNQUIRE.Controllers
             return results;
         }
 
-        private SolrSearchResults SearchSolr(SearchQuery sq)
+        private SolrSearchResults SearchSolr(SearchQuery sq, string lang_id)
         {
             var results = _IRepository.Search(sq, Facets, FacetRanges);
             forceHttps(ref results);
             addImageMetaData(ref results);
+            setLanguageData(ref results, lang_id);
             return results;
         }
 
@@ -577,7 +582,7 @@ namespace iNQUIRE.Controllers
                     // k.ImageMetadata = new ImageMetadata { Identifier = file, Imagefile = file, Width = d[0], Height = d[1], DwtLevels = 0, Levels = 0, CompositingLayerCount = 0 };
                 }
                 else
-                { 
+                {
                     if (k.File != null)
                     {
                         if (!String.IsNullOrEmpty((ImageHelper.Jpeg2000NamespaceReplace)) && k.File.Contains(ImageHelper.Jpeg2000NamespaceReplace)) // see Jpeg2000NamespaceReplace for explanation
@@ -615,6 +620,47 @@ namespace iNQUIRE.Controllers
             // return r_list;
         }
 
+
+        protected void setLanguageData(ref SolrSearchResults solr_results, string lang_id)
+        {
+            // propertyInfo.SetValue(ship, value, null);
+            if (solr_results != null && solr_results.Results != null && solr_results.Results.Count() > 0)
+            {
+                foreach (IInqItem k in solr_results.Results)
+                {
+                    // get any multilingual properties, select the relevant language array from their dictionary, copy to the
+                    // normal version of the property, eg _mlKeywords -> Keywords. this way we filter out language data we don't
+                    // need to send to the client.
+                    Type t = k.GetType();
+                    IList<PropertyInfo> mlprops = new List<PropertyInfo>(t.GetProperties().Where(p => p.Name.StartsWith(MultilingualPropertyPrefix)).ToList());
+
+                    foreach (PropertyInfo mlprop in mlprops)
+                    {
+                        var lang_dict = mlprop.GetValue(k, null) as Dictionary<string, List<string>>;
+
+                        if (lang_dict != null)
+                        {
+                            var propinfo = k.GetType().GetProperty(mlprop.Name.Replace("_ml", ""));
+
+                            if (propinfo != null && propinfo.PropertyType == typeof(List<string>))
+                            {
+                                // if we don't have a lang_id for some reason then just try to return some data (rather than nothing)
+                                if (string.IsNullOrEmpty(lang_id))
+                                    lang_id = lang_dict.Keys.FirstOrDefault();
+
+                                if (!string.IsNullOrEmpty(lang_id))
+                                {
+                                    if (lang_dict.ContainsKey(lang_id))
+                                        propinfo.SetValue(k, lang_dict[lang_id], null);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+
         public ActionResult SearchDeleteAjax(string user_id, string search_id)
         {
             if ((String.IsNullOrEmpty(user_id)) || (String.IsNullOrEmpty(search_id)))
@@ -647,7 +693,7 @@ namespace iNQUIRE.Controllers
             return Json(sug, JsonRequestBehavior.AllowGet);
         }
 
-        public ActionResult GetRecordAjax(string id)
+        public ActionResult GetRecordAjax(string id, string lang_id)
         {
             if (String.IsNullOrEmpty(id))
                 return null;
@@ -655,6 +701,7 @@ namespace iNQUIRE.Controllers
             var res = _IRepository.GetRecord(id);
             forceHttps(ref res);
             addImageMetaData(ref res);
+            setLanguageData(ref res, lang_id);
             var results_vm = new SearchAjaxViewModel(res) { Rows = 1, RowStart = 0 };
             return Json(results_vm, JsonRequestBehavior.AllowGet);
         }

@@ -40,18 +40,18 @@ namespace iNQUIRE.Models
             }
         }
 
-        public bool CollectionDelete(Guid collection_id)
+        public string CollectionDelete(Guid collection_id)
         {
             try
             {
                 var workspace = _db.Workspaces.Single(w => w.WorkspaceID == collection_id);
                 _db.Workspaces.DeleteOnSubmit(workspace);
                 _db.SubmitChanges();
-                return true;
+                return null;
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return false;
+                return e.Message;
             }
         }
 

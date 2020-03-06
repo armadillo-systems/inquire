@@ -18,5 +18,11 @@ namespace iNQUIRE.Models
             get { return ImageMetadata.Height; }
             set { ImageMetadata.Height = value; }
         }
+
+        public int Levels
+        {
+            get { return ImageMetadata.Levels; }
+            set { ImageMetadata.Levels = value; }
+        }
     }
 }

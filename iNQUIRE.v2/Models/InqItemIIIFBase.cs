@@ -31,14 +31,6 @@ namespace iNQUIRE.Models
         [SolrField("Height")]
         public override Int32 Height { get; set; }
 
-        public double AspectRatio
-        {
-            get
-            {
-                return (double)Width / Height;
-            }
-        }
-
         public virtual string GetImageUri(int max_w, int max_h)
         {
             if (this.Width > this.Height)

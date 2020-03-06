@@ -39,7 +39,7 @@
             <ul id="notes-list">
                 <li>
                     <div id="notes-fields">
-                        <textarea rows="2" cols="17" id="input-note"></textarea> <span id="note-new" class="fa fa-comment"></span>
+                        <textarea rows="2" cols="17" id="input-note"></textarea> <span id="note-new" class="fa fa-paper-plane"></span>
                         <ul id="note-list" data-bind="template: { name: 'notes-list-template',
                                         foreach: notesPrivate,
                                         beforeRemove: function(elem) { $(elem).fadeOut(_fadeMsTags, function() { $(elem).remove(); }) },
@@ -56,7 +56,7 @@
             <ul id="tags-list">
                 <li>
                     <div id="tags-fields">
-                        <input id="input-tags" value="Enter new tag" /> <span id="tag-new" class="fa fa-comment"></span>
+                        <input id="input-tags" value="Enter new tag" /> <span id="tag-new" class="fa fa-paper-plane"></span>
                         <ul id="tag-list" data-bind="template: { name: 'tags-list-template',
                                                                 foreach: resultCurrentTags,
                                                                 beforeRemove: function(elem) { $(elem).fadeOut(_fadeMsTags, function() { $(elem).remove(); }) },
@@ -74,7 +74,7 @@
             <ul id="comments-list">
                 <li>
                     <div id="comments-fields">
-                        <textarea rows="2" cols="17" id="input-comment"></textarea> <span id="comment-new"  class="fa fa-comments"></span>
+                        <textarea rows="2" cols="17" id="input-comment"></textarea> <span id="comment-new"  class="fa fa-paper-plane"></span>
                         <ul id="comment-list" data-bind="template: { name: 'notes-list-template',
                                         foreach: notesPublic,
                                         beforeRemove: function(elem) { $(elem).fadeOut(_fadeMsTags, function() { $(elem).remove(); }) },

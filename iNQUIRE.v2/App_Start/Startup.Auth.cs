@@ -108,7 +108,8 @@ namespace iNQUIRE
                 app.UseGoogleAuthentication(new GoogleOAuth2AuthenticationOptions()
                 {
                     ClientId = g_client_id,
-                    ClientSecret = g_client_secret
+                    ClientSecret = g_client_secret,
+                    Provider = new GoogleOAuth2AuthenticationProvider()
                 });
             }
 

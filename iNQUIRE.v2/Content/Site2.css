@@ -7,6 +7,13 @@
 /* Override the default bootstrap behavior where horizontal description lists 
    will truncate terms that are too long to fit in the left column 
 */
+.strong {
+  font-weight: bolder;
+  font-size: 105%; }
+
+.clickable {
+  cursor: pointer; }
+
 .dl-horizontal dt {
   white-space: normal; }
 
@@ -411,4 +418,3 @@ $result-anim-type: scale(1.1, 1.1);
     animation-fill-mode: forwards;
 }*/
 /* new layout stuff 21102015*/
-

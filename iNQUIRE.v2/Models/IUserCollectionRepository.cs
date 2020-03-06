@@ -9,7 +9,7 @@ namespace iNQUIRE.Models
     public interface IUserCollectionRepository<T, U, V> // T: Workspace type, U: WorkspaceItem type, V: item id type
     {
         string CollectionNew(Guid application_id, string user_id, string title); // returns guid of new collection
-        bool CollectionDelete(Guid collection_id);
+        string CollectionDelete(Guid collection_id);
         bool CollectionRename(Guid collection_id, string new_title);
         string CollectionAddItem(Guid collection_id, V item_id, string title, string search_term, string language_id, int position);
         bool CollectionDeleteItem(Guid collection_id, V item_id);

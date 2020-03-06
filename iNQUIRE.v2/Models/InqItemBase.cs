@@ -27,18 +27,26 @@ namespace iNQUIRE.Models
         public abstract int Width { get; set; }
         public abstract int Height { get; set; }
 
-        public abstract string ExportRis();
-        public abstract XElement ExportXml();
-        public abstract string ExportHtmlFields(string content_id);
+        public abstract string ExportRis(string lang_id = null);
+        public abstract XElement ExportXml(string lang_id = null);
+        public abstract string ExportHtmlFields(string lang_id = null);
 
-        public virtual string ExportHtml(string content_id)
+        public virtual double AspectRatio
+        {
+            get
+            {
+                return (double)Width / Height;
+            }
+        }
+
+        public virtual string ExportHtml(string content_id, string lang_id = null)
         {
             var html = new StringBuilder();
 
             if (!string.IsNullOrEmpty(content_id))
                 html.Append(ExportHtmlImage(content_id));
 
-            html.Append(ExportHtmlFields(content_id));
+            html.Append(ExportHtmlFields(lang_id));
             return html.ToString();
         }
 

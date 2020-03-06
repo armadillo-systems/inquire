@@ -69,7 +69,7 @@ namespace iNQUIRE.Models
         public override string Author { get; set; }
         //public override string Description { get; set; }
 
-        public override XElement ExportXml()
+        public override XElement ExportXml(string lang_id = null)
         {
             return new XElement("item",
                                 new XElement("Title", Title),
@@ -80,7 +80,7 @@ namespace iNQUIRE.Models
                                 );
         }
 
-        public override string ExportRis()
+        public override string ExportRis(string lang_id)
         {
             var sb = new StringBuilder(System.Environment.NewLine);
             sb.AppendLine("TY  - BOOK");
@@ -92,7 +92,7 @@ namespace iNQUIRE.Models
             return sb.Append("ER  - ").ToString();
         }
 
-        public override string ExportHtmlFields(string content_id)
+        public override string ExportHtmlFields(string lang_id)
         {
             var html = new StringBuilder();
 

@@ -124,7 +124,8 @@
 
         self.userID = '@ViewBag.UserID';
         self.userEmail = ko.observable('@ViewBag.UserEmail');
-        self.languageID = 'eng';
+        self.languages = [{ 'code': 'nl-NL', 'name': 'Nederlands' }, { 'code': 'en-US', 'name': 'English' }];
+        self.languageId = ko.observable(self.languages[0].code);
         self.savedSearches = ko.observableArray([]);
 
         self.classNameResult = 'result';
@@ -191,7 +192,7 @@
         // End: Data
 
         // Start: Behaviours
-        self.refreshSearch = function () {
+        self.refreshSearch = function (force_reload) {
             var params = self.searchParamsString();
 
             if (location.hash != ('#' + params)) {
@@ -199,6 +200,12 @@
             }
 
             window.scrollTo(0, 0);
+
+            if (force_reload) {
+                if (!IsFieldNullOrEmpty(self.viewItem())) {
+                    location.reload();
+                }
+            }
         }
 
         self.clearContent = function () {
@@ -467,7 +474,7 @@
                 self.searchTermOld = (term == '') ? ' ' : term;
                 clearSearch(true, true);
             }*/
-            self.clearSearch(true, true, term_changed); /*@* 2014: will clear facets if search term has changed *@*/
+            self.clearSearch(true, true, term_changed); /* 2014: will clear facets if search term has changed */
             self.refreshSearch();
         }
 
@@ -656,9 +663,12 @@
             $('#download-modal').modal('show');
         }
 
-        self.download = function  (id) {
+        self.download = function  (id = null, lang_id= null) {
             if(IsFieldNullOrEmpty(id)) {
                 id = self.exportId;
+            }
+            if (IsFieldNullOrEmpty(lang_id)) {
+                lang_id = self.languageId();
             }
             var ids = self.getItemIds(id);
 
@@ -672,7 +682,7 @@
                 formats_str += '^ris';
             }
 
-            var url = '@Url.Content("~/Discover/Download/?id_str=")' + ids + '&formats_str=' + formats_str + '&inc_asset=' + inc_asset;
+            var url = '@Url.Content("~/Discover/Download/?id_str=")' + ids + '&lang_id=' + lang_id + '&formats_str=' + formats_str + '&inc_asset=' + inc_asset;
             window.location.href = url;
             $('#download-modal').modal('hide');
         }
@@ -689,7 +699,7 @@
                 id = self.exportId;
             }
             var ids = self.getItemIds(id);
-            $.post("@Url.Content("~/Discover/EmailExportAjax")", { "email_to": $('#email-to').val(), "message": $('#email-message').val(), "id_str": ids },
+            $.post("@Url.Content("~/Discover/EmailExportAjax")", { "email_to": $('#email-to').val(), "message": $('#email-message').val(), "id_str": ids, "lang_id": self.languageId() },
                 function(data) {
                     if (data != 'ok') {
                         alert('Error: Email could not be sent');
@@ -712,7 +722,7 @@
         self.setupSortFields();
 
         if (location.hash == '') {
-            location.hash = 't+*%3A*,rsrs+0,rsps+' + self.recordsetPageSize() + ',fa+,so+' + encodeURIComponent(self.sortField().OptionValue) + ',scids+,pid+,vi+' + self.viewItem();
+            location.hash = 't+*%3A*,rsrs+0,rsps+' + self.recordsetPageSize() + ',fa+,so+' + encodeURIComponent(self.sortField().OptionValue) + ',scids+,pid+,vi+' + self.viewItem() + ',l+' + self.languageId();
         }
 
 
@@ -768,6 +778,12 @@
                 // console.log('aborting search');
                 self.searchRequest.abort();
             }
+        }
+
+
+        self.languageClick = function (data, event) {
+            self.languageId(data.code);
+            self.refreshSearch(true);
         }
 
 
@@ -1185,7 +1201,7 @@
                 var position = c.items().length + 1;
                 // alert('addItemToCollectionDb position: ' + position);
 
-                $.post('@Url.Content("~/Discover/CollectionAddItemAjax")', { "collection_id": c.id, "item_id": id, "title": title, "search_term": self.searchTerm(), "language_id": self.languageID, "position": position },
+                $.post('@Url.Content("~/Discover/CollectionAddItemAjax")', { "collection_id": c.id, "item_id": id, "title": title, "search_term": self.searchTerm(), "language_id": self.languageId(), "position": position },
                     function (data) {
                         if(data == 'ok') {
                             /*@* might be able to get fade-in animation working, add to collection, then display:none immediately, then fadeInSlideDown...*@*/
@@ -1345,9 +1361,9 @@
                 var r_db = false;
                 $.get('@Url.Content("~/Discover/CollectionDeleteAjax")', { "collection_id": c_id },
                     function (data) { r_db = data; })
-                    .error(function() { r_db = false; })
-                    .complete(function() {
-                        if(r_db) {
+                    .error(function() { r_db = 'Ajax request error'; })
+                    .complete(function () {
+                        if (IsFieldNullOrEmpty(r_db)) {
                             // remove collection from underlying array, which will be automatically reflected in the UI
 
                             if(c) {
@@ -1363,7 +1379,7 @@
                                 }
                             }
                         } else {
-                            alert('Could not delete collection');
+                            alert('Could not delete collection, ' + r_db);
                         }
                     });
             }
@@ -1526,7 +1542,7 @@
                 return;
             }
 
-            $.post("@Url.Content("~/Discover/NoteAddAjax")", { "lang_id": self.languageID, "user_id": self.userID, "item_id": item_id, "text": note_text, "public_note": public_note },
+            $.post("@Url.Content("~/Discover/NoteAddAjax")", { "lang_id": self.languageId(), "user_id": self.userID, "item_id": item_id, "text": note_text, "public_note": public_note },
             function (data) {
                 if(data.NoteID == '00000000-0000-0000-0000-000000000000') {
                     alert("Error adding note: " + data.Text);
@@ -1611,7 +1627,7 @@
             for (var i = 0; i < tags_array.length; i++) {
                 var title = tags_array[i];
                 title = jQuery.trim(title);
-                $.post("@Url.Content("~/Discover/TagItemAjax")", { "lang_id": self.languageID, "user_id": self.userID, "title": title, "item_id": item_id  },
+                $.post("@Url.Content("~/Discover/TagItemAjax")", { "lang_id": self.languageId(), "user_id": self.userID, "title": title, "item_id": item_id  },
                 function (data) {
                     if(data.Result == false) {
                         if(data.Message.toLowerCase().indexOf("error") != -1) // @* if not an error it's probably because the item is already tagged by this user with this tag *@
@@ -1823,7 +1839,7 @@
             _highlightBgColourOld = $(object).css('background-color');
             // _highlightOutlineColourOld = $(object).css('border-top');
             $(object).addClass("highlight");
-            $(object).animate({ backgroundColor: "#a6a8ac" }, _fadeMsMax, _animType);// .animate({ outlineColor: "#ff0000" }, _fadeMsOut);
+            $(object).animate({ backgroundColor: "#717c52" }, _fadeMsMax, _animType);// .animate({ outlineColor: "#ff0000" }, _fadeMsOut);
             $(object).addClass("shadow-highlight");
         }
 
@@ -2170,8 +2186,8 @@
         }
 
 
-        self.getRecord = function (id) {
-            $.get("@Url.Content("~/Discover/GetRecordAjax")", { "id": id },
+        self.getRecord = function (id, lang_id) {
+            $.get("@Url.Content("~/Discover/GetRecordAjax")", { "id": id, "lang_id": lang_id },
             function (data) {
                 // alert('GetRecordAjax returned: ' + data.SearchResults.Results.length);
                 var d = data.SearchResults;
@@ -2437,7 +2453,7 @@
 
             self.resultCurrentTags([]);
             $.post("@Url.Content("~/Discover/GetUserItemTagsAjax")",
-                    { "lang_id": this.languageID, "item_id": item_id,
+                    { "lang_id": this.languageId(), "item_id": item_id,
                         "user_id": this.userID },
                     function(data) {
                         self.resultCurrentTags(data);
@@ -2472,7 +2488,7 @@
             // if visiting a shared fb link you can get a scenario where the sortField() gets set to an object, so check for that here and fix
             // how it ends up as an object needs to be invstigated
             var sort_str = (self.sortField().OptionValue) ? self.sortField().OptionValue : self.sortField();
-            var params_str = 't+' + encodeURIComponent(self.searchTerm()) + ',rsrs+' + self.recordsetRowStart() + ',rsps+' + self.recordsetPageSize() + ',fa+' + encodeURIComponent(self.facetsAppliedString()) + ',so+' + encodeURIComponent(sort_str) + ',scids+' + self.searchCollectionIds() + ',pid+' + self.searchParentId() + ',vi+' + self.viewItem();
+            var params_str = 't+' + encodeURIComponent(self.searchTerm()) + ',rsrs+' + self.recordsetRowStart() + ',rsps+' + self.recordsetPageSize() + ',fa+' + encodeURIComponent(self.facetsAppliedString()) + ',so+' + encodeURIComponent(sort_str) + ',scids+' + self.searchCollectionIds() + ',pid+' + self.searchParentId() + ',vi+' + self.viewItem() + ',l+' + self.languageId();
             // console.log('searchParamsString read: ' + params_str);
             return params_str;
         }).extend({ rateLimit: 100 });
@@ -2519,7 +2535,7 @@
             var id = decodeURIComponent(self.viewItem());
             // alert('viewItem set: ' + id);
             if(IsFieldNullOrEmpty(id) == false) {
-                self.getRecord(id);
+                self.getRecord(id, self.languageId());
             }
         }, self).extend({ throttle: 100 });
 
@@ -2567,7 +2583,13 @@
                 scids = '';
             }
 
-            self.searchRequest = $.get("@Url.Content("~/Discover/SearchAjax")", { "user_id": self.userID, "term": self.searchTerm(), "rows": self.recordsetPageSize(), "row_start": self.recordsetRowStart(), "sort_orders": self.sortField(), "facet_constraints": self.facetsAppliedString(),"collection_ids": scids, "parent_id": self.searchParentId(), "lang_id": self.languageID },
+            // if using a parentId to find child records we don't want to also apply a search term
+            // (if one was used to find the parent record) as the child records might not have any reference to this search term
+            // but we don't want to clear the searchTerm property in case the user use's the "back" button
+            // (their original search would be lost)
+            var search_term = IsFieldNullOrEmpty(self.searchParentId()) ? self.searchTerm() : '';
+
+            self.searchRequest = $.get("@Url.Content("~/Discover/SearchAjax")", { "user_id": self.userID, "term": search_term, "rows": self.recordsetPageSize(), "row_start": self.recordsetRowStart(), "sort_orders": self.sortField(), "facet_constraints": self.facetsAppliedString(),"collection_ids": scids, "parent_id": self.searchParentId(), "lang_id": self.languageId() },
                 function (data) {
                     var d = data.SearchResults;
                     self.applyHighlights(d);
@@ -2621,6 +2643,14 @@
                 });
         }
 
+        self.keywordClick = function (data, event) {
+            if (self.searchTerm() !== data) {
+                data_no_commas = !IsFieldNullOrEmpty(data) ? data.replace(",", " ") : data;
+                self.searchTerm(data_no_commas);
+                self.searchClick(data_no_commas);
+            }
+        }
+
         // Client-side routes
         Sammy(function() {
             this.get('#:p', function() {
@@ -2642,6 +2672,12 @@
                     } else {
                         ps[p[0]] = p[1];
                     }
+                }
+
+                // set language code observable from the url param
+                if (self.languageId() != ps.l) {
+                    // console.log('language changed');
+                    self.languageId(ps.l);
                 }
 
                 if(IsFieldNullOrEmpty(ps.vi) == false) { //  != ps.vi

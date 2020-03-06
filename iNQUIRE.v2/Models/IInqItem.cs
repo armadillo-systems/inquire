@@ -24,11 +24,11 @@ namespace iNQUIRE.Models
         string ViewItemUrl { get; }
 
         #region methods
-        string ExportRis();
-        XElement ExportXml();
-        string ExportHtml(string content_id);
+        string ExportRis(string lang_id);
+        XElement ExportXml(string lang_id);
+        string ExportHtml(string content_id, string lang_id);
         string ExportHtmlImage(string content_id);
-        string ExportHtmlFields(string content_id);
+        string ExportHtmlFields(string lang_id);
         #endregion
 
         //string Title { get; set; }

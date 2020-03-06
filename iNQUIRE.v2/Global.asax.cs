@@ -180,7 +180,7 @@ namespace iNQUIRE
                             email_resources.Add(lr);
                         }
 
-                        email_html.Append(ei.Item.ExportHtml(content_id));
+                        email_html.Append(ei.Item.ExportHtml(content_id, ei.LanguageId));
                         email_html.Append("</td></tr></table></div>");
 
                         if (count < email_export.Items.Count - 1)
