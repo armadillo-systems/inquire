@@ -47,7 +47,7 @@ namespace iNQUIRE.Models
                 var workspace = _db.Workspaces.Single(w => w.WorkspaceID == collection_id);
                 _db.Workspaces.DeleteOnSubmit(workspace);
                 _db.SubmitChanges();
-                return null;
+                return "";
             }
             catch (Exception e)
             {

@@ -1360,8 +1360,12 @@
             if(r) {
                 var r_db = false;
                 $.get('@Url.Content("~/Discover/CollectionDeleteAjax")', { "collection_id": c_id },
-                    function (data) { r_db = data; })
-                    .error(function() { r_db = 'Ajax request error'; })
+                    function (data) {
+                        r_db = data;
+                    })
+                    .error(function (data) {
+                        r_db = 'Ajax request error';
+                    })
                     .complete(function () {
                         if (IsFieldNullOrEmpty(r_db)) {
                             // remove collection from underlying array, which will be automatically reflected in the UI
