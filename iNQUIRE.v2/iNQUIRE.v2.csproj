@@ -467,7 +467,6 @@
     <Content Include="Content\overlay-apple.css" />
     <Content Include="Content\cd-rsn.scss" />
     <Content Include="Content\cd-3dnav.scss" />
-    <Content Include="App_Data\INQUIRE_Lite.dacpac" />
     <Content Include="ConnectionStrings.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -480,9 +479,55 @@
     <Content Include="ConnectionStrings_empty.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="App_Data\INQUIRE_Lite.bacpac" />
+    <Content Include="App_Data\INQUIRE_Lite.dacpac" />
     <None Include="Content\simple-sidebar.scss" />
     <Content Include="Content\reset.css" />
     <None Include="Content\RKD\_rkd-cd-properties.scss" />
+    <Content Include="Documentation\css\inquire.css" />
+    <Content Include="Documentation\google-code-prettify\lang-apollo.js" />
+    <Content Include="Documentation\google-code-prettify\lang-clj.js" />
+    <Content Include="Documentation\google-code-prettify\lang-css.js" />
+    <Content Include="Documentation\google-code-prettify\lang-go.js" />
+    <Content Include="Documentation\google-code-prettify\lang-hs.js" />
+    <Content Include="Documentation\google-code-prettify\lang-lisp.js" />
+    <Content Include="Documentation\google-code-prettify\lang-lua.js" />
+    <Content Include="Documentation\google-code-prettify\lang-ml.js" />
+    <Content Include="Documentation\google-code-prettify\lang-n.js" />
+    <Content Include="Documentation\google-code-prettify\lang-proto.js" />
+    <Content Include="Documentation\google-code-prettify\lang-scala.js" />
+    <Content Include="Documentation\google-code-prettify\lang-sql.js" />
+    <Content Include="Documentation\google-code-prettify\lang-tex.js" />
+    <Content Include="Documentation\google-code-prettify\lang-vb.js" />
+    <Content Include="Documentation\google-code-prettify\lang-vhdl.js" />
+    <Content Include="Documentation\google-code-prettify\lang-wiki.js" />
+    <Content Include="Documentation\google-code-prettify\lang-xq.js" />
+    <Content Include="Documentation\google-code-prettify\lang-yaml.js" />
+    <Content Include="Documentation\google-code-prettify\prettify.css" />
+    <Content Include="Documentation\google-code-prettify\prettify.js" />
+    <Content Include="Documentation\html_images\env_var_sys_var.png" />
+    <Content Include="Documentation\html_images\env_var_user_var.png" />
+    <Content Include="Documentation\html_images\iis_install.png" />
+    <Content Include="Documentation\html_images\mvc3_install.png" />
+    <Content Include="Documentation\html_images\sql_server_auth_mode1.png" />
+    <Content Include="Documentation\html_images\sql_server_auth_mode2.png" />
+    <Content Include="Documentation\html_images\sql_server_browser1.png" />
+    <Content Include="Documentation\html_images\sql_server_browser2.png" />
+    <Content Include="Documentation\html_images\sql_server_browser3.png" />
+    <Content Include="Documentation\html_images\sql_server_connect.png" />
+    <Content Include="Documentation\html_images\sql_server_create_user0.png" />
+    <Content Include="Documentation\html_images\sql_server_create_user1.png" />
+    <Content Include="Documentation\html_images\sql_server_create_user2.png" />
+    <Content Include="Documentation\html_images\sql_server_manager.png" />
+    <Content Include="Documentation\html_images\sql_server_restore_inquire_db.png" />
+    <Content Include="Documentation\html_images\sql_server_restore_inquire_db2.png" />
+    <Content Include="Documentation\html_images\tomcat_install1.png" />
+    <Content Include="Documentation\html_images\tomcat_install2.png" />
+    <Content Include="Documentation\html_images\tomcat_install3.png" />
+    <Content Include="Documentation\html_images\tomcat_install4.png" />
+    <Content Include="Documentation\html_images\tomcat_install5.png" />
+    <Content Include="Documentation\html_images\tomcat_install6.png" />
+    <Content Include="Documentation\Install.htm" />
     <Content Include="RKD_export.xsl" />
     <Content Include="Content\RKD\_rkd-cd-properties.css">
       <DependentUpon>_rkd-cd-properties.scss</DependentUpon>

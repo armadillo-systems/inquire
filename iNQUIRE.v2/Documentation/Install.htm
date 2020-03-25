@@ -1,0 +1,594 @@
+﻿<!doctype html>
+<html lang="en">
+    <head>
+    	<meta charset="UTF-8">
+        <link href="css/inquire.css" rel="stylesheet" type="text/css" />
+        <link href="google-code-prettify/prettify.css" type="text/css" rel="stylesheet" />
+        <script type="text/javascript" src="google-code-prettify/prettify.js"></script>
+		<style>
+			.red { background-color: red; }
+		</style>
+        <title>iNQUIRE Installation</title>
+    </head>
+    <body onload="prettyPrint()">
+        <article>
+            <h1>iNQUIRE Installation v1.3 28/02/2019</h1>
+            <section>
+                <h2>0. Contents</h2>
+                <nav>
+                    <ol>
+                        <li><a href="#Prerequisites">Prerequisites</a></li>
+                        <li><a href="#Download">Download and Installation of Components</a></li>
+                        <li><a href="#Configuration">Configuration</a></li>
+                    </ol>
+                </nav>
+            </section>
+
+            <section id="Prerequisites">
+                <h2>1. Prerequisites</h2>
+                <ul>
+                    <li>Microsoft Windows Server 2008 R2 Standard 32bit or (?)64bit</li>
+                    <li>Microsoft SQL Server 2008 R2</li>
+                    <li>Microsoft SQL Server Management Studio 2008 R2</li>
+                    <li>Microsoft Web Platform Installer 3.x+ <a href="http://www.microsoft.com/web/downloads/platform.aspx">http://www.microsoft.com/web/downloads/platform.aspx</a></li>
+                    <li>UNIX compatible text edititor, eg TextPad <a href="http://www.textpad.com/download/index.html">http://www.textpad.com/download/index.html</a></li>
+                </ul>
+
+            </section>
+
+            <section id="Download">
+                <h2>2. Download and Installation of Components</h2>
+
+                <section>
+                    <h3>2.1 Microsoft IIS v6/7/7.5</h3>
+                        <ol>
+                            <li>http://learn.iis.net/page.aspx/29/installing-iis-7-and-above-on-windows-server-2008-or-windows-server-2008-r2/</li>
+                            <li>Tick "Application Development -> ASP.NET"</li>
+                            <li>
+                                Role Services:
+                                <img src="html_images/iis_install.png" alt="iis_install.png" />
+                            </li>
+                            <li>[* Untick "Common HTTP Features -> Directory Browsing"]</li>
+                            <li>[* Note: Install only the absolutely necessary IIS services to minimize the IIS  installation footprint and also minimize the attack surface]</li>
+                            <li>Click start, right click "Command prompt", select "Run as administrator"</li>
+                            <li>Change directory to Microsoft.net Framework directory, either eg "C:\Windows\Microsoft.NET\Framework" on 32bit systems, or eg "C:\Windows\Microsoft.NET\Framework64", change directory to "v4.0.30319"</li>
+                            <li>Type "aspnet_regiis -ir", hit enter, ASP.NET 4 should be installed</li>
+                        </ol>
+                </section>
+
+                <section>
+                    <h3>2.2 Microsoft ASP.NET MVC3</h3>
+                        <ol>
+                            <li>
+                                <a href="http://www.asp.net/mvc/mvc3">http://www.asp.net/mvc/mvc3</a>
+                                <img src="html_images/mvc3_install.png" alt="mvc3_install.png" />
+                            </li>
+                        </ol>
+                </section>
+
+
+                <section>
+                    <h3>2.3 Java SE 7u67+ 32bit</h3>
+                        <ol>
+                            <li><a href="https://java.com/en/download/manual.jsp">https://java.com/en/download/manual.jsp</a>, eg <a href="http://javadl.sun.com/webapps/download/AutoDL?BundleId=95123">Windows 32-bit: http://javadl.sun.com/webapps/download/AutoDL?BundleId=95123</a></li>
+                        </ol>
+                </section>
+
+                <section>
+                    <h3>2.4 IIP Image Server</h3>
+                        <ol>
+                            <li><a href="http://iipimage.sourceforge.net/download/">http://iipimage.sourceforge.net/download/</a></li>
+                        	<li>Installation instructions can be found on the IIP Image Server site <a href="http://iipimage.sourceforge.net/documentation/server/">http://iipimage.sourceforge.net/documentation/server/</a></li>
+                        	<li>Detailed instructions for installing on Windows Server IIS can be found here <a href="http://iipimage.sourceforge.net/2011/08/installing-iipimage-on-iis7/">http://iipimage.sourceforge.net/2011/08/installing-iipimage-on-iis7/</a></li>
+                        </ol>
+                </section>
+
+
+                <section>
+                    <h3>2.5 Apache Solr 4.10.0</h3>
+                        <ol>
+                            <li><a href="http://www.apache.org/dyn/closer.cgi/lucene/solr">http://www.apache.org/dyn/closer.cgi/lucene/solr</a></li>
+                            <li>Copy contents of "example" directory to path with no spaces in name, eg "C:\solr"</li>
+                        </ol>
+                </section>
+
+                <!-- <section>
+                    <h3>2.7 Apache Tomcat 5.5.x</h3>
+                        <ol>
+                            <li><a href="http://tomcat.apache.org/download-55.cgi">http://tomcat.apache.org/download-55.cgi</a></li>
+                            <li><img src="html_images/tomcat_install1.png" alt="tomcat_install1.png" /></li>
+                            <li><img src="html_images/tomcat_install2.png" alt="tomcat_install2.png" /></li>
+                            <li><img src="html_images/tomcat_install3.png" alt="tomcat_install3.png" /></li>
+                            <li>
+                                Install to a path without spaces in filename, eg "C:\tomcat"
+                                <img src="html_images/tomcat_install4.png" alt="tomcat_install4.png" />
+                            </li>
+                            <li>Do not run Tomcat on exit</li>
+                            <li>Click "Start -> Adminstrative Tools -> Services"</li>
+                            <li>
+                                Right click "Apache Tomcat -> Properties"
+                                <img src="html_images/tomcat_install5.png" alt="tomcat_install5.png" />
+                            </li>
+                            <li>
+                                Select startup type "Manual"
+                                <img src="html_images/tomcat_install6.png" alt="tomcat_install6.png" />
+                            </li>
+                            <li>Copy supplied catalina.bat to [tomcat install path]\bin eg "C:\tomcat\bin"</li>
+                            <li>Copy supplied setclasspath.bat to [tomcat install path]\bin eg "C:\tomcat\bin"</li>
+                            <li><strong>NB:</strong> Return at end of installation [after running Tomcat for the first time, then stopping it] to complete this step, else the path won't exist. Copy sqljdbc4.jar to [tomcat install path]\webapps\adore-djatoka\WEB-INF\lib eg "C:\tomcat\webapps\adore-djatoka\WEB-INF\lib"</li>
+                            <li>Copy [djatoka installation path]\dist\adore-djatoka.war [tomcat installpath]/webapps/adore-djatoka.war</li>
+                            <li>Copy tomcat.bat to "[djatoka installation path]\bin\"</li>
+                            <li>Create shortcut [djatoka installation path]\bin\tomcat.bat</li>
+                            <li>Shortcut must be run as administrator, set shortcut to run as administrator if needed (if not being run by a user with administrator rights)</li>
+                        </ol>
+                </section> -->
+
+                <section>
+                    <h3>2.6 iNQUIRE</h3>
+
+                        <ol>
+                        	<li>If you have been supplied precompiled web deployment files then you can skip this step, else if compiling iNQUIRE from source code it must be compiled with reference to correct data object class (derived from InqItemBase), currently in use InqItemBod (for Bodleian) and InqItemArmNode (for BL Crimea test data), use these as example of how to build your data object class (which maps your Solr fields to C# object properties):
+                        			<ul>
+                        				<li>Global.asax.cs: 
+<pre class="prettyprint">
+	Startup.Init&lt;<span class="red">InqItemBod</span>&gt;(ConfigurationManager.AppSettings["SolrUri"]);
+</pre>
+                        				</li>
+                        				
+                        				<li>SolrRepository.cs
+<pre class="prettyprint">
+        private static ISolrOperations&lt;<span class="red">InqItemBod</span>&gt; _solr;
+        private static ISolrOperations&lt;<span class="red">InqItemBod</span>&gt; Solr
+        {
+            get
+            {
+                if (_solr == null)
+                    _solr = ServiceLocator.Current.GetInstance&lt;ISolrOperations&lt;<span class="red">InqItemBod</span>&gt;&gt;();
+
+                return _solr;
+            }
+        } 
+</pre>
+
+<pre class="prettyprint">
+	protected SolrSearchResults makeSolrSearchResults(SolrQueryResults&lt;<span class="red">InqItemBod</span>&gt; results)
+	{
+		...
+		
+	protected SolrSearchResults makeSolrSearchResults(SolrQueryResults&lt;<span class="red">InqItemBod</span>&gt; results, List&lt;KeyValuePair&lt;string, string&gt;&gt; facets, List&lt;FacetRange&gt; facet_ranges)
+	{
+		...	
+</pre>
+		                       				
+                        				</li>
+                        			
+                        			</ul>
+                        			
+                        			
+                        	</li>
+                            <li>Unpack latest build (eg 1.13) to chosen deployment directory, eg "C:\ASPSites\inquire\1.13"</li>
+                            <li>Edit Views\Discover\Print.cshtml to match object metadata fields</li>
+                            <li>iNQUIRE must be compiled to match the JPEG2000 image server being used (currently supported Djatoka, IIP Image Server)
+                            	<ul>
+                            		<li>iNQUIRE.Controllers.DiscoverController.cs
+<pre class="prettyprint">
+    public class JP2HelperModule : NinjectModule
+    {
+        public override void Load()
+        {
+            Bind&lt;Helper.IJP2Helper&gt;().To&lt;Helper.IIPImageHelper&gt;();
+            // Bind&lt;Helper.IJP2Helper&gt;().To&lt;Helper.DjatokaHelper&gt;();
+        }
+    }
+</pre>
+
+                            		</li>
+                            		<li>Edit JPEG2000 Image Server Settings in Web.Config:
+<pre class="prettyprint">
+    &lt;!-- JPEG2000 Image Server Settings --&gt;
+    &lt;!-- Use thes settings with IIP Image Server --&gt;
+    &lt!-- &lt;add key="ResolverUri" value="http://62.49.109.149/imageserver-test/iipsrv.fcgi" /&gt;
+    &lt;add key="ViewerUri" value="http://62.49.109.149/imageserver-test/iipsrv.fcgi" /&gt;
+    &lt;add key="ProxyResolverFile" value="resolver.iip" /&gt;
+    &lt;add key="Jpeg2000NamespaceReplace" value="info:arm/test/" /&gt;
+    &lt;add key="Jpeg2000Namespace" value="crimea/" /&gt;
+    &lt;add key="ImageFilenameAppend" value=".jp2" /&gt;
+    &lt;add key="DeepZoomQueryParameter" value="DeepZoom" /&gt; --&gt;
+    &lt;!-- End: Use thes settings with IIP Image Server --&gt;
+
+    &lt;!-- Use these settings with Djatoka --&gt;
+    &lt;add key="ResolverUri" value="http://62.49.109.149:8080/adore-djatoka/resolver" /&gt;
+    &lt;add key="ViewerUri" value="http://62.49.109.149:8080/djatoka-viewer/viewer.html" /&gt;
+    &lt;add key="ProxyResolverFile" value="resolver.dja" /&gt;
+    &lt;add key="Jpeg2000NamespaceReplace" value="" /&gt;
+    &lt;add key="Jpeg2000Namespace" value="info:arm/test/" /&gt;
+    &lt;add key="ImageFilenameAppend" value="" /&gt;
+    &lt;add key="DeepZoomQueryParameter" value="rft_id" /&gt;
+    &lt;!-- End: Use these settings with Djatoka --&gt;
+
+    &lt;add key="DjatokaHome" value="F:\Clients\iNQUiRE\inquire_working\iNQUIRE\iNQUIRE\djatoka" /&gt; &lt;!-- required if using Djatoka and require jpeg2000s to be created on the fly from non-jpeg2000 original source images --&gt;
+    &lt;add key="DeepZoomViewerFile" value="viewer.dzi" /&gt;
+    &lt;!-- end: JPEG2000 Image Server Settings --&gt;
+</pre>
+                            		</li>
+
+                            		<li>Edit the handlers section in Web.Config, comment/uncomment the two lines which refer to IIPImageServer/Djatoka as needed:
+<pre class="prettyprint">
+    &lt;handlers&gt;
+      ...
+      &lt;!-- &lt;add name="DjatokaHandler" path="*.dja" verb="*" type="DjatokaIIS.DjatokaHandler" resourceType="Unspecified" preCondition="integratedMode" /&gt; --&gt;
+      &lt;!-- &lt;add name="DeepZoomHandler" path="*.dzi" verb="*" type="DjatokaIIS.DeepZoomHandler" resourceType="Unspecified" preCondition="integratedMode" /&gt; --&gt;
+      &lt;add name="IIPImageHandler" path="*.iip" verb="*" type="IIPImageIIS.IIPImageHandler" resourceType="Unspecified" preCondition="integratedMode" /&gt;
+      &lt;add name="DeepZoomHandlerIIP" path="*.dzi" verb="*" type="IIPImageIIS.DeepZoomHandlerIIP" resourceType="Unspecified" preCondition="integratedMode" /&gt;
+      ...
+    &lt;/handlers&gt;
+</pre>
+                            		</li>
+                            	</ul>
+                            </li>
+                            
+                            <li>Edit Web.config to set user security settings, eg minimum password length:
+<pre class="prettyprint">
+    &lt;membership defaultProvider="SqlProvider" userIsOnlineTimeWindow="15"&gt;
+      &lt;providers&gt;
+        &lt;add name="SqlProvider" type="System.Web.Security.SqlMembershipProvider"
+             connectionStringName="SqlServices"
+             applicationName="iNQUIRE"
+             enablePasswordRetrieval="false"
+             enablePasswordReset="true"
+             requiresQuestionAndAnswer="false"
+             requiresUniqueEmail="true"
+             passwordFormat="Hashed"
+             maxInvalidPasswordAttempts="5"
+             passwordAttemptWindow="10"
+             minRequiredPasswordLength="3"
+             minRequiredNonalphanumericCharacters="0" /&gt;
+      &lt;/providers&gt;
+    &lt;/membership&gt;
+</pre>                            
+                            </li>
+                        </ol>
+                </section>
+
+                <section>
+                    <h3>2.7 Microsoft IIS URL Rewrite</h3>
+                    <h4>[Optional, used eg for short Urls direct linking to individual items (eg Url field in an Xml/Ris export)]</h4>
+                        <ol>
+                            <li>
+                                <a href="http://www.iis.net/download/urlrewrite">http://www.iis.net/download/urlrewrite</a>
+                                <!-- <a class="download-button" href="http://go.microsoft.com/?linkid=9722531">
+                                    <img src="http://i1.iis.net/resources/images-css/install_webpi.png?cdn_id=20120424-001"/>
+                                </a>-->
+                            </li>
+                        </ol>
+                </section>
+            </section>
+
+            <section id="Configuration">
+                <h2>3. Configuration</h2>
+
+                <section id="Environment_Variables">
+                    <h3>3.1 Environment Variables</h3>
+
+                    <p>Click "Start -> [Right Click] Computer -> Properties -> Advanced System Settings -> Environment Variables"</p>
+
+                    <h4>3.1.1 User Variables for [user]</h4>
+                    <img src="html_images/env_var_user_var.png" alt="env_var_user_var.png" />
+                    <ol>
+                        <li>New user variable JAVA_HOME set to JRE installtion directory eg "C:\Program Files (x86)\Java\jre7"</li>
+                        <li>New user variable SOLR_HOME set to solr multicore installation directory eg "C:\solr\multicore"</li>
+                        <li>Restart computer</li>
+                    </ol>
+
+                    <!-- <h4>3.1.2 System Variables</h4>
+                    <ol>
+                        <li>
+                            Edit "Path" append ";%KAKADU_HOME%"
+                            <img src="html_images/env_var_sys_var.png" alt="env_var_sys_var.png" />
+                            <li>Restart computer</li>
+                        </li>
+                    </ol> -->
+                </section>
+
+                <section>
+                    <h3>3.2 Sql Database for User Data and User Generated Content (Notes, Collections, etc)</h3>
+                        <ul>
+                        	<li>If you have a bacpac file and are using an Azure database please <a href="https://docs.microsoft.com/en-us/azure/sql-database/sql-database-import?tabs=azure-powershell">follow the guide here to restore the iNQUIRE database</a>. You can use your Azure database username and password in your database connection string in web.config (or in ConnectionStrings.config if you are working from source code and not deployment files), the rest of this section can be skipped, jump to "3.3 Solr".</li>
+                        	<li>If you have a dacpac file and are using Sql Server Management Studio or similar please start from step 1.</li>
+                        </ul>                    
+                    <section>
+                        <h4>3.2.1 Sql Server Configuration</h4>
+                        <ol>
+                            <li>Click start, run Sql Server Configuration Manager</li>
+                            <li>Expand "SQL Server Network Configuration" in left hand pane</li>
+                            <li>Highlight "Protocols for MSSQLSERVER", make sure "Shared Memory", "TCP/IP" enabled</li>
+                            <li>Expand "SQL Native Client xx.x Configuration"</li>
+                            <li>Highlight "Client Protocols", make sure "Shared Memory", "TCP/IP" and "Named Pipes" are all enabled</li>
+                            <li>Repeat for 32/64 bit instances as needed</li>
+                            <li>[*Run "OpenSqlServerPort.bat" as administrator from command line]?</li>
+                        </ol>
+                    </section>
+
+                    <section>
+                        <h4>3.2.2 Sql Server Browser Service</h4>
+                        <ol>
+                            <li>
+                                Click "Start -> Administrative Tools -> Services", right click "SQL Server Browser" select "Properties"
+                                <img src="html_images/sql_server_browser1.png" alt="sql_server_browser1.png" />
+                            </li>
+                            <li>
+                                Tab "Log on" as "Built-in account -> Network Service [enter admin password]"
+                                <img src="html_images/sql_server_browser2.png" alt="sql_server_browser2.png" />
+                            </li>
+                            <li>
+                                Tab "General" set startup type to automatic
+                                <img src="html_images/sql_server_browser3.png" alt="sql_server_browser3.png" />
+                            </li>
+                            <li>Click apply, click ok</li>
+                            <li>In "Services" window, right click "SQL Server Browser -> Restart"</li>
+                        </ol>
+                    </section>
+
+                    <section>
+                        <h4>3.2.3 Sql Server Properties</h4>
+                        <ol>
+                            <li>
+                                Run SQL Server Management Studio, connect to SQL Server instance, right click on server instance in left hand side pane, select "Properties"
+                                <img src="html_images/sql_server_auth_mode1.png" alt="sql_server_auth_mode1.png" />
+                            </li>
+                            <li>Click "Security" in left hand side pane</li>
+                            <li>
+                                Select "Sql Server and Windows Authentication Mode"
+                                <img src="html_images/sql_server_auth_mode2.png" alt="sql_server_auth_mode2.png" />
+                            </li>
+                            <li>Click "Connections" in left hand side pane</li>
+                            <li>Ensure "Allow remote connections to this server" is checked</li>
+                            <li>Click "Ok"</li>
+                            <li>Right click on server instance, select "Restart"</li>
+                        </ol>
+                    </section>
+
+                    <section>
+                        <h4>3.2.4 Restore iNQUIRE Database</h4>
+
+                        <ol>
+
+                            <li>
+                                Start -> Sql Server Management Studio
+                                <img src="html_images/sql_server_manager.png" alt="sql_server_manager.png" />
+                            </li>
+                            <li>
+                                Connect to Sql Server
+                                <img src="html_images/sql_server_connect.png" alt="sql_server_connect.png" />
+                            </li>
+
+
+                            <li>Extract database .bak file from supplied zip/rar "INQUIRE_Lite"</li>
+                            <li>Copy database to easily accessible path, eg "C:\"</li>
+                            <li>Sql Server Management Studio, right click "Databases -> Restore Database"</li>
+                            <li>Select database from path above <img src="html_images/sql_server_restore_inquire_db.png" alt="sql_server_restore_inquire_db.png" /></li>
+                            <li>To database: INQUIRE_Lite <img src="html_images/sql_server_restore_inquire_db2.png" alt="sql_server_restore_inquire_db2.png" /></li>
+                            <li>In "Select the backup sets to restore" tick in restore column, should only be one set [see screenshot]</li>
+                            <li>Click "Ok"</li>
+							<!-- <li>Repeat above for "BL_DRE_INQUIRE" database if this is the data source (which will be imported into Solr)</li> -->
+                        </ol>
+                    </section>
+
+                    <section>
+                        <h4>3.2.5 Create a New User</h4>
+                        <ol>
+                            <li>
+                                Left pane, expand Security, right click Logins -> New Login
+                                <img src="html_images/sql_server_create_user0.png" alt="sql_server_create_user0.png" />
+                            </li>
+                            <li>
+                                Login name "dreuser2"
+                                <img src="html_images/sql_server_create_user1.png" alt="sql_server_create_user1.png" />
+                            </li>
+                            <li>Select Sql Server Authentication, password "dr3u53r123+"</li>
+                            <li>Untick "Enforce password expiration"</li>
+                            <li>Select Default database: INQUIRE_Lite</li>
+                            <li>If there are any issues with using login name "dreuser2", you can try "dreuser[x]" eg "dreuser3", as long as you update your ASP.net web.config with the login name, eg edit "C:\ASPSites\inquire\1.13\web.config" &lt;connectionStrings&gt; section, it may appear multipe times.</li>
+                        </ol>
+                    </section>
+
+                    <section>
+                        <h4>3.2.6 Add Users to Databases</h4>
+                        <ol>
+                            <li>Left pane expand Databases, expand "INQUIRE_Lite", expand "Security", right click "Users -> New User"</li>
+                            <li>Username as created above eg "dreuser2"</li>
+                            <li>Login name eg "dreuser2"</li>
+                            <li>
+                                Database role membership, tick: db_datareader, db_datawriter, db_owner
+                                <img src="html_images/sql_server_create_user2.png" alt="sql_server_create_user2.png" />
+                            </li>
+                        </ol>
+                    </section>
+                </section>
+
+                <section>
+                    <h3>3.3 Solr</h3>
+
+					<ol>
+						<li>Download latest version or unpack solr\solr-4.10.0.zip, copy contents of "example" directory to path with no spaces in name, eg "C:\solr"</li>
+						<li>Set the SOLR_HOME enviroment variable (see <a href="#Environment_Variables">Environment Variables</a>)</li>
+                    	<li>If upgrading from Solr v3 to v4 check configuration differences (see solr\solr_example_config.zip and <a href="http://myjeeva.com/upgrade-migrate-solr-3x-to-solr-4.html">http://myjeeva.com/upgrade-migrate-solr-3x-to-solr-4.html</a>)
+                    		and also the contents of supplied example "solr_config.zip" which would normally be found in "[solr install dir]\multicore\core1\conf"</li>
+                        <li>Duplicate initial core to other cores as required (allows flipping between cores so one can be re-populated/re-indexed in the background), eg copy contents of "[solr install dir]\multicore\core1\conf" to "[solr install dir]\multicore\core0\conf"</li>
+					</ol>
+
+                    <section>
+                        <h4>3.3.1 Running Solr via included server (Jetty)</h4>
+                        <ol>
+	                        <li>To run Solr on demand, with an output window (useful for debugging), copy solr\solr.bat to the Solr installation directory, update to reflect correct JRE path, Jetty/Solr port, etc, then run this batch file from the command line:
+	                        	<pre class="prettyprint">"%JAVA_HOME%\bin\java" -Dsolr.solr.home=%SOLR_HOME% -Djetty.port=8983 -jar c:\solr\start.jar</pre>
+	                        </li>
+                        </ol>
+                    </section>
+
+                    <section>
+                        <h4>3.3.2 Running Solr via Jetty as a Windows Service (for full documentation see <a href="http://www.eclipse.org/jetty/documentation/current/startup-windows-service.html">http://www.eclipse.org/jetty/documentation/current/startup-windows-service.html</a>)</h4>
+                        <ol>
+                        	<li>Make "temp" directory in Solr installation path, eg "C:\solr\temp"</li>
+                        	<li>Unpack supplied solr\commons-daemon-1.0.15-bin-windows.zip or download latest Apache Commons Daemon from <a href="http://www.apache.org/dist/commons/daemon/binaries/">http://www.apache.org/dist/commons/daemon/binaries/</a></li>
+                        	<li>Copy prunmgr.exe and [system cpu architecture]\prunsrv.exe to Solr installation path eg "c:\solr"</li>
+	                        <li>Copy solr\install-jetty-service.bat to the Solr installation directory, update the file to reflect the system configuration (see variables highlighted in red):
+	                        	<pre class="prettyprint">
+@echo off
+set SOLR_BASE=<span class="red">C:\solr</span>
+set SERVICE_NAME=<span class="red">SolrService</span>
+set JETTY_HOME=%SOLR_BASE%
+set JETTY_BASE=%SOLR_BASE%
+set STOPKEY=<span class="red">inquire</span>
+set STOPPORT=50001
+
+set PR_INSTALL=%SOLR_BASE%\prunsrv.exe
+
+@REM Service Log Configuration
+set PR_LOGPREFIX=%SERVICE_NAME%
+set PR_LOGPATH=%SOLR_BASE%\logs
+set PR_STDOUTPUT=auto
+set PR_STDERROR=auto
+set PR_LOGLEVEL=Debug
+
+@REM Path to Java Installation
+set PR_JVM=%JAVA_HOME%\jre\bin\server\jvm.dll
+set PR_CLASSPATH=%JETTY_HOME%\start.jar;%JAVA_HOME%\lib\tools.jar
+
+@REM JVM Configuration
+set PR_JVMMS=128
+set PR_JVMMX=512
+set PR_JVMSS=4000
+set PR_JVMOPTIONS=-Duser.dir="%JETTY_BASE%";-Djava.io.tmpdir="%SOLR_BASE%\temp";-Djetty.home="%JETTY_HOME%";-Djetty.base="%JETTY_BASE%";-Dsolr.solr.home="%SOLR_HOME%";-Djetty.port=<span class="red">8983</span>
+@REM Startup Configuration
+set JETTY_START_CLASS=org.eclipse.jetty.start.Main
+
+set PR_STARTUP=auto
+set PR_STARTMODE=java
+set PR_STARTCLASS=%JETTY_START_CLASS%
+set PR_STARTPARAMS=STOP.KEY="%STOPKEY%";STOP.PORT=%STOPPORT%
+
+@REM Shutdown Configuration
+set PR_STOPMODE=java
+set PR_STOPCLASS=%JETTY_START_CLASS%
+set PR_STOPPARAMS=--stop;STOP.KEY="%STOPKEY%";STOP.PORT=%STOPPORT%;STOP.WAIT=10
+
+%PR_INSTALL% //IS/%SERVICE_NAME% ^
+  --DisplayName="%SERVICE_NAME%" ^
+  --Install="%PR_INSTALL%" ^
+  --Startup="%PR_STARTUP%" ^
+  --LogPath="%PR_LOGPATH%" ^
+  --LogPrefix="%PR_LOGPREFIX%" ^
+  --LogLevel="%PR_LOGLEVEL%" ^
+  --StdOutput="%PR_STDOUTPUT%" ^
+  --StdError="%PR_STDERROR%" ^
+  --JavaHome="%JAVA_HOME%" ^
+  --Jvm="%PR_JVM%" ^
+  --JvmMs="%PR_JVMMS%" ^
+  --JvmMx="%PR_JVMMX%" ^
+  --JvmSs="%PR_JVMSS%" ^
+  --JvmOptions="%PR_JVMOPTIONS%" ^
+  --Classpath="%PR_CLASSPATH%" ^
+  --StartMode="%PR_STARTMODE%" ^
+  --StartClass="%JETTY_START_CLASS%" ^
+  --StartParams="%PR_STARTPARAMS%" ^
+  --StopMode="%PR_STOPMODE%" ^
+  --StopClass="%PR_STOPCLASS%" ^
+  --StopParams="%PR_STOPPARAMS%"
+
+if not errorlevel 1 goto installed
+echo Failed to install "%SERVICE_NAME%" service.  Refer to log in %PR_LOGPATH%
+goto end
+
+:installed
+echo The Service "%SERVICE_NAME%" has been installed
+
+:end
+								</pre>
+							</li>
+							<li>Run this batch file from the command line as an Administrator</li>
+                        </ol>
+                    </section>
+
+				<!-- included when sample car data was supplied and used (to test djatoka and solr), assume not needed (well not for the Bodleian anyway)
+				 <section>
+                    <ol>
+                        <li>Copy contents of supplied "solr_config.zip" to "[solr install dir]\multicore\core1\conf"</li>
+                        <li>Copy supplied "data-config.xml" to ""[solr install dir]\multicore", eg "C:\solr\multicore"</li>
+                        <li>Edit newly copied "data-config.xml" and update line containing "url" attribute to correct path to the test or live data xml file, or if not using supplied test data edit whole "data-config.xml" to match specific data to be imported</li>
+                        <li>Edit "[solr install dir]\multicore\core1\conf\solrconfig.xml", amend section "&lt;!- - Data Import Handler - -&gt;"</pre> to contain correct path to data import config, eg "C:\solr\multicore\data-config.xml"</li>
+                        <li>Make directory "lib" in "[solr install dir]\multicore\core0\" and "[solr install dir]\multicore\core1\"</li>
+                        <li>Copy "[solr unpack path]\dist\apache-solr-dataimporthandler-3.5.0.jar" and "[solr unpack path]\dist\apache-solr-dataimporthandler-extras-3.5.0.jar"  to "[solr install dir]\multicore\core0\lib" and "[solr install dir]\multicore\core1\lib"</li>
+                        <li>Copy contents of "[solr install dir]\multicore\core1\conf" to "[solr install dir]\multicore\core0\conf"</li>
+                    </ol>
+                </section> -->
+
+                <section>
+                    <h3>3.4 iNQUIRE</h3>
+                    <ol>
+                        <li>Edit "[iNQUIRE deployment path]\Web.config"</li>
+                        <li>Edit email settings</li>
+                        <li>Edit SolrUri settings (NB: SolrUriXml is redundant and can just point to any instance/core of Solr)</li>
+                        <li>XmlDataFile is deprecated</li>
+                        <li>MediaDirectoryRemote is for non Jpeg2000 media, can just be set to "/" if none exist, or create "Media" directory in deployment directory if needed</li>
+                        <li>ImageDirectory can be set to eg "C:\ASPSites\inquire\1.8\" if no non-jpeg2000 media, or point at non-jp2 media directory</li>
+                        <li>connectionStrings: DataSource should be Sql Server machine, eg localhost, user should be the username and password created in Sql Server management utility above:
+                            <pre class="prettyprint">
+&lt;add name="BL_DRE_INQUIREConnectionString"
+	connectionString="Data Source=BODL-DIGITAL-DE;Initial Catalog=BL_DRE_INQUIRE;Persist Security Info=True;User ID=dreuser2;Password=dr3u53r123+"
+	providerName="System.Data.SqlClient" /&gt;"</pre>
+
+                            NB: MS Sql Server seems to be happy with just eg "Data Source=BODL-DIGITAL-DE", but Sql Server Express needs [machine name]\[instance name] eg "Data Source=ACER-LAPTOP\SQLEXPRESS"</li>
+                    </ol>
+                </section>
+
+                <section>
+                    <h3>3.5 IIS</h3>
+                    <ol>
+                        <li>Launch IIS, right click "Default Web Site -> Add Application"</li>
+                        <li>Alias: eg "inquire_1.8", Application pool: "ASP.NET v4.0", Physical path "[inquire deployment directory]", eg "C:\ASPSites\inquire\1.8"</li>
+                        <!--<li>Add MIME types for HTML5 media: ".m4v", ".ogv", ".mp3", ".oga", ".wav"</li>
+                        <li>[Not needed, now included in Web.config] In IIS, click main server node, double click "MIME Types" from main pane</li>-->
+                    </ol>
+                </section>
+
+                <section>
+                    <h3>3.6 Microsoft IIS Url Rewrite [Optional]</h3>
+                    <ol>
+                    <li>Open web.config, copy rewrite section to default website web.config (usually in inetput/wwwroot) so rules are inherited by inquire site.
+                        Then comment out the rewrite section in the inquire web.config. The default
+                        website web.config should thus look similar to the following:
+                        <pre class="prettyprint">
+&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+    &lt;configuration&gt;
+        &lt;system.webServer&gt;
+            &lt;rewrite&gt;
+                &lt;rules&gt;
+                    &lt;clear /&gt;
+                        &lt;rule name=&quot;inquire direct view item (ris export url)&quot; patternSyntax=&quot;Wildcard&quot; stopProcessing=&quot;false&quot;&gt;
+                            &lt;match url=&quot;inquire/v/*&quot; /&gt; &lt;conditions logicalGrouping=&quot;MatchAll&quot; trackAllCaptures=&quot;false&quot; /&gt;
+                            &lt;action type=&quot;Rewrite&quot; url=&quot;inquire/Discover/Search/?p=c+0,t+,rsrs+0,rsps+10,fa+,so+id^desc,scids+,pid+,vi+{R:1}&quot; appendQueryString=&quot;true&quot; /&gt;
+                        &lt;/rule&gt;
+
+                        &lt;rule name=&quot;iNQUIRE&quot; patternSyntax=&quot;Wildcard&quot; stopProcessing=&quot;true&quot;&gt;
+                            &lt;match url=&quot;inquire/*&quot; negate=&quot;false&quot; /&gt;
+                            &lt;conditions logicalGrouping=&quot;MatchAll&quot; trackAllCaptures=&quot;false&quot; /&gt;
+                            &lt;action type=&quot;Redirect&quot; url=&quot;inquire_1.12/{R:1}&quot; redirectType=&quot;Found&quot; /&gt;
+                        &lt;/rule&gt;
+                    &lt;/rules&gt;
+                &lt;/rewrite&gt;
+            &lt;/system.webServer&gt;
+        &lt;/configuration&gt;</pre>
+                        </li>
+                        <!--<li>Launch IIS, select "Default Web  Site" in the left hand pane</li>
+                        <li>In the centre pane double click IIS -> URL Rewrite</li>
+                        <li>For direct viewing items from exported links: "Add Rule -> Matches the Pattern -> Using Wildcards -> Pattern "inquire/vi=*" -> Tick ignore case -> Action type: Rewrite -> Rewrite URL "inquire/Discover/Search/#/?p=c+0,t+,rsrs+0,rsps+10,fa+,so+id^desc,scids+,pid+,vi+{R:1}" -> Tick "Append query string" -> Untick "Stop processing of subsequent rules""</li>
+                        <li>For directing to latest code build, eg making "/inquire/" recidrect to "/inquire_1.10/" (make sure this is the bottom rule in the list of rules): "Add Rule -> Matches the Pattern -> Using Wildcards -> Pattern "inquire/*" -> Tick ignore case -> Action type: Redirect -> Redirect URL "inquire_1.10/{R:1}" -> Tick "Append query string" -> Redirect type: "Found (302)"</li>
+                        -->
+                    </ol>
+                </section>
+            </section>
+         </section>
+        </article>
+    </body>
+</html>
