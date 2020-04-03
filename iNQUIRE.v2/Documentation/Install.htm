@@ -385,7 +385,7 @@
                                 Login name "dreuser2"
                                 <img src="html_images/sql_server_create_user1.png" alt="sql_server_create_user1.png" />
                             </li>
-                            <li>Select Sql Server Authentication, password "dr3u53r123+"</li>
+                            <li>Select Sql Server Authentication, password "[PASSWORD]"</li>
                             <li>Untick "Enforce password expiration"</li>
                             <li>Select Default database: INQUIRE_Lite</li>
                             <li>If there are any issues with using login name "dreuser2", you can try "dreuser[x]" eg "dreuser3", as long as you update your ASP.net web.config with the login name, eg edit "C:\ASPSites\inquire\1.13\web.config" &lt;connectionStrings&gt; section, it may appear multipe times.</li>
@@ -535,7 +535,7 @@ echo The Service "%SERVICE_NAME%" has been installed
                         <li>connectionStrings: DataSource should be Sql Server machine, eg localhost, user should be the username and password created in Sql Server management utility above:
                             <pre class="prettyprint">
 &lt;add name="BL_DRE_INQUIREConnectionString"
-	connectionString="Data Source=BODL-DIGITAL-DE;Initial Catalog=BL_DRE_INQUIRE;Persist Security Info=True;User ID=dreuser2;Password=dr3u53r123+"
+	connectionString="Data Source=BODL-DIGITAL-DE;Initial Catalog=BL_DRE_INQUIRE;Persist Security Info=True;User ID=dreuser2;Password=[PASSWORD]"
 	providerName="System.Data.SqlClient" /&gt;"</pre>
 
                             NB: MS Sql Server seems to be happy with just eg "Data Source=BODL-DIGITAL-DE", but Sql Server Express needs [machine name]\[instance name] eg "Data Source=ACER-LAPTOP\SQLEXPRESS"</li>

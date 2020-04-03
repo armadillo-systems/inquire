@@ -548,7 +548,33 @@ namespace iNQUIRE.Controllers
 
         private SolrSearchResults SearchSolr(SearchQuery sq, string lang_id)
         {
-            var results = _IRepository.Search(sq, Facets, FacetRanges);
+            // for properties which are multi-lingual and also facetted we store the languages in different Solr fields
+            // eg InqItemRKD, property "Category" has an entry for nl and en languages, we store in separate Solr fields.
+            // here we can select the correct Solr facetted field if a language has been selected which isn't the default 
+            // eg in the web.config we have "category_nl|Category" but maybe the user has selected "en" via the UI
+            // so we need to check for this here and update Facets as required
+
+            var facets_lang_applied = new List<KeyValuePair<string, string>>();
+
+            if (!string.IsNullOrEmpty(lang_id))
+            {
+                foreach (var f in Facets)
+                {
+                    var f_lang = f.Key;
+
+                    var f_split = f.Key.Split(new[] { "_" }, StringSplitOptions.RemoveEmptyEntries);
+                    if (f_split.Length > 1)
+                    {
+                        var lang_split = lang_id.Split(new[] { "-" }, StringSplitOptions.RemoveEmptyEntries);
+                        if (f_split[1].ToLower().CompareTo(lang_split[0].ToLower()) != 0)
+                            f_lang = string.Format("{0}_{1}", f_split[0], lang_split[0]);
+                    }
+
+                    facets_lang_applied.Add(new KeyValuePair<string, string>(f_lang, f.Value));
+                }
+            }
+
+            var results = _IRepository.Search(sq, facets_lang_applied, FacetRanges);
             forceHttps(ref results);
             addImageMetaData(ref results);
             setLanguageData(ref results, lang_id);
@@ -623,6 +649,8 @@ namespace iNQUIRE.Controllers
 
         protected void setLanguageData(ref SolrSearchResults solr_results, string lang_id)
         {
+            // lang_id = lang_id?.Split(new char[]{ '-' }, 1, StringSplitOptions.RemoveEmptyEntries)[0];
+
             // propertyInfo.SetValue(ship, value, null);
             if (solr_results != null && solr_results.Results != null && solr_results.Results.Count() > 0)
             {
@@ -632,7 +660,7 @@ namespace iNQUIRE.Controllers
                     // normal version of the property, eg _mlKeywords -> Keywords. this way we filter out language data we don't
                     // need to send to the client.
                     Type t = k.GetType();
-                    IList<PropertyInfo> mlprops = new List<PropertyInfo>(t.GetProperties().Where(p => p.Name.StartsWith(MultilingualPropertyPrefix)).ToList());
+                    IList<PropertyInfo> mlprops = new List<PropertyInfo>(t.GetProperties(BindingFlags.NonPublic | BindingFlags.Instance).Where(p => p.Name.StartsWith(MultilingualPropertyPrefix)).ToList());
 
                     foreach (PropertyInfo mlprop in mlprops)
                     {
@@ -646,7 +674,7 @@ namespace iNQUIRE.Controllers
                             {
                                 // if we don't have a lang_id for some reason then just try to return some data (rather than nothing)
                                 if (string.IsNullOrEmpty(lang_id))
-                                    lang_id = lang_dict.Keys.FirstOrDefault();
+                                    lang_id = lang_dict.Keys.FirstOrDefault(); // ?.Split(new char[] { '-' }, 1, StringSplitOptions.RemoveEmptyEntries)[0];
 
                                 if (!string.IsNullOrEmpty(lang_id))
                                 {
