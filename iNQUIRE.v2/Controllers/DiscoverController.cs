@@ -512,13 +512,13 @@ namespace iNQUIRE.Controllers
         //[HttpPost]
         public ActionResult SearchAjax(string user_id, string term, string collection_ids, int rows, int row_start, string parent_id, string sort_orders, string facet_constraints, string lang_id) // SearchFacetViewModel facet)
         {
-            var sq = new SearchQuery(user_id, term, collection_ids, rows, row_start, parent_id, sort_orders, facet_constraints);
+            var sq = new SearchQuery(user_id, term, collection_ids, rows, row_start, parent_id, sort_orders, facet_constraints, lang_id);
 
             if (String.IsNullOrEmpty(user_id))
                 user_id = Guid.Empty.ToString();
 
             //XmlDataHelper.SearchXml(Request.GetBaseUri(Url), term, new List<string>(ids), collection_search)
-            var results = SearchSolr(sq, lang_id);
+            var results = SearchSolr(sq);
 
             // save all searches, even if user not logged in (for complete stats). if start row == 0 assume new search (and not a seach page nav click)
             var kvp = new KeyValuePair<Guid, String>(Guid.Empty, null);
@@ -546,7 +546,7 @@ namespace iNQUIRE.Controllers
             return results;
         }
 
-        private SolrSearchResults SearchSolr(SearchQuery sq, string lang_id)
+        private SolrSearchResults SearchSolr(SearchQuery sq)
         {
             // for properties which are multi-lingual and also facetted we store the languages in different Solr fields
             // eg InqItemRKD, property "Category" has an entry for nl and en languages, we store in separate Solr fields.
@@ -556,7 +556,7 @@ namespace iNQUIRE.Controllers
 
             var facets_lang_applied = new List<KeyValuePair<string, string>>();
 
-            if (!string.IsNullOrEmpty(lang_id))
+            if (!string.IsNullOrEmpty(sq.LanguageID))
             {
                 foreach (var f in Facets)
                 {
@@ -565,7 +565,7 @@ namespace iNQUIRE.Controllers
                     var f_split = f.Key.Split(new[] { "_" }, StringSplitOptions.RemoveEmptyEntries);
                     if (f_split.Length > 1)
                     {
-                        var lang_split = lang_id.Split(new[] { "-" }, StringSplitOptions.RemoveEmptyEntries);
+                        var lang_split = sq.LanguageID.Split(new[] { "-" }, StringSplitOptions.RemoveEmptyEntries);
                         if (f_split[1].ToLower().CompareTo(lang_split[0].ToLower()) != 0)
                             f_lang = string.Format("{0}_{1}", f_split[0], lang_split[0]);
                     }
@@ -577,7 +577,7 @@ namespace iNQUIRE.Controllers
             var results = _IRepository.Search(sq, facets_lang_applied, FacetRanges);
             forceHttps(ref results);
             addImageMetaData(ref results);
-            setLanguageData(ref results, lang_id);
+            setLanguageData(ref results, sq.LanguageID);
             return results;
         }
 
@@ -707,12 +707,12 @@ namespace iNQUIRE.Controllers
             return Json(r, JsonRequestBehavior.AllowGet);
         }
 
-        public ActionResult GetSearchSuggestionsAjax(string str)
+        public ActionResult GetSearchSuggestionsAjax(string lang_id, string str)
         {
             if (String.IsNullOrEmpty(str))
                 return null;
 
-            var res = _IRepository.GetSearchSuggestions(str);
+            var res = _IRepository.GetSearchSuggestions(lang_id, str);
             var sug = new List<string>();
 
             foreach (SolrNet.Impl.SpellCheckResult s in res.SpellChecking)

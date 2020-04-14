@@ -17,74 +17,7 @@
 </head>
 <body>
 
-    <script type="text/javascript">
-    function IsFieldNullOrEmpty(obj) {
-        return !((obj) && (obj.toString().length > 0));
-    }
-
-    var _gvm = {
-        fbLoaded: ko.observable(false),
-        fbAccessToken: ko.observable('')
-    };
-
-    _gvm.fbConnected = ko.computed(function () {
-        return !IsFieldNullOrEmpty(this.fbAccessToken());
-    }, _gvm);
-    </script>
-
-    @if (ViewBag.Facebook)
-    {
-        <div id="fb-root"></div>
-        <script type="text/javascript">
-            window.fbAsyncInit = function () {
-                FB.init({
-                    appId: '@ViewBag.FacebookAppId', // App ID
-                    status: true, // check login status
-                    cookie: true, // enable cookies to allow the server to access the session
-                    xfbml: true  // parse XFBML
-                });
-
-                function fbCheckLoginStatus() {
-                    FB.getLoginStatus(function (response) {
-                        // alert('fbCheckLoginStatus: ' + response.status);
-                        var t = '';
-                        if (response.status == 'connected')
-                            t = response.authResponse.accessToken;
-                        _gvm.fbAccessToken(t);
-                    });
-                }
-
-                fbCheckLoginStatus(); /*@* check on page load/refresh, as might already be logged in, event below only triggered on login/logout button click *@*/
-
-                FB.Event.subscribe('auth.authResponseChange', function (response) {
-                    // alert('auth.authResponseChange');
-                    var t = '';
-                    if (response.status === 'connected') {
-                        // alert('fb connected');
-                        t = response.authResponse.accessToken;
-                    } else if (response.status === 'not_authorized') {
-                        // the user is logged in to Facebook,
-                        // but has not authenticated your app
-                        alert('Please update your Facebook account to authorise iNQUIRE');
-                    } else {
-                        // the user isn't logged in to Facebook.
-                    }
-                    _gvm.fbAccessToken(t);
-                });
-
-                _gvm.fbLoaded(true);
-            };
-
-            // Load the SDK Asynchronously
-            (function (d) {
-                var js, id = 'facebook-jssdk', ref = d.getElementsByTagName('script')[0];
-                if (d.getElementById(id)) { return; }
-                js = d.createElement('script'); js.id = id; js.async = true;
-                js.src = "//connect.facebook.net/en_US/all.js";
-                ref.parentNode.insertBefore(js, ref);
-            } (document));
-        </script>
-    }
+    @Html.Partial("~/Views/Shared/_Facebook.cshtml");
 
     <header id="cd-header-wrapper">
         <div class="cd-main-header">
@@ -107,7 +40,7 @@
         <div class="content-wrapper">
             @RenderBody()
             @*@Html.Partial("~/Views/Shared/_Footer.cshtml")*@
-        </div> 
+        </div>
     </main>
 
     @Scripts.Render("~/bundles/bootstrap")
@@ -115,53 +48,9 @@
     @Scripts.Render("~/bundles/jquery-ui")
     @RenderSection("scripts", required: false)
 
-    <script type="text/javascript">
-    $(function () {
-        openid.init('openid_identifier');
-        openid.locale = 'en';
-        openid.sprite = 'en'; // reused in german& japan localization
-        openid.demo_text = 'In client demo mode. Normally would have submitted OpenID:';
-        openid.signin_text = 'Sign-In';
-        openid.image_title = 'log in with {provider}';
+    @Html.Partial("~/Views/Shared/_HeaderJS.cshtml")
 
-        var cache = {}, lastXhr;
-        $("#search-term").autocomplete({
-            minLength: 2,
-            close: function(event, ui) { _vm.searchTerm(this.value); }, // need this otherwise for some reason _vm.searchTerm doesn't get the autosuggested word via the data binding, will just be left as whatever the user typed (eg typed "bala" and selected "balaclava")
-            source:  function( request, response ) {
-                var term = request.term;
-
-                if (term in cache) {
-                    response(cache[term]);
-                    return;
-                }
-
-                lastXhr = $.getJSON('@Url.Content("~/Discover/GetSearchSuggestionsAjax")', { "str": term },
-                    function( data, status, xhr ) {
-                        cache[term] = data;
-                        if (xhr === lastXhr) {
-                            response(data);
-                        }
-                    });
-            }
-        });
-    });
-    </script>
-
-    @if (!String.IsNullOrEmpty(ViewBag.GoogleAnalyticsId))
-    {
-        <script type="text/javascript">
-            var _gaq = _gaq || [];
-            _gaq.push(['_setAccount', '@ViewBag.GoogleAnalyticsId']);
-            _gaq.push(['_trackPageview']);
-
-            (function () {
-                var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-                ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-                var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-            })();
-        </script>
-    }
+    @Html.Partial("~/Views/Shared/_GoogleAnalytics.cshtml")
 
 </body>
 </html>

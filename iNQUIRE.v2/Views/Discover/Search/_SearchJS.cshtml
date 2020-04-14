@@ -721,8 +721,8 @@
         }
         self.setupSortFields();
 
-        if (location.hash == '') {
-            location.hash = 't+*%3A*,rsrs+0,rsps+' + self.recordsetPageSize() + ',fa+,so+' + encodeURIComponent(self.sortField().OptionValue) + ',scids+,pid+,vi+' + self.viewItem() + ',l+' + self.languageId();
+        if (location.hash == '') { // t+*%3A*
+            location.hash = 't+,rsrs+0,rsps+' + self.recordsetPageSize() + ',fa+,so+' + encodeURIComponent(self.sortField().OptionValue) + ',scids+,pid+,vi+' + self.viewItem() + ',l+' + self.languageId();
         }
 
 
@@ -1016,7 +1016,7 @@
         self.getFacetFields = function () {
             self.searchInProgress(true);
             self.searchRequest = $.get("@Url.Content("~/Discover/SearchAjax")",
-                { "term": '', "collection_ids": '', "rows": 0, "row_start": 0, "parent_id": '', "sort_orders": '', "facet_constraints": '' },
+                { "term": '', "collection_ids": '', "rows": 0, "row_start": 0, "parent_id": '', "sort_orders": '', "facet_constraints": '', "lang_id": self.languageId() },
                 function (data) {
                     var d = data.SearchResults;
                     self.populateFacetFields(d.FacetFields, d.FacetQueries);

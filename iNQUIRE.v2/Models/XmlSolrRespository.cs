@@ -22,7 +22,7 @@ namespace iNQUIRE.Models
         public override SolrSearchResults Search(SearchQuery query, List<KeyValuePair<string, string>> facets, List<FacetRange> facet_ranges)
         {
             // string solr_term = (ids.Count > 0) ? String.Format("{0}:^", _solrIdField) : makeSolrTerm(term, ids);
-            string solr_term = makeSolrTerm(query.Term, query.IDs);
+            string solr_term = makeSolrTerm(query.LanguageID, query.Term, query.IDs);
 
             var solr = ServiceLocator.Current.GetInstance<ISolrOperations<InqItemXml>>();
             var results = solr.Query(new SolrQuery(solr_term), new QueryOptions { Rows = query.Rows, Start = query.RowStart });
