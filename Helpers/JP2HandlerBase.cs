@@ -25,9 +25,9 @@ namespace iNQUIRE.Helper
 
         protected string appBaseUri { get; set; }
 
-        public virtual string MakeUri(HttpContext context)
+        public virtual string MakeUri(HttpContext context) 
         {
-            appBaseUri = string.Format("http://{0}{1}", context.Request.Url.Host, context.Request.FilePath);
+            appBaseUri = string.Format("{0}://{1}{2}", context.Request.Url.Scheme, context.Request.Url.Host, context.Request.FilePath);
 
             string new_uri = context.Request.FilePath.Contains("viewer") ? HandlerHelper.ViewerUri : HandlerHelper.ResolverUri;
             return context.Request.Url.AbsoluteUri.Replace(appBaseUri, new_uri);
@@ -52,14 +52,28 @@ namespace iNQUIRE.Helper
             HttpWebResponse response;
             try
             {
+                // throw new WebException("moo!");
                 response = (HttpWebResponse)request.GetResponse();
             }
             catch (WebException ex)
             {
-                //remote url not found, send 404 to client 
-                context.Response.StatusCode = (int)((HttpWebResponse)ex.Response).StatusCode;
-                context.Response.StatusDescription = "Not Found";
-                context.Response.Write("<h2>Page not found</h2>");
+                //remote url not found, log an error and send 404 to client 
+                var err_response = ex.Response != null ? (HttpWebResponse)ex.Response : null;
+
+                var status_code = 500;
+                var status_desc = "Internal server error";
+
+                if (err_response != null)
+                {
+                    status_code = (int)err_response.StatusCode;
+                    status_desc = err_response.StatusDescription;
+                }
+
+                LogHelper.StatsLog(null, "JP2HandlerBase.ProcessRequest()", String.Format("Failed, status code: {0} , status desc: {1}, Message: {2}, Uri: {3}", status_code, status_desc, ex.Message, remoteUrl), null, null);
+
+                context.Response.StatusCode = status_code;
+                context.Response.StatusDescription = status_desc ;
+                context.Response.Write("<h2>Error getting JP2 metadata</h2>");
                 context.Response.End();
                 return;
             }
