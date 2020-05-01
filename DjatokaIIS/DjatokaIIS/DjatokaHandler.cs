@@ -10,12 +10,12 @@ namespace DjatokaIIS
     {
         public override bool IsJpeg(string url)
         {
-            return url.Contains("getRegion");
+            return !string.IsNullOrEmpty(url) ? url.Contains("getRegion") : false;
         }
 
         public override bool IsJson(string url)
         {
-            return url.Contains("getMetadata");
+            return !string.IsNullOrEmpty(url) ? url.Contains("getMetadata") : false;
         }
 
         public override string ProxyFixHTML(string content)

@@ -14,12 +14,12 @@ namespace IIIFIIS
 
         public override bool IsJpeg(string url)
         {
-            return url.EndsWith(".jpg", StringComparison.CurrentCultureIgnoreCase);
+            return !string.IsNullOrEmpty(url) ? url.EndsWith(".jpg", StringComparison.CurrentCultureIgnoreCase) : false;
         }
 
         public override bool IsJson(string url)
         {
-            return url.EndsWith(".json", StringComparison.CurrentCultureIgnoreCase);
+            return !string.IsNullOrEmpty(url) ? url.EndsWith(".json", StringComparison.CurrentCultureIgnoreCase) : false;
         }
 
         public override string ProxyFixHTML(string content)

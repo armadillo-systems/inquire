@@ -39,21 +39,23 @@ namespace iNQUIRE.Helper
         /// <param name="context">HTTP context for client</param>
         public void ProcessRequest(HttpContext context)
         {
-            var remoteUrl = MakeUri(context);
-
-            var is_json = IsJson(remoteUrl);
-            var is_jpeg = IsJpeg(remoteUrl);
-
-            //create the web request to get the remote stream
-            var request = (HttpWebRequest)WebRequest.Create(remoteUrl);
-
-            //request.Credentials = CredentialCache.DefaultCredentials;
-
+            string remoteUrl = null;
             HttpWebResponse response;
+
             try
             {
+                remoteUrl = MakeUri(context);
+
+                //create the web request to get the remote stream
+                var request = (HttpWebRequest)WebRequest.Create(remoteUrl);
+
+                //request.Credentials = CredentialCache.DefaultCredentials;
+
                 // throw new WebException("moo!");
                 response = (HttpWebResponse)request.GetResponse();
+
+                if (HandlerHelper.DebugJp2HandlerRequests)
+                    LogHelper.StatsLog(null, "JP2HandlerBase.ProcessRequest()", String.Format("Ok, status code: {0} , status desc: {1}, Uri: {2}", response.StatusCode, response.StatusDescription, remoteUrl), null, null);
             }
             catch (WebException ex)
             {
@@ -100,10 +102,10 @@ namespace iNQUIRE.Helper
                     {
                         //the response is not HTML Content
 
-                        if (is_jpeg)
+                        if (IsJpeg(remoteUrl))
                             context.Response.ContentType = "image/jpeg";
 
-                        if (is_json)
+                        if (IsJson(remoteUrl))
                         {
                             context.Response.ContentType = "application/json";
                             context.Response.ContentEncoding = Encoding.UTF8;

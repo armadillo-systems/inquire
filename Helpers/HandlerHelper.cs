@@ -11,6 +11,7 @@ namespace iNQUIRE.Helper
         public static string ResolverUri = ConfigurationManager.AppSettings["ResolverUri"];
         public static string ViewerUri = ConfigurationManager.AppSettings["ViewerUri"];
         public static int TileSize = Convert.ToInt32(ConfigurationManager.AppSettings["TileSize"]);
+        public static bool DebugJp2HandlerRequests = Convert.ToBoolean(ConfigurationManager.AppSettings["DebugJp2HandlerRequests"]);
 
         /// <summary>
         /// Get the remote URL to call

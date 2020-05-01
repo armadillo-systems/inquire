@@ -10,12 +10,12 @@ namespace IIPImageIIS
     {
         public override bool IsJpeg(string url)
         {
-            return url.Contains("RGN");
+            return !string.IsNullOrEmpty(url) ? url.Contains("RGN") : false;
         }
 
         public override bool IsJson(string url)
         {
-            return url.Contains("Max-size");
+            return !string.IsNullOrEmpty(url) ? url.Contains("Max-size") : false;
         }
 
         public override string ProxyFixHTML(string content)
