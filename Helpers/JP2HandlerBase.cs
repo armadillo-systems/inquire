@@ -27,7 +27,7 @@ namespace iNQUIRE.Helper
 
         public virtual string MakeUri(HttpContext context) 
         {
-            appBaseUri = string.Format("{0}://{1}{2}", context.Request.Url.Scheme, context.Request.Url.Host, context.Request.FilePath);
+            appBaseUri = string.Format("{0}://{1}:{2}{3}", context.Request.Url.Scheme, context.Request.Url.Host, context.Request.Url.Port, context.Request.FilePath);
 
             string new_uri = context.Request.FilePath.Contains("viewer") ? HandlerHelper.ViewerUri : HandlerHelper.ResolverUri;
             return context.Request.Url.AbsoluteUri.Replace(appBaseUri, new_uri);
