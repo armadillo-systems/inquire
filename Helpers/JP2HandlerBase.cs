@@ -25,10 +25,14 @@ namespace iNQUIRE.Helper
 
         protected string appBaseUri { get; set; }
 
+        private string MakeAppBaseUri(HttpContext context)
+        {
+            return string.Format("{0}://{1}:{2}{3}", context.Request.Url.Scheme, context.Request.Url.Host, context.Request.Url.Port, context.Request.FilePath);
+        }
+
         public virtual string MakeUri(HttpContext context) 
         {
-            appBaseUri = string.Format("{0}://{1}:{2}{3}", context.Request.Url.Scheme, context.Request.Url.Host, context.Request.Url.Port, context.Request.FilePath);
-
+            appBaseUri = MakeAppBaseUri(context);
             string new_uri = context.Request.FilePath.Contains("viewer") ? HandlerHelper.ViewerUri : HandlerHelper.ResolverUri;
             return context.Request.Url.AbsoluteUri.Replace(appBaseUri, new_uri);
         }
@@ -46,6 +50,20 @@ namespace iNQUIRE.Helper
             {
                 remoteUrl = MakeUri(context);
 
+                // we've received a Url request and our handler has intercepted the request
+                // and attempted to substitute the viewer/resolver Uri, but we've ended up
+                // with the same Url, if we request it again we will just get stuck in a request loop
+                if (remoteUrl.ToLower().CompareTo(context.Request.Url.AbsoluteUri.ToLower()) == 0)
+                {
+                    var msg = "JP2HandlerBase.ProcessRequest() source and destination Urls are the same";
+                    //var r = new HttpWebResponse(null, null, null)
+                    //{
+                    //    r.StatusCode = 500,
+                    //    r.StatusDescription = "Internal server error"
+                    //};
+                    throw new WebException(msg);
+                }
+
                 //create the web request to get the remote stream
                 var request = (HttpWebRequest)WebRequest.Create(remoteUrl);
 
@@ -61,9 +79,8 @@ namespace iNQUIRE.Helper
             {
                 //remote url not found, log an error and send 404 to client 
                 var err_response = ex.Response != null ? (HttpWebResponse)ex.Response : null;
-
-                var status_code = 500;
-                var status_desc = "Internal server error";
+                var status_code = 404;
+                var status_desc = "No response";
 
                 if (err_response != null)
                 {
@@ -71,7 +88,7 @@ namespace iNQUIRE.Helper
                     status_desc = err_response.StatusDescription;
                 }
 
-                LogHelper.StatsLog(null, "JP2HandlerBase.ProcessRequest()", String.Format("Failed, status code: {0} , status desc: {1}, Message: {2}, Uri: {3}", status_code, status_desc, ex.Message, remoteUrl), null, null);
+                LogHelper.StatsLog(null, "JP2HandlerBase.ProcessRequest()", String.Format("Failed, Response status code: {0} , Response status desc: {1}, WebExceptionMessage: {2}, HandlerHelper.ViewerUri: {3}, HandlerHelper.ResolverUri: {4}, context.Request.Url.AbsoluteUri: {5}, Constructed remoteUrl: {6}", status_code, status_desc, ex.Message, HandlerHelper.ViewerUri, HandlerHelper.ResolverUri, context.Request.Url.AbsoluteUri, remoteUrl), null, null);
 
                 context.Response.StatusCode = status_code;
                 context.Response.StatusDescription = status_desc ;
