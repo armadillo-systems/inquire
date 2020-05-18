@@ -8,6 +8,7 @@
 <div class="row">
     <div class="col-md-12">
         <div id="test-page">
+            <div data-bind="visible: error, text: error"></div>
             <div>
                 <h3>Search</h3>
                 <span data-bind="text: testSearchUrl"></span><br />
@@ -106,6 +107,7 @@
         var self = this;
 
         self.adminPage = true;
+        self.error = ko.observable('@ViewBag.Error');
         self.viewerUrl = '@ViewBag.ViewerUrl';
         self.resolverUrl = '@ViewBag.ResolverUrl';
         self.reverseProxyUrl = '@ViewBag.ReverseProxyUrl';

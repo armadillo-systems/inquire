@@ -190,6 +190,9 @@ namespace iNQUIRE.Controllers
                 ViewBag.IIPDebugParameters = IIPDebugParameters;
                 ViewBag.DeepZoomDebugParameters = DeepZoomDebugParameters;
             }
+            else
+                ViewBag.Error = "To enable this page set DebugJp2HandlerRequests to true in the web.config, remember to set back to false when testing is complete.";
+
             return View();
         }
 
@@ -1084,21 +1087,24 @@ namespace iNQUIRE.Controllers
         {
             var result = new JObject();
 
-            try
+            if (JP2ConfigHelper.DebugJp2HandlerRequests)
             {
-                using (var db = new iNQUIRELiteDataContext())
+                try
                 {
-                    var db_exists = db.DatabaseExists();
-                    System.Data.Common.DbConnectionStringBuilder builder = new System.Data.Common.DbConnectionStringBuilder();
-                    builder.ConnectionString = db.Connection.ConnectionString;
-                    result.Add("Server", builder["Data Source"] as string);
-                    result.Add("Database", builder["Initial Catalog"] as string);
-                    result.Add("Result", db.DatabaseExists() ? "OK" : "Failed to connect");
+                    using (var db = new iNQUIRELiteDataContext())
+                    {
+                        var db_exists = db.DatabaseExists();
+                        System.Data.Common.DbConnectionStringBuilder builder = new System.Data.Common.DbConnectionStringBuilder();
+                        builder.ConnectionString = db.Connection.ConnectionString;
+                        result.Add("Server", builder["Data Source"] as string);
+                        result.Add("Database", builder["Initial Catalog"] as string);
+                        result.Add("Result", db.DatabaseExists() ? "OK" : "Failed to connect");
+                    }
                 }
-            }
-            catch (Exception e)
-            {
-                result.Add("Error", e.Message);
+                catch (Exception e)
+                {
+                    result.Add("Error", e.Message);
+                }
             }
 
             return Content(result.ToString(), "application/json");
@@ -1110,80 +1116,69 @@ namespace iNQUIRE.Controllers
             HttpWebResponse response;
             var result = new JObject();
 
-            try
+            if (JP2ConfigHelper.DebugJp2HandlerRequests && !string.IsNullOrEmpty(url))
             {
-                var request = (HttpWebRequest)WebRequest.Create(url);
-                response = (HttpWebResponse)request.GetResponse();
-                result.Add("StatusCode", (int)response.StatusCode);
-                result.Add("StatusDescription", response.StatusDescription);
-            }
-            catch (WebException ex)
-            {
-                //remote url not found, log an error and send 404 to client 
-                var err_response = ex.Response != null ? (HttpWebResponse)ex.Response : null;
-                var status_code = 404;
-                var status_desc = "No response";
-
-                if (err_response != null)
+                try
                 {
-                    status_code = (int)err_response.StatusCode;
-                    status_desc = err_response.StatusDescription;
+                    var request = (HttpWebRequest)WebRequest.Create(url);
+                    response = (HttpWebResponse)request.GetResponse();
+                    result.Add("StatusCode", (int)response.StatusCode);
+                    result.Add("StatusDescription", response.StatusDescription);
+                }
+                catch (WebException ex)
+                {
+                    //remote url not found, log an error and send 404 to client 
+                    var err_response = ex.Response != null ? (HttpWebResponse)ex.Response : null;
+                    var status_code = 404;
+                    var status_desc = "No response";
+
+                    if (err_response != null)
+                    {
+                        status_code = (int)err_response.StatusCode;
+                        status_desc = err_response.StatusDescription;
+                    }
+
+                    LogHelper.StatsLog(null, "DiscoverController.TestUrl()", String.Format("Failed, Response status code: {0} , Response status desc: {1}, WebExceptionMessage: {2}, Url: {3}", status_code, status_desc, ex.Message, url), null, null);
+
+                    result.Add("Error", ex.Message);
+                    result.Add("StatusCode", status_code);
+                    result.Add("StatusDescription", status_desc);
+                    return Json(result, JsonRequestBehavior.AllowGet);
+                }
+                catch (Exception e)
+                {
+                    result.Add("Error", e.Message);
+                    return Json(result, JsonRequestBehavior.AllowGet);
                 }
 
-                LogHelper.StatsLog(null, "DiscoverController.TestUrl()", String.Format("Failed, Response status code: {0} , Response status desc: {1}, WebExceptionMessage: {2}, Url: {3}", status_code, status_desc, ex.Message, url), null, null);
-
-                result.Add("Error", ex.Message);
-                result.Add("StatusCode", status_code);
-                result.Add("StatusDescription", status_desc);
-                return Json(result, JsonRequestBehavior.AllowGet);
-            }
-
-            using (Stream receiveStream = response.GetResponseStream())
-            {
-                if (receiveStream != null)
+                using (Stream receiveStream = response.GetResponseStream())
                 {
-                    //if ((response.ContentType.ToLower().IndexOf("html") >= 0) ||
-                    //    (response.ContentType.ToLower().IndexOf("javascript") >= 0))
-                    //{
+                    if (receiveStream != null)
+                    {
+                        //if ((response.ContentType.ToLower().IndexOf("html") >= 0) ||
+                        //    (response.ContentType.ToLower().IndexOf("javascript") >= 0))
+                        //{
                         //this response is HTML Content, so we must parse it
                         using (var readStream = new StreamReader(receiveStream, Encoding.Default))
                         {
                             string content = readStream.ReadToEnd();// HandlerHelper.ParseHtmlResponse(readStream.ReadToEnd(), "");
                             result.Add("Data", content);
                         }
-                    //}
-                    //else
-                    //{
-                    //    //the response is not HTML Content
-
-                    //    if (IIPImageIIS.IIPImageHandler.IsJpeg(remoteUrl))
-                    //        context.Response.ContentType = "image/jpeg";
-
-                    //    if (IsJson(remoteUrl))
-                    //    {
-                    //        context.Response.ContentType = "application/json";
-                    //        context.Response.ContentEncoding = Encoding.UTF8;
-                    //    }
-
-                    //    var buff = new byte[1024];
-                    //    int bytes;
-                    //    while ((bytes = receiveStream.Read(buff, 0, 1024)) > 0)
-                    //    {
-                    //        //Write the stream directly to the client 
-                    //        context.Response.OutputStream.Write(buff, 0, bytes);
-                    //    }
-                    //}
+                    }
                 }
+                response.Close();
             }
 
-            response.Close();
             return Content(result.ToString(), "application/json");
         }
 
 
         public ActionResult GetLog(int month, int year)
         {
-            return Json(LogHelper.GetLog(month, year), JsonRequestBehavior.AllowGet);
+            if (JP2ConfigHelper.DebugJp2HandlerRequests)
+                return Json(LogHelper.GetLog(month, year), JsonRequestBehavior.AllowGet);
+            else
+                return Json("Set DebugJp2HandlerRequests to true in the web.config to view log, remember to set back to false when testing complete.", JsonRequestBehavior.AllowGet);
         }
     }
 
