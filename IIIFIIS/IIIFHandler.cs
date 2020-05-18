@@ -48,7 +48,7 @@ namespace IIIFIIS
             if (rsplit[1].EndsWith("default.jpg", StringComparison.CurrentCultureIgnoreCase))
                 rsplit[1] = rsplit[1].Replace("default.jpg", String.Format("{0}.jpg", IIIFDefaultQuality));
 
-            return string.Format("{0}?IIIF={1}", HandlerHelper.ResolverUri, rsplit[1]);
+            return string.Format("{0}?IIIF={1}", JP2ConfigHelper.ResolverUri, rsplit[1]);
         }
 
     }

@@ -58,12 +58,13 @@ namespace iNQUIRE
             Helper.JP2ConfigHelper.ApplicationBaseUri = ConfigurationManager.AppSettings["ApplicationBaseUri"];
             Helper.JP2ConfigHelper.ProxyResolverFile = ConfigurationManager.AppSettings["ProxyResolverFile"];
             Helper.JP2ConfigHelper.ResolverUri = ConfigurationManager.AppSettings["ResolverUri"];
-            // Helper.JP2ConfigHelper.ProxyViewerFile = ConfigurationManager.AppSettings["ProxyViewerFile"];
             Helper.JP2ConfigHelper.ViewerUri = ConfigurationManager.AppSettings["ViewerUri"];
             Helper.JP2ConfigHelper.DeepZoomViewerFile = ConfigurationManager.AppSettings["DeepZoomViewerFile"];
             Helper.JP2ConfigHelper.DeepZoomQueryParameter = ConfigurationManager.AppSettings["DeepZoomQueryParameter"];
             Helper.JP2ConfigHelper.ZoomViewerHeightPx = Convert.ToInt32(ConfigurationManager.AppSettings["ZoomViewerHeightPx"]);
+            Helper.JP2ConfigHelper.TileSize = Convert.ToInt32(ConfigurationManager.AppSettings["TileSize"]);
             Helper.JP2ConfigHelper.MediaDirectory = ConfigurationManager.AppSettings["MediaDirectoryRemote"];
+            Helper.JP2ConfigHelper.DebugJp2HandlerRequests = Convert.ToBoolean(ConfigurationManager.AppSettings["DebugJp2HandlerRequests"]);
 
             iNQUIRE.ApplicationViewPage<object>.GoogleAnalyticsId = ConfigurationManager.AppSettings["GoogleAnalyticsId"];
             iNQUIRE.ApplicationViewPage<object>.FacebookAppId = ConfigurationManager.AppSettings["FacebookAppId"];
@@ -88,7 +89,13 @@ namespace iNQUIRE
             Controllers.DiscoverController.AlwaysShowOpenDeepZoomTouchIcon = Convert.ToBoolean(ConfigurationManager.AppSettings["AlwaysShowOpenDeepZoomTouchIcon"]);
             Controllers.DiscoverController.FacebookShareHashtag = ConfigurationManager.AppSettings["FacebookShareHashtag"];
 
-            Helper.EmailHelper.FromAddress = ConfigurationManager.AppSettings["FromEmailAddress"];
+            
+            Controllers.DiscoverController.SearchDebugParameters = ConfigurationManager.AppSettings["SearchDebugParameters"];
+            Controllers.DiscoverController.SolrDebugParameters = ConfigurationManager.AppSettings["SolrDebugParameters"];
+            Controllers.DiscoverController.IIPDebugParameters = ConfigurationManager.AppSettings["IIPDebugParameters"];
+            Controllers.DiscoverController.DeepZoomDebugParameters = ConfigurationManager.AppSettings["DeepZoomDebugParameters"];
+
+        Helper.EmailHelper.FromAddress = ConfigurationManager.AppSettings["FromEmailAddress"];
             Helper.EmailHelper.Subject = ConfigurationManager.AppSettings["ExportEmailSubject"];
             Helper.EmailHelper.SmtpHost = ConfigurationManager.AppSettings["SMTPHost"];
             var port = ConfigurationManager.AppSettings["SMTPPort"];

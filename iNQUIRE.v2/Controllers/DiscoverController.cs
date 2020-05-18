@@ -41,6 +41,12 @@ namespace iNQUIRE.Controllers
         public static Boolean AlwaysShowOpenDeepZoomTouchIcon { get; set; }
         public static string FacebookShareHashtag { get; set; }
 
+        // public static bool DebugJp2HandlerRequests { get; set; }
+        public static string SearchDebugParameters { get; set; }
+        public static string SolrDebugParameters { get; set; }
+        public static string IIPDebugParameters { get; set; }
+        public static string DeepZoomDebugParameters { get; set; }
+
         private readonly Helper.IJP2Helper _IJP2Helper;
         private readonly IRepository _IRepository;
         private readonly IUserCollectionRepository<Workspace, WorkspaceItem, string> _IUserCollectionRepository;
@@ -171,18 +177,18 @@ namespace iNQUIRE.Controllers
 
         public ActionResult Test()
         {
-            if (HandlerHelper.DebugJp2HandlerRequests)
+            if (JP2ConfigHelper.DebugJp2HandlerRequests)
             {
-                ViewBag.ViewerUrl = HandlerHelper.ViewerUri;
-                ViewBag.ResolverUrl = HandlerHelper.ResolverUri;
+                ViewBag.ViewerUrl = JP2ConfigHelper.ViewerUri;
+                ViewBag.ResolverUrl = JP2ConfigHelper.ResolverUri;
                 ViewBag.ReverseProxyUrl = string.Format("{0}{1}", JP2ConfigHelper.ApplicationBaseUri, JP2ConfigHelper.ProxyResolverFile);
                 ViewBag.DeepZoomReverseProxyUrl = string.Format("{0}{1}", JP2ConfigHelper.ApplicationBaseUri, JP2ConfigHelper.DeepZoomViewerFile);
                 ViewBag.SearchUrl = string.Format("{0}Discover/SearchAjax", JP2ConfigHelper.ApplicationBaseUri);
                 ViewBag.SolrUrl = System.Configuration.ConfigurationManager.AppSettings["SolrUri"];
-                ViewBag.SearchDebugParameters = HandlerHelper.SearchDebugParameters;
-                ViewBag.SolrDebugParameters = HandlerHelper.SolrDebugParameters;
-                ViewBag.IIPDebugParameters = HandlerHelper.IIPDebugParameters;
-                ViewBag.DeepZoomDebugParameters = HandlerHelper.DeepZoomDebugParameters;
+                ViewBag.SearchDebugParameters = SearchDebugParameters;
+                ViewBag.SolrDebugParameters = SolrDebugParameters;
+                ViewBag.IIPDebugParameters = IIPDebugParameters;
+                ViewBag.DeepZoomDebugParameters = DeepZoomDebugParameters;
             }
             return View();
         }

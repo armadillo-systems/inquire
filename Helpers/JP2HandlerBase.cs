@@ -23,18 +23,23 @@ namespace iNQUIRE.Helper
 
         public abstract string ProxyFixHTML(string content);
 
-        protected string appBaseUri { get; set; }
+        //protected string appBaseUri { get; set; }
 
-        private string MakeAppBaseUri(HttpContext context)
-        {
-            return string.Format("{0}://{1}:{2}{3}", context.Request.Url.Scheme, context.Request.Url.Host, context.Request.Url.Port, context.Request.FilePath);
-        }
+        //private string MakeAppBaseUri(HttpContext context)
+        //{
+        //    return string.Format("{0}{1}", JP2ConfigHelper.ApplicationBaseUri, context.Request.Url.Host,; // string.Format("{0}://{1}:{2}{3}", context.Request.Url.Scheme, context.Request.Url.Host, context.Request.Url.Port, context.Request.FilePath);
+        //}
 
         public virtual string MakeUri(HttpContext context) 
         {
-            appBaseUri = MakeAppBaseUri(context);
-            string new_uri = context.Request.FilePath.Contains("viewer") ? HandlerHelper.ViewerUri : HandlerHelper.ResolverUri;
-            return context.Request.Url.AbsoluteUri.Replace(appBaseUri, new_uri);
+            // appBaseUri = MakeAppBaseUri(context);
+            string new_uri = context.Request.FilePath.Contains("viewer") ? JP2ConfigHelper.ViewerUri : JP2ConfigHelper.ResolverUri;
+            // var base_uri = JP2ConfigHelper.ApplicationBaseUri;
+
+            // sometimes on a live server, even if the request is https the context.Request.Url.Scheme and AbsoluteUri report http, also can be true on load balances servers
+            // so we can't rely on just replace ApplicationBaseUri with our new_uri (as it won't be found due to the https part of the string)
+
+            return string.Format("{0}{1}", new_uri, context.Request.Url.Query);
         }
 
         /// <summary>
@@ -72,8 +77,8 @@ namespace iNQUIRE.Helper
                 // throw new WebException("moo!");
                 response = (HttpWebResponse)request.GetResponse();
 
-                if (HandlerHelper.DebugJp2HandlerRequests)
-                    LogHelper.StatsLog(null, "JP2HandlerBase.ProcessRequest()", String.Format("Ok, status code: {0} , status desc: {1}, Uri: {2}", response.StatusCode, response.StatusDescription, remoteUrl), null, null);
+                if (JP2ConfigHelper.DebugJp2HandlerRequests)
+                    LogHelper.StatsLog(null, "JP2HandlerBase.ProcessRequest()", String.Format("Ok, Response status code: {0} , Response status desc: {1}, HandlerHelper.ViewerUri: {2}, HandlerHelper.ResolverUri: {3}, ApplicationBaseUri: {4}, context.Request.Url.AbsoluteUri: {5}, Constructed remoteUrl: {6}", (int)response.StatusCode, response.StatusDescription, JP2ConfigHelper.ViewerUri, JP2ConfigHelper.ResolverUri, JP2ConfigHelper.ApplicationBaseUri, context.Request.Url.AbsoluteUri, remoteUrl), null, null);
             }
             catch (WebException ex)
             {
@@ -88,7 +93,7 @@ namespace iNQUIRE.Helper
                     status_desc = err_response.StatusDescription;
                 }
 
-                LogHelper.StatsLog(null, "JP2HandlerBase.ProcessRequest()", String.Format("Failed, Response status code: {0} , Response status desc: {1}, WebExceptionMessage: {2}, HandlerHelper.ViewerUri: {3}, HandlerHelper.ResolverUri: {4}, context.Request.Url.AbsoluteUri: {5}, Constructed remoteUrl: {6}", status_code, status_desc, ex.Message, HandlerHelper.ViewerUri, HandlerHelper.ResolverUri, context.Request.Url.AbsoluteUri, remoteUrl), null, null);
+                LogHelper.StatsLog(null, "JP2HandlerBase.ProcessRequest()", String.Format("Failed, Response status code: {0} , Response status desc: {1}, WebExceptionMessage: {2}, HandlerHelper.ViewerUri: {3}, HandlerHelper.ResolverUri: {4}, ApplicationBaseUri: {5}, context.Request.Url.AbsoluteUri: {6}, Constructed remoteUrl: {7}", status_code, status_desc, ex.Message, JP2ConfigHelper.ViewerUri, JP2ConfigHelper.ResolverUri, JP2ConfigHelper.ApplicationBaseUri, context.Request.Url.AbsoluteUri, remoteUrl), null, null);
 
                 context.Response.StatusCode = status_code;
                 context.Response.StatusDescription = status_desc ;
