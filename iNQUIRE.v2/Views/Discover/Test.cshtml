@@ -9,90 +9,93 @@
     <div class="col-md-12">
         <div id="test-page">
             <div data-bind="visible: error, text: error"></div>
-            <div>
-                <h3>Search</h3>
-                <span data-bind="text: testSearchUrl"></span><br />
-                <input class="form-control" style="width: 500px;" data-bind="textInput: searchDebugParameters">
+            
+            <div data-bind="visible: !error()">
                 <div>
+                    <h3>Search</h3>
+                    <span data-bind="text: testSearchUrl"></span><br />
+                    <input class="form-control" style="width: 500px;" data-bind="textInput: searchDebugParameters">
                     <div>
-                        <a data-bind="attr: { href: testSearchUrl() }" target="_blank">Click here to test in your browser.</a> (Client Browser -> iNQUIRE Server [Reverse Proxy] -> Solr Server). This should return Json data.
+                        <div>
+                            <a data-bind="attr: { href: testSearchUrl() }" target="_blank">Click here to test in your browser.</a> (Client Browser -> iNQUIRE Server [Reverse Proxy] -> Solr Server). This should return Json data.
+                        </div>
                     </div>
                 </div>
-            </div>
-            <br />
+                <br />
 
-            <div>
-                <h3>Solr Search</h3>
-                <span data-bind="text: testSolrUrl"></span><br />
-                <div><input class="form-control" style="width: 500px;" data-bind="textInput: solrDebugParameters"></div>
                 <div>
-                    <button data-bind="click: function () { testUrl(testSolrUrl(), solrTestInProgress, 1); }, enable: !testInProgress()">Test On Server (iNQUIRE Server -> Solr Server)</button>
-                    <div data-bind="visible: solrTestInProgress" class="loader" id="loader-1"></div>
-                </div>
-                <pre data-bind="text: ko.toJSON(solrTestResult, null, 2)"></pre>
-                <div>
-                    <div><a data-bind="attr: { href: testSolrUrl() }" target="_blank">Click here to test in your browser.</a> (Client Browser -> Solr Server). This should return Json data.</div>
-                    This Url <strong>is not required</strong> to work from a client browser (eg if your Solr Server is not public internet facing), but it must work on the iNQUIRE server.
-                </div>
-
-            </div>
-            <br />
-
-
-            <div>
-                <h3>Image Service</h3>
-                <span data-bind="text: testReverseProxyUrl"></span><br />
-                <div><input class="form-control" style="width: 500px;" data-bind="textInput: iipDebugParameters"></div>
-                <div>
-                    <div><a data-bind="attr: { href: testReverseProxyUrl() }" target="_blank">Click here to test in your browser.</a> (Client Browser -> iNQUIRE Server IIP Image Handler [Reverse Proxy] -> IIP Image Server). This should return an image.</div>
-                </div>
-
-            </div>
-            <br />
-            <div>
-                <h3>DeepZoom Image Service</h3>
-                <span data-bind="text: testDeepZoomReverseProxyUrl"></span><br />
-                <input class="form-control" style="width: 500px;" data-bind="textInput: deepZoomDebugParameters">
-                <div>
-                    <a data-bind="attr: { href: testDeepZoomReverseProxyUrl() }" target="_blank">Click here to test in your browser.</a> (Client Browser -> iNQUIRE Server DeepZoom Handler [Reverse Proxy] -> IIP Image Server). This should return an image.
+                    <h3>Solr Search</h3>
+                    <span data-bind="text: testSolrUrl"></span><br />
+                    <div><input class="form-control" style="width: 500px;" data-bind="textInput: solrDebugParameters"></div>
+                    <div>
+                        <button data-bind="click: function () { testUrl(testSolrUrl(), solrTestInProgress, 1); }, enable: !testInProgress()">Test On Server (iNQUIRE Server -> Solr Server)</button>
+                        <div data-bind="visible: solrTestInProgress" class="loader" id="loader-1"></div>
+                    </div>
+                    <pre data-bind="text: ko.toJSON(solrTestResult, null, 2)"></pre>
+                    <div>
+                        <div><a data-bind="attr: { href: testSolrUrl() }" target="_blank">Click here to test in your browser.</a> (Client Browser -> Solr Server). This should return Json data.</div>
+                        This Url <strong>is not required</strong> to work from a client browser (eg if your Solr Server is not public internet facing), but it must work on the iNQUIRE server.
+                    </div>
 
                 </div>
-            </div>
-            <br />
-            <div>
-                <h3>IIP Image Server</h3>
-                <span data-bind="text: testResolverUrl"></span><br />
-                <div><input class="form-control" style="width: 500px;" data-bind="textInput: iipDebugParameters"></div>
-                <button data-bind="click: function () { testUrl(testResolverUrl(), iipTestInProgress, 0); }, enable: !testInProgress()">
-                    Test On Server (iNQUIRE Server -> IIP Image Server)
-                </button>
-                <div data-bind="visible: iipTestInProgress" class="loader" id="loader-1"></div>
-                <pre data-bind="text: ko.toJSON(iipTestResult, null, 2)"></pre>
-                <div>
-                    <div><a data-bind="attr: { href: testResolverUrl() }" target="_blank">Click here to test in your browser.</a> (Client Browser -> IIP Image Server). This should return an image.</div>
-                    This Url <strong>is not required</strong> to work from a client browser (eg if your image server is not public internet facing), but it must work on the iNQUIRE server.
-                </div>
-            </div>
-            <br />
+                <br />
 
-            <div>
-                <h3>Database</h3>
-                <button data-bind="click: testDatabase, enable: !testInProgress()">
-                    Test Database (iNQUIRE Server -> Database)
-                </button>
-                <div data-bind="visible: dbTestInProgress" class="loader" id="loader-1"></div>
-                <pre data-bind="text: ko.toJSON(dbTestResult, null, 2)"></pre>
-            </div>
-            <br />
 
-            <div>
-                <h3>View Log</h3>
                 <div>
-                    <a data-bind="attr: { href: logUrl() }" target="_blank">Click here to view the iNQUIRE error log in your browser.</a>
-                    <div>For better readability copy and paste in to an advanced text editor and replace instances of /r/n with linebreaks.</div>
+                    <h3>Image Service</h3>
+                    <span data-bind="text: testReverseProxyUrl"></span><br />
+                    <div><input class="form-control" style="width: 500px;" data-bind="textInput: iipDebugParameters"></div>
+                    <div>
+                        <div><a data-bind="attr: { href: testReverseProxyUrl() }" target="_blank">Click here to test in your browser.</a> (Client Browser -> iNQUIRE Server IIP Image Handler [Reverse Proxy] -> IIP Image Server). This should return an image.</div>
+                    </div>
+
                 </div>
+                <br />
+                <div>
+                    <h3>DeepZoom Image Service</h3>
+                    <span data-bind="text: testDeepZoomReverseProxyUrl"></span><br />
+                    <input class="form-control" style="width: 500px;" data-bind="textInput: deepZoomDebugParameters">
+                    <div>
+                        <a data-bind="attr: { href: testDeepZoomReverseProxyUrl() }" target="_blank">Click here to test in your browser.</a> (Client Browser -> iNQUIRE Server DeepZoom Handler [Reverse Proxy] -> IIP Image Server). This should return an image.
+
+                    </div>
+                </div>
+                <br />
+                <div>
+                    <h3>IIP Image Server</h3>
+                    <span data-bind="text: testResolverUrl"></span><br />
+                    <div><input class="form-control" style="width: 500px;" data-bind="textInput: iipDebugParameters"></div>
+                    <button data-bind="click: function () { testUrl(testResolverUrl(), iipTestInProgress, 0); }, enable: !testInProgress()">
+                        Test On Server (iNQUIRE Server -> IIP Image Server)
+                    </button>
+                    <div data-bind="visible: iipTestInProgress" class="loader" id="loader-1"></div>
+                    <pre data-bind="text: ko.toJSON(iipTestResult, null, 2)"></pre>
+                    <div>
+                        <div><a data-bind="attr: { href: testResolverUrl() }" target="_blank">Click here to test in your browser.</a> (Client Browser -> IIP Image Server). This should return an image.</div>
+                        This Url <strong>is not required</strong> to work from a client browser (eg if your image server is not public internet facing), but it must work on the iNQUIRE server.
+                    </div>
+                </div>
+                <br />
+
+                <div>
+                    <h3>Database</h3>
+                    <button data-bind="click: testDatabase, enable: !testInProgress()">
+                        Test Database (iNQUIRE Server -> Database)
+                    </button>
+                    <div data-bind="visible: dbTestInProgress" class="loader" id="loader-1"></div>
+                    <pre data-bind="text: ko.toJSON(dbTestResult, null, 2)"></pre>
+                </div>
+                <br />
+
+                <div>
+                    <h3>View Log</h3>
+                    <div>
+                        <a data-bind="attr: { href: logUrl() }" target="_blank">Click here to view the iNQUIRE error log in your browser.</a>
+                        <div>For better readability copy and paste in to an advanced text editor and replace instances of /r/n with linebreaks.</div>
+                    </div>
+                </div>
+                <br />
             </div>
-            <br />
         </div>
     </div>
 </div>
