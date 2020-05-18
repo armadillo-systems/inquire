@@ -723,6 +723,7 @@
     <Content Include="Views\Shared\_Facebook.cshtml" />
     <Content Include="Views\Shared\_GoogleAnalytics.cshtml" />
     <Content Include="Views\Shared\_HeaderJS.cshtml" />
+    <Content Include="Views\Discover\Test.cshtml" />
     <None Include="Web.armserv.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

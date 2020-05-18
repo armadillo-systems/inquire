@@ -17,6 +17,8 @@ using Facebook;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using System.Reflection;
+using Newtonsoft.Json.Linq;
+using System.Text;
 
 namespace iNQUIRE.Controllers
 {
@@ -164,6 +166,24 @@ namespace iNQUIRE.Controllers
 
         public ActionResult SocialMedia()
         {
+            return View();
+        }
+
+        public ActionResult Test()
+        {
+            if (HandlerHelper.DebugJp2HandlerRequests)
+            {
+                ViewBag.ViewerUrl = HandlerHelper.ViewerUri;
+                ViewBag.ResolverUrl = HandlerHelper.ResolverUri;
+                ViewBag.ReverseProxyUrl = string.Format("{0}{1}", JP2ConfigHelper.ApplicationBaseUri, JP2ConfigHelper.ProxyResolverFile);
+                ViewBag.DeepZoomReverseProxyUrl = string.Format("{0}{1}", JP2ConfigHelper.ApplicationBaseUri, JP2ConfigHelper.DeepZoomViewerFile);
+                ViewBag.SearchUrl = string.Format("{0}Discover/SearchAjax", JP2ConfigHelper.ApplicationBaseUri);
+                ViewBag.SolrUrl = System.Configuration.ConfigurationManager.AppSettings["SolrUri"];
+                ViewBag.SearchDebugParameters = HandlerHelper.SearchDebugParameters;
+                ViewBag.SolrDebugParameters = HandlerHelper.SolrDebugParameters;
+                ViewBag.IIPDebugParameters = HandlerHelper.IIPDebugParameters;
+                ViewBag.DeepZoomDebugParameters = HandlerHelper.DeepZoomDebugParameters;
+            }
             return View();
         }
 
@@ -617,7 +637,7 @@ namespace iNQUIRE.Controllers
                         if (!JP2HelperBase.IsAudioOrVideo(k.File) && !String.IsNullOrEmpty(ImageHelper.ImageFilenameAppend) && !k.File.EndsWith(ImageHelper.ImageFilenameAppend))
                             k.File = string.Format("{0}{1}", k.File, ImageHelper.ImageFilenameAppend);
 
-                        if (k.File.Contains(ImageHelper.Jpeg2000Namespace)) // file is a jpeg2000 image
+                        if (k.File.ToLower().Contains(ImageHelper.Jpeg2000Namespace.ToLower())) // file is a jpeg2000 image
                         {
                             var md_str = _IJP2Helper.GetJpeg2000Metadata(k.File, false);
                             md_str = md_str.Replace(@"\", @"\\");
@@ -1052,6 +1072,113 @@ namespace iNQUIRE.Controllers
         //    //Results = Xml Server.MapPath(@"~\App_Data\" + _appDataXml); // jpeg2000s.xml
         //    return Json(sb.ToString(), JsonRequestBehavior.AllowGet);
         //}
+
+
+        public ActionResult TestDatabase()
+        {
+            var result = new JObject();
+
+            try
+            {
+                using (var db = new iNQUIRELiteDataContext())
+                {
+                    var db_exists = db.DatabaseExists();
+                    System.Data.Common.DbConnectionStringBuilder builder = new System.Data.Common.DbConnectionStringBuilder();
+                    builder.ConnectionString = db.Connection.ConnectionString;
+                    result.Add("Server", builder["Data Source"] as string);
+                    result.Add("Database", builder["Initial Catalog"] as string);
+                    result.Add("Result", db.DatabaseExists() ? "OK" : "Failed to connect");
+                }
+            }
+            catch (Exception e)
+            {
+                result.Add("Error", e.Message);
+            }
+
+            return Content(result.ToString(), "application/json");
+        }
+
+        [HttpPost]
+        public ActionResult TestUrl(string url)
+        {
+            HttpWebResponse response;
+            var result = new JObject();
+
+            try
+            {
+                var request = (HttpWebRequest)WebRequest.Create(url);
+                response = (HttpWebResponse)request.GetResponse();
+                result.Add("StatusCode", (int)response.StatusCode);
+                result.Add("StatusDescription", response.StatusDescription);
+            }
+            catch (WebException ex)
+            {
+                //remote url not found, log an error and send 404 to client 
+                var err_response = ex.Response != null ? (HttpWebResponse)ex.Response : null;
+                var status_code = 404;
+                var status_desc = "No response";
+
+                if (err_response != null)
+                {
+                    status_code = (int)err_response.StatusCode;
+                    status_desc = err_response.StatusDescription;
+                }
+
+                LogHelper.StatsLog(null, "DiscoverController.TestUrl()", String.Format("Failed, Response status code: {0} , Response status desc: {1}, WebExceptionMessage: {2}, Url: {3}", status_code, status_desc, ex.Message, url), null, null);
+
+                result.Add("Error", ex.Message);
+                result.Add("StatusCode", status_code);
+                result.Add("StatusDescription", status_desc);
+                return Json(result, JsonRequestBehavior.AllowGet);
+            }
+
+            using (Stream receiveStream = response.GetResponseStream())
+            {
+                if (receiveStream != null)
+                {
+                    //if ((response.ContentType.ToLower().IndexOf("html") >= 0) ||
+                    //    (response.ContentType.ToLower().IndexOf("javascript") >= 0))
+                    //{
+                        //this response is HTML Content, so we must parse it
+                        using (var readStream = new StreamReader(receiveStream, Encoding.Default))
+                        {
+                            string content = readStream.ReadToEnd();// HandlerHelper.ParseHtmlResponse(readStream.ReadToEnd(), "");
+                            result.Add("Data", content);
+                        }
+                    //}
+                    //else
+                    //{
+                    //    //the response is not HTML Content
+
+                    //    if (IIPImageIIS.IIPImageHandler.IsJpeg(remoteUrl))
+                    //        context.Response.ContentType = "image/jpeg";
+
+                    //    if (IsJson(remoteUrl))
+                    //    {
+                    //        context.Response.ContentType = "application/json";
+                    //        context.Response.ContentEncoding = Encoding.UTF8;
+                    //    }
+
+                    //    var buff = new byte[1024];
+                    //    int bytes;
+                    //    while ((bytes = receiveStream.Read(buff, 0, 1024)) > 0)
+                    //    {
+                    //        //Write the stream directly to the client 
+                    //        context.Response.OutputStream.Write(buff, 0, bytes);
+                    //    }
+                    //}
+                }
+            }
+
+            response.Close();
+            return Content(result.ToString(), "application/json");
+        }
+
+
+        public ActionResult GetLog(int month, int year)
+        {
+            return Json(LogHelper.GetLog(month, year), JsonRequestBehavior.AllowGet);
+        }
     }
 
 #if XML

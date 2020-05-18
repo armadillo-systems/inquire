@@ -11,7 +11,12 @@ namespace iNQUIRE.Helper
         public static string ResolverUri = ConfigurationManager.AppSettings["ResolverUri"];
         public static string ViewerUri = ConfigurationManager.AppSettings["ViewerUri"];
         public static int TileSize = Convert.ToInt32(ConfigurationManager.AppSettings["TileSize"]);
+
         public static bool DebugJp2HandlerRequests = Convert.ToBoolean(ConfigurationManager.AppSettings["DebugJp2HandlerRequests"]);
+        public static string SearchDebugParameters = ConfigurationManager.AppSettings["SearchDebugParameters"];
+        public static string SolrDebugParameters = ConfigurationManager.AppSettings["SolrDebugParameters"];
+        public static string IIPDebugParameters = ConfigurationManager.AppSettings["IIPDebugParameters"];
+        public static string DeepZoomDebugParameters = ConfigurationManager.AppSettings["DeepZoomDebugParameters"];
 
         /// <summary>
         /// Get the remote URL to call

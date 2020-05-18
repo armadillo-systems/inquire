@@ -6,6 +6,8 @@ namespace iNQUIRE.Helper
 {
     public static class LogHelper
     {
+        private static readonly object _locker = new Object();
+        public static string ErrorLogFileName { get; set; }
         public static string LogFileDirectory { get; set; }
 
         public static Guid ApplicationID { get; set; }
@@ -27,6 +29,58 @@ namespace iNQUIRE.Helper
         {
             get { return _isLogStatsEnabledCsv; }
             set { _isLogStatsEnabledCsv = value; }
+        }
+
+
+        static LogHelper()
+        {
+            ErrorLogFileName = "inquire.csv";
+        }
+
+        /// <summary>
+        /// Returns the log for the current month
+        /// </summary>
+        /// <returns></returns>
+        public static string GetLog()
+        {
+            return GetLog(DateTime.Now);
+        }
+
+        public static string GetLog(int month, int year)
+        {
+            var dt = new DateTime(year, month, 1);
+            return GetLog(dt);
+        }
+
+        public static string GetLog(DateTime dt)
+        {
+            lock (_locker)
+            {
+                var file = MakeLogFileFullPath(dt);
+                if (File.Exists(file))
+                    return File.ReadAllText(file);
+                else
+                    return string.Format("Could not find file {0}", file);
+            }
+        }
+
+        private static string MakeLogFileFullPath(DateTime dt)
+        {
+            var filename = GetLogFileNameFromMonthAndYear(dt);
+            return string.Format("{0}{1}{2}", LogFileDirectory, Path.DirectorySeparatorChar, filename);
+        }
+
+        private static string GetLogFileNameFromMonthAndYear(DateTime dt)
+        {
+            string cur_month = dt.Month.ToString();
+            string cur_year = dt.Year.ToString();
+
+            if (cur_month.Length == 1)
+                cur_month = "0" + cur_month;
+
+            var file = Path.GetFileNameWithoutExtension(ErrorLogFileName);
+            var ext = Path.GetExtension(ErrorLogFileName);
+            return string.Format(@"{0}_{1}{2}{3}", file, cur_month, cur_year, ext);
         }
 
         public static void StatsLog(Guid? object_id, String object_name, String event_type, String value1, String value2)
@@ -52,14 +106,8 @@ namespace iNQUIRE.Helper
                     try
                     {
                         // break logs down in to monthly to avoid file appends to giant files
-                        DateTime cur_date = DateTime.Now;
-                        string cur_month = cur_date.Month.ToString();
-                        string cur_year = cur_date.Year.ToString();
-
-                        if (cur_month.Length == 1)
-                            cur_month = "0" + cur_month;
-
-                        string filename = String.Format(@"{0}{1}{2}.csv", LogFileDirectory, cur_month, cur_year);
+                        var cur_date = DateTime.Now;
+                        var filename = MakeLogFileFullPath(cur_date);
 
                         if (File.Exists(filename) == false)
                             File.AppendAllText(filename, "Date;Time;ApplicationID;ObjectID;ObjectName;EventType;Value1;Value2\r\n");
@@ -99,7 +147,10 @@ namespace iNQUIRE.Helper
                         sb.Append("\"");
                         sb.Append("\r\n");
 
-                        File.AppendAllText(filename, sb.ToString());
+                        lock (_locker)
+                        {
+                            File.AppendAllText(filename, sb.ToString());
+                        }
                     }
                     catch (Exception ex)
                     {

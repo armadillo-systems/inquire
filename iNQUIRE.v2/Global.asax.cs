@@ -44,6 +44,7 @@ namespace iNQUIRE
 
 
             Console.WriteLine("Application_Start()");
+            Helper.LogHelper.ErrorLogFileName = ConfigurationManager.AppSettings["ErrorLogFile"];
             Helper.LogHelper.LogFileDirectory = ConfigurationManager.AppSettings["LogFileDirectory"];
 
             ImageHelper.DjatokaHome = ConfigurationManager.AppSettings["DjatokaHome"];
