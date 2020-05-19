@@ -1,0 +1,68 @@
+<script type="text/javascript">
+        function IsFieldNullOrEmpty(obj) {
+            return !((obj) && (obj.toString().length > 0));
+        }
+
+        var _gvm = {
+            fbLoaded: ko.observable(false),
+            fbAccessToken: ko.observable('')
+        };
+
+        _gvm.fbConnected = ko.computed(function () {
+            return !IsFieldNullOrEmpty(this.fbAccessToken());
+        }, _gvm);
+</script>
+
+@if (ViewBag.Facebook)
+{
+    <div id="fb-root"></div>
+    <script type="text/javascript">
+            window.fbAsyncInit = function () {
+                FB.init({
+                    appId: '@ViewBag.FacebookAppId', // App ID
+                    status: true, // check login status
+                    cookie: true, // enable cookies to allow the server to access the session
+                    xfbml: true  // parse XFBML
+                });
+
+                function fbCheckLoginStatus() {
+                    FB.getLoginStatus(function (response) {
+                        // alert('fbCheckLoginStatus: ' + response.status);
+                        var t = '';
+                        if (response.status == 'connected')
+                            t = response.authResponse.accessToken;
+                        _gvm.fbAccessToken(t);
+                    });
+                }
+
+                fbCheckLoginStatus(); /*@* check on page load/refresh, as might already be logged in, event below only triggered on login/logout button click *@*/
+
+                FB.Event.subscribe('auth.authResponseChange', function (response) {
+                    // alert('auth.authResponseChange');
+                    var t = '';
+                    if (response.status === 'connected') {
+                        // alert('fb connected');
+                        t = response.authResponse.accessToken;
+                    } else if (response.status === 'not_authorized') {
+                        // the user is logged in to Facebook,
+                        // but has not authenticated your app
+                        alert('Please update your Facebook account to authorise iNQUIRE');
+                    } else {
+                        // the user isn't logged in to Facebook.
+                    }
+                    _gvm.fbAccessToken(t);
+                });
+
+                _gvm.fbLoaded(true);
+            };
+
+            // Load the SDK Asynchronously
+            (function (d) {
+                var js, id = 'facebook-jssdk', ref = d.getElementsByTagName('script')[0];
+                if (d.getElementById(id)) { return; }
+                js = d.createElement('script'); js.id = id; js.async = true;
+                js.src = "//connect.facebook.net/en_US/all.js";
+                ref.parentNode.insertBefore(js, ref);
+            } (document));
+    </script>
+}

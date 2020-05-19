@@ -84,6 +84,7 @@ namespace iNQUIRE.Helper
 
                     using (var resStream = response.GetResponseStream())
                     {
+                        // throw new Exception("test");
                         int count = 0;
                         var sb = new StringBuilder();
                         var buf = new byte[8192];
@@ -106,7 +107,7 @@ namespace iNQUIRE.Helper
                 }
                 catch (Exception ex)
                 {
-                    LogHelper.StatsLog(null, "ReadJpeg2000Metadata()", String.Format("Failed for id{0}: , Message: {1}, Uri: {2}", id, ex.Message, metadata_uri), null, null);
+                    LogHelper.StatsLog(null, "ReadJpeg2000Metadata()", String.Format("Failed for id {0}: , Message: {1}, Uri: {2}", id, ex.Message, metadata_uri), null, null);
                     throw new Exception("Couldn't get JPEG2000 Metadata", ex);
                 }
             }

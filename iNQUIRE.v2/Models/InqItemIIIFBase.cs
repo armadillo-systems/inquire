@@ -10,6 +10,12 @@ namespace iNQUIRE.Models
     {
         // can use following to check for derived IIIF classes: if (r.GetType().IsSubclassOf(typeof(InqItemIIIFBase)))
 
+        public override string File
+        {
+            get { return IIIFImageRoot; }
+            set { }
+        }
+
         [SolrField("IIIF-Manifest")]
         public string IIIFManifest { get; set; }
 
@@ -20,18 +26,10 @@ namespace iNQUIRE.Models
         public string IIIFImageRoot { get; set; }
 
         [SolrField("Width")]
-        public Int32 Width { get; set; }
+        public override Int32 Width { get; set; }
 
         [SolrField("Height")]
-        public Int32 Height { get; set; }
-
-        public double AspectRatio
-        {
-            get
-            {
-                return (double)Width / Height;
-            }
-        }
+        public override Int32 Height { get; set; }
 
         public virtual string GetImageUri(int max_w, int max_h)
         {

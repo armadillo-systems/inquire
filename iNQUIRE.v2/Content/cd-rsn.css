@@ -1,4 +1,6 @@
-﻿/*rgb(225, 225, 225);*/
+﻿/* used when */
+/*rgb(225, 225, 225);*/
+/* line can be removed if this file not found, it's custom css settings */
 .nav-desc {
   display: none; }
 
@@ -10,13 +12,13 @@ ul, ol, li {
   margin: 0; }
 
 .glyphicon {
-  font-size: 1.6rem; }
+  font-size: 1.4rem; }
 
 .fa {
-  font-size: 2.2rem; }
+  font-size: 2rem; }
 
 .result-option-selected {
-  background: #ff7e66; }
+  background: #AACC45; }
 
 /* -------------------------------- 
 
@@ -30,9 +32,9 @@ html {
   font-size: 62.5%; }
 
 body {
-  font-size: 1.6rem;
-  font-family: "Roboto", sans-serif;
-  color: #3e454c;
+  font-size: 1.4rem;
+  font-family: "Roboto Condensed", sans-serif;
+  color: #AACC45;
   background-color: #ffffff; }
 
 body::after {
@@ -45,8 +47,8 @@ a {
   text-decoration: none; }
 
 input {
-  font-family: "Roboto", sans-serif;
-  font-size: 1.6rem; }
+  font-family: "Roboto Condensed", sans-serif;
+  font-size: 1.4rem; }
 
 input[type="search"]::-webkit-search-decoration,
 input[type="search"]::-webkit-search-cancel-button,
@@ -65,7 +67,7 @@ Main Page Content
 .cd-main-content .content-wrapper h1 {
   text-align: center;
   padding: 3em 0;
-  font-size: 2rem; }
+  font-size: 1.8rem; }
 
 .cd-main-content::before {
   /* never visible - used to check MQ in jQuery */
@@ -75,10 +77,10 @@ Main Page Content
 @media only screen and (min-width: 768px) {
   .cd-main-content .content-wrapper {
     margin-left: 230px;
-    padding-top: 60px; }
+    padding-top: 120px; }
   .cd-main-content .content-wrapper h1 {
     padding: 4em 0;
-    font-size: 3.2rem;
+    font-size: 2.8rem;
     font-weight: 300; }
   .cd-main-content::before {
     content: 'tablet'; } }
@@ -101,14 +103,14 @@ Header
   z-index: 10;
   top: 0;
   left: 0;
-  height: 100px;
+  height: 165px;
   width: 100%; }
 
 .cd-main-header {
   z-index: 2;
-  height: 55px;
+  height: 120px;
   width: 100%;
-  background: #3e454c;
+  background: #AACC45;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale; }
@@ -119,11 +121,12 @@ Header
   display: table; }
 
 .cd-logo {
-  color: #fff;
+  background-size: cover;
+  color: #AACC45;
   float: left;
   display: block;
   margin: 8px 0 0 5%;
-  background: url(images/inquire_34x40.png) no-repeat 0 0;
+  background: url("") no-repeat 0 0;
   width: 34px;
   height: 40px; }
 
@@ -135,7 +138,7 @@ Header
 
 @media only screen and (min-width: 768px) {
   #cd-header-wrapper {
-    height: 55px; }
+    height: 120px; }
   .cd-logo {
     margin: 8px 0 0 20px; }
   .cd-logo #cd-logo-text {
@@ -143,8 +146,9 @@ Header
 
 @media only screen and (min-width: 1170px) {
   .cd-logo {
+    background-size: cover;
     margin: 12px 0 0 20px;
-    background: url(images/inquire_120x32.png) no-repeat 0 0;
+    background: url("") no-repeat 0 0;
     width: 120px;
     height: 32px; } }
 
@@ -300,7 +304,7 @@ Header
     border: none;
     /*padding-left: 2.6em;*/
     border-radius: 0;
-    background-color: #3e454c;
+    background-color: #AACC45;
     color: #ffffff;
     border: solid 1px #fff; }
   .cd-search input::-webkit-input-placeholder {
@@ -311,6 +315,10 @@ Header
     color: #777c81; }
   .cd-search input:-ms-input-placeholder {
     color: #777c81; } }
+
+@media only screen and (min-width: 768px) {
+  .cd-search {
+    padding-top: 80px; } }
 
 @media only screen and (min-width: 1170px) {
   .cd-search {
@@ -325,7 +333,8 @@ Top Navigation
   .cd-nav {
     display: block;
     float: right;
-    height: 100%; } }
+    height: 100%;
+    padding-top: 75px; } }
 
 /*.cd-top-nav > li > a::before {
 
@@ -334,6 +343,21 @@ Top Navigation
 .cd-top-nav > li a {
   padding: 1em 5% !important;
 }*/
+#cd-top-lang {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: block; }
+
+#cd-top-lang li {
+  display: inline;
+  list-style-type: none;
+  padding-right: 10px;
+  float: none; }
+
+#cd-top-lang a, a:visited, a:hover, a:active {
+  color: inherit; }
+
 .cd-top-nav {
   height: 45px;
   width: 100%;
@@ -341,7 +365,7 @@ Top Navigation
 
 .cd-top-nav a, .cd-top-nav .recordset-nav {
   display: block;
-  font-size: 1.4rem;
+  font-size: 1.2rem;
   color: #ffffff; }
 
 .cd-top-nav a, .cd-top-nav a:hover, .cd-top-nav a:visited {
@@ -356,7 +380,7 @@ Top Navigation
   margin-right: 0; }
 
 .cd-top-nav > li a {
-  padding: 1em .6em !important; }
+  padding: 0.2em 0.6em !important; }
 
 .cd-top-nav img {
   display: block; }
@@ -368,7 +392,7 @@ Top Navigation
 .cd-top-nav .has-children > a {
   height: 100%;
   padding: 0 calc(1.8em + 22px) 0 calc(1.8em + 26px) !important;
-  line-height: 55px; }
+  line-height: 120px; }
 
 .cd-top-nav .has-children > a::after {
   display: block;
@@ -393,7 +417,7 @@ Top Navigation
 
 @media only screen and (min-width: 768px) {
   .cd-top-nav {
-    background: #3e454c; }
+    background: #AACC45; }
   .cd-top-nav > li {
     margin-right: 1em; } }
 
@@ -407,15 +431,15 @@ Sidebar
 
 -------------------------------- */
 .cd-side-nav {
-  font-size: 1.6rem;
-  font-family: "Roboto", sans-serif;
+  font-size: 1.4rem;
+  font-family: "Roboto Condensed", sans-serif;
   position: fixed;
   z-index: 5;
   left: 0;
   top: 0;
   width: 100%;
-  margin: 100px 0 0;
-  background-color: #2c3136;
+  margin: 165px 0 0;
+  background-color: #717c52;
   visibility: hidden;
   opacity: 0;
   max-height: 100vh;
@@ -453,21 +477,25 @@ Sidebar
   text-transform: uppercase;
   font-weight: bold;
   color: #646a6f;
-  font-size: 1rem;
+  font-size: 0.8rem;
   letter-spacing: .1em; }
 
 .cd-side-nav a, .cd-side-nav div {
   position: relative;
   color: #ffffff;
-  font-size: 1.4rem; }
+  font-size: 1.2rem; }
 
 .cd-side-nav a {
-  font-size: 1.4rem;
+  font-size: 1.2rem;
   text-align: center; }
 
 .cd-side-nav div {
-  font-size: 1.2rem;
+  font-size: 1rem;
   text-align: center; }
+
+.cd-side-nav a.keyword {
+  font-size: 1rem;
+  cursor: pointer; }
 
 .cd-side-nav textarea, .cd-side-nav input {
   color: #000; }
@@ -527,11 +555,11 @@ Sidebar
   transform: translateY(-50%);
   right: calc(5% + 16px + 0.4em);
   padding: 0.2em 0.4em;
-  background-color: #ff7e66;
+  background-color: #AACC45;
   border-radius: .25em;
   color: #ffffff;
   font-weight: bold;
-  font-size: 1.2rem;
+  font-size: 1rem;
   text-align: center; }
 
 .cd-side-nav .action-btn a {
@@ -574,17 +602,21 @@ Sidebar
   margin-left: 5px; }
 
 @media only screen and (min-width: 480px) {
+  .cd-main-header, #cd-header-wrapper {
+    height: 55px; }
   #results-children-slider-container {
     max-width: calc(100% - 290px); } }
 
 @media only screen and (min-width: 768px) {
+  .cd-main-header, #cd-header-wrapper {
+    height: 120px; }
   .cd-side-nav div {
     text-align: center; }
   .cd-side-nav {
     position: fixed;
     float: left;
     /*top: auto;*/
-    top: 55px;
+    top: 120px;
     width: 230px;
     min-height: calc(100% - 55px);
     margin-top: 0;
@@ -618,7 +650,7 @@ Sidebar
   .cd-side-nav .active > a {
     /* current page */
     box-shadow: inset 3px 0 0 #1784c7;
-    background-color: #33383e; }
+    background-color: #AACC45; }
   .cd-side-nav .action-btn a {
     margin: 1em 10% 0; }
   .cd-side-nav .count {
@@ -648,7 +680,7 @@ Sidebar
   .cd-side-nav > ul {
     padding: 0; }
   .cd-side-nav > ul > li:not(.action-btn):hover > a {
-    background-color: #33383e; }
+    background-color: #AACC45; }
   .cd-side-nav > ul > li > a {
     padding: 1em 1em 1em 20px;
     /*text-align: left;*/
@@ -729,7 +761,7 @@ Sidebar
   transform: translateY(-50%) rotate(180deg); }
 
 .cd-side-nav .has-children.selected > a {
-  color: #ffd800; }
+  color: #ffffff; }
 
 @media only screen and (min-width: 768px) {
   .has-children {
@@ -753,7 +785,7 @@ Sidebar
   }*/
   .cd-side-nav .has-children.selected > a {
     /* focus state -> show sub pages */
-    background-color: #33383e; } }
+    background-color: #AACC45; } }
 
 @media only screen and (min-width: 1170px) {
   /*.has-children > ul {
@@ -776,3 +808,19 @@ Sidebar
     visibility: visible;
   }*/ }
 
+.cd-side-nav ul.keywords {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  display: inline; }
+
+.cd-side-nav li.keyword {
+  padding: 0;
+  margin: 0;
+  display: inline; }
+
+.cd-side-nav li.keyword + li.keyword::before {
+  content: ",";
+  padding: 0;
+  padding-right: 5px;
+  margin: 0; }

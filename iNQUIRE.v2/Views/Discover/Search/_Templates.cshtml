@@ -74,7 +74,7 @@
                     </div>
 
                      <button type="button" class="btn btn-default" data-bind="click: function() {$root.collectionViewToggle(id)}">
-                         <span data-bind="css : {'fa-caret-down' : visible(), 'fa-caret-up' : !visible()}" class="fa collection-dd-icon"></span>
+                         <span data-bind="css : {'fa-caret-up' : visible(), 'fa-caret-down' : !visible()}" class="fa collection-dd-icon"></span>
                      </button>
                 </div>
                 
@@ -143,11 +143,15 @@
             <!-- /ko -->
             <span> said </span>
             <span data-bind="text: ('&quot;' + Text + '&quot;')"></span>
-            <span class="note-date" data-bind="text: _formatCSharpDateString(LastEdited)"></span>
+            <span class="note-date" data-bind="text: dateFormat(LastEdited)"></span>
 
             <!-- ko if: (_vm.userID == UserID) -->
             <span class="note-rem" data-bind="attr: { 'data-public': PublicNote, 'data-note_id': NoteID }"><i class="fa fa-remove"></i></span>
             <!-- /ko -->
         </div>
     </li>
+</script>
+
+<script id='metadata-keyword-template' type='text/html'>
+    <a data-bind="html: $data, click: $root.keywordClick" class="keyword"></a>
 </script>

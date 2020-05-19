@@ -59,7 +59,8 @@ namespace iNQUIRE
                       "~/Content/cd-rsn.css",
                       "~/Content/cd-3dnav.css",
                       "~/Content/Site2.css",
-                      "~/Content/UserDefined2.css"
+                      "~/Content/UserDefined2.css",
+                      "~/Content/RKD/RKD_Theme.css"
                       // "~/Content/simple-sidebar.css" , "~/Content/materialize/css/materialze.min.css"
                       ));
         }

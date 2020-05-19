@@ -1,18 +1,5 @@
-﻿@import '_cd-header-properties.scss';
-
-$cd-width-sm: 480px;
-$cd-width-md: 768px;
-$cd-width-md-no-button-labels: 990px;
-$cd-width-lg: 1170px;
-$cd-side-nav-width-md: 230px;
-$cd-side-nav-width-lg: 300px;
-$cd-side-nav-bg: #2c3136; /*rgb(225, 225, 225);*/
-$cd-side-nav-border: rgb(200, 200, 200) solid 1px;
-$cd-font-size: 1.6rem;
-$cd-font-family: "Roboto", sans-serif;
-$bg-highlight-colour: #ff7e66;
-
-$bg-colour-main: #3e454c;
+﻿@import '_cd-properties.scss';
+@import 'RKD/_rkd-cd-properties.scss'; /* line can be removed if this file not found, it's custom css settings */
 
 .nav-desc {
     display: none;
@@ -28,11 +15,11 @@ ul, ol, li {
 }
 
 .glyphicon {
-    font-size: 1.6rem;
+    font-size: $cd-font-size;
 }
 
 .fa {
-    font-size: 2.2rem;
+    font-size: $cd-font-size + 0.6;
 }
 
 .result-option-selected {
@@ -91,9 +78,9 @@ Main Page Content
 }
 
 .cd-main-content .content-wrapper h1 {
-  text-align: center;
-  padding: 3em 0;
-  font-size: 2rem;
+    text-align: center;
+    padding: 3em 0;
+    font-size: $cd-font-size + 0.4;
 }
 .cd-main-content::before {
   /* never visible - used to check MQ in jQuery */
@@ -105,13 +92,13 @@ Main Page Content
 
   .cd-main-content .content-wrapper {
     margin-left: $cd-side-nav-width-md;
-    padding-top: 60px;
+    padding-top: $cd-main-header-h;
   }
-  .cd-main-content .content-wrapper h1 {
-    padding: 4em 0;
-    font-size: 3.2rem;
-    font-weight: 300;
-  }
+    .cd-main-content .content-wrapper h1 {
+        padding: 4em 0;
+        font-size: $cd-font-size * 2;
+        font-weight: 300;
+    }
   .cd-main-content::before {
     content: 'tablet';
   }
@@ -145,14 +132,15 @@ Header
 }
 
 .cd-main-header {
-  z-index: 2;
-  height: $cd-main-header-h;
-  width: 100%;
-  background: $bg-colour-main;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+    z-index: 2;
+    height: $cd-main-header-h;
+    width: 100%;
+    background: $bg-colour-main;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
+
 .cd-main-header::after {
   clear: both;
   content: "";
@@ -160,13 +148,14 @@ Header
 }
 
 .cd-logo {
-  color: #fff;
-  float: left;
-  display: block;
-  margin: 8px 0 0 5%;
-  background: url(images/inquire_34x40.png) no-repeat 0 0;
-  width: 34px;
-  height: 40px;
+    background-size: cover;
+    color: $bg-highlight-colour;
+    float: left;
+    display: block;
+    margin: 8px 0 0 5%;
+    background: $cd-logo-sm no-repeat 0 0;
+    width: 34px;
+    height: 40px;
 }
 
 .cd-logo #cd-logo-text {
@@ -193,8 +182,9 @@ Header
 @media only screen and (min-width: $cd-width-lg) {
 
   .cd-logo {
+      background-size:cover;
       margin: 12px 0 0 20px;
-      background: url(images/inquire_120x32.png) no-repeat 0 0;
+      background: $cd-logo-lg no-repeat 0 0;
       width: 120px;
       height: 32px;
   }
@@ -378,6 +368,12 @@ Header
   }
 }
 
+@media only screen and (min-width: $cd-width-md) {
+    .cd-search {
+        padding-top: $cd-search-padding-top;
+    }
+}
+
 @media only screen and (min-width: $cd-width-lg) {
   .cd-search {
     width: 300px;
@@ -391,11 +387,12 @@ Top Navigation
 -------------------------------- */
 
 @media only screen and (min-width: $cd-width-md) {
-  .cd-nav {
-    display: block;
-    float: right;
-    height: 100%;
-  }
+    .cd-nav {
+        display: block;
+        float: right;
+        height: 100%;
+        padding-top: $cd-top-nav-padding-top;
+    }
 }
 
 /*.cd-top-nav > li > a::before {
@@ -406,6 +403,24 @@ Top Navigation
   padding: 1em 5% !important;
 }*/
 
+#cd-top-lang {
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: block;
+}
+
+#cd-top-lang li {
+    display: inline;
+    list-style-type: none;
+    padding-right: 10px;
+    float: none;
+}
+
+#cd-top-lang a, a:visited, a:hover, a:active {
+    color: inherit;
+}
+
 
 .cd-top-nav {
     height: $cd-sub-header-h;
@@ -415,7 +430,7 @@ Top Navigation
 
 .cd-top-nav a, .cd-top-nav .recordset-nav {
     display: block;
-    font-size: 1.4rem;
+    font-size: $cd-font-size - 0.2;
     color: #ffffff;
 }
 
@@ -432,7 +447,7 @@ Top Navigation
     margin-right: 0;
 }
 .cd-top-nav > li a {
-    padding: 1em .6em !important;
+    padding: $cd-top-nav-button-padding .6em !important;
 }
 
 .cd-top-nav img {
@@ -535,27 +550,32 @@ Sidebar
   padding: 1em 5%;
 }
 .cd-side-nav .cd-label {
-  text-transform: uppercase;
-  font-weight: bold;
-  color: #646a6f;
-  font-size: 1rem;
-  letter-spacing: .1em;
+    text-transform: uppercase;
+    font-weight: bold;
+    color: #646a6f;
+    font-size: $cd-font-size - 0.6;
+    letter-spacing: .1em;
 }
 .cd-side-nav a, .cd-side-nav div {
-  position: relative;
-  color: #ffffff;
-  font-size: 1.4rem;
+    position: relative;
+    color: #ffffff;
+    font-size: $cd-font-size - 0.2;
 }
 
-  .cd-side-nav a {
-    font-size: 1.4rem;
+.cd-side-nav a {
+    font-size: $cd-font-size - 0.2;
     text-align: center;
-  }
+}
 
-  .cd-side-nav div {
-    font-size: 1.2rem;
+.cd-side-nav div {
+    font-size: $cd-font-size - 0.4;
     text-align: center;
-  }
+}
+
+.cd-side-nav a.keyword {
+    font-size: $cd-font-size - 0.4;
+    cursor: pointer;
+}
 
   .cd-side-nav textarea, .cd-side-nav input {
       color: #000;
@@ -607,23 +627,23 @@ Sidebar
 }*/
 
 .cd-side-nav .count {
-  /* notification badge */
-  position: absolute;
-  top: 50%;
-  bottom: auto;
-  -webkit-transform: translateY(-50%);
-  -moz-transform: translateY(-50%);
-  -ms-transform: translateY(-50%);
-  -o-transform: translateY(-50%);
-  transform: translateY(-50%);
-  right: calc(5% + 16px + 0.4em);
-  padding: 0.2em 0.4em;
-  background-color: $bg-highlight-colour;
-  border-radius: .25em;
-  color: #ffffff;
-  font-weight: bold;
-  font-size: 1.2rem;
-  text-align: center;
+    /* notification badge */
+    position: absolute;
+    top: 50%;
+    bottom: auto;
+    -webkit-transform: translateY(-50%);
+    -moz-transform: translateY(-50%);
+    -ms-transform: translateY(-50%);
+    -o-transform: translateY(-50%);
+    transform: translateY(-50%);
+    right: calc(5% + 16px + 0.4em);
+    padding: 0.2em 0.4em;
+    background-color: $bg-highlight-colour;
+    border-radius: .25em;
+    color: #ffffff;
+    font-weight: bold;
+    font-size: $cd-font-size - 0.4;
+    text-align: center;
 }
 .cd-side-nav .action-btn a {
   display: block;
@@ -672,12 +692,20 @@ Sidebar
 }
 
 @media only screen and (min-width: $cd-width-sm) {
+ .cd-main-header,  #cd-header-wrapper {
+        height: $cd-main-header-h-sm;
+    }
+
     #results-children-slider-container {
         max-width: calc(100% - 290px);
     }
 }
 
 @media only screen and (min-width: $cd-width-md) {
+    .cd-main-header, #cd-header-wrapper {
+        height: $cd-main-header-h;
+    }
+
       .cd-side-nav div {
           text-align: center;
       }
@@ -733,7 +761,7 @@ Sidebar
       .cd-side-nav .active > a {
         /* current page */
         box-shadow: inset 3px 0 0 #1784c7;
-        background-color: #33383e;
+        background-color: $cd-side-nav-bg-selected;
       }
       .cd-side-nav .action-btn a {
         margin: 1em 10% 0;
@@ -773,7 +801,7 @@ Sidebar
         padding: 0;
       }
       .cd-side-nav > ul > li:not(.action-btn):hover > a {
-        background-color: #33383e;
+        background-color: $cd-side-nav-bg-selected;
       }
       .cd-side-nav > ul > li > a {
         padding: 1em 1em 1em 20px;
@@ -869,7 +897,7 @@ Sidebar
 }
 
 .cd-side-nav .has-children.selected > a {
-    color: #ffd800;
+    color: $cd-side-nav-children-selected;
 }
 
 @media only screen and (min-width: $cd-width-md) {
@@ -902,7 +930,7 @@ Sidebar
 
   .cd-side-nav .has-children.selected > a {
     /* focus state -> show sub pages */
-    background-color: #33383e;
+    background-color: $cd-side-nav-bg-selected;
   }
 }
 @media only screen and (min-width: $cd-width-lg) {
@@ -932,3 +960,25 @@ Sidebar
     visibility: visible;
   }*/
 }
+
+.cd-side-nav ul.keywords {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    display: inline;
+}
+
+
+.cd-side-nav li.keyword {
+    padding: 0;
+    margin: 0;
+    display: inline;
+}
+
+.cd-side-nav li.keyword + li.keyword::before {
+    content: ",";
+    padding: 0;
+    padding-right: 5px;
+    margin: 0;
+}
+

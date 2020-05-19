@@ -23,14 +23,23 @@ namespace iNQUIRE.Helper
 
         public abstract string ProxyFixHTML(string content);
 
-        protected string appBaseUri { get; set; }
+        //protected string appBaseUri { get; set; }
 
-        public virtual string MakeUri(HttpContext context)
+        //private string MakeAppBaseUri(HttpContext context)
+        //{
+        //    return string.Format("{0}{1}", JP2ConfigHelper.ApplicationBaseUri, context.Request.Url.Host,; // string.Format("{0}://{1}:{2}{3}", context.Request.Url.Scheme, context.Request.Url.Host, context.Request.Url.Port, context.Request.FilePath);
+        //}
+
+        public virtual string MakeUri(HttpContext context) 
         {
-            appBaseUri = string.Format("http://{0}{1}", context.Request.Url.Host, context.Request.FilePath);
+            // appBaseUri = MakeAppBaseUri(context);
+            string new_uri = context.Request.FilePath.Contains("viewer") ? JP2ConfigHelper.ViewerUri : JP2ConfigHelper.ResolverUri;
+            // var base_uri = JP2ConfigHelper.ApplicationBaseUri;
 
-            string new_uri = context.Request.FilePath.Contains("viewer") ? HandlerHelper.ViewerUri : HandlerHelper.ResolverUri;
-            return context.Request.Url.AbsoluteUri.Replace(appBaseUri, new_uri);
+            // sometimes on a live server, even if the request is https the context.Request.Url.Scheme and AbsoluteUri report http, also can be true on load balances servers
+            // so we can't rely on just replace ApplicationBaseUri with our new_uri (as it won't be found due to the https part of the string)
+
+            return string.Format("{0}{1}", new_uri, context.Request.Url.Query);
         }
 
         /// <summary>
@@ -39,27 +48,56 @@ namespace iNQUIRE.Helper
         /// <param name="context">HTTP context for client</param>
         public void ProcessRequest(HttpContext context)
         {
-            var remoteUrl = MakeUri(context);
-
-            var is_json = IsJson(remoteUrl);
-            var is_jpeg = IsJpeg(remoteUrl);
-
-            //create the web request to get the remote stream
-            var request = (HttpWebRequest)WebRequest.Create(remoteUrl);
-
-            //request.Credentials = CredentialCache.DefaultCredentials;
-
+            string remoteUrl = null;
             HttpWebResponse response;
+
             try
             {
+                remoteUrl = MakeUri(context);
+
+                // we've received a Url request and our handler has intercepted the request
+                // and attempted to substitute the viewer/resolver Uri, but we've ended up
+                // with the same Url, if we request it again we will just get stuck in a request loop
+                if (remoteUrl.ToLower().CompareTo(context.Request.Url.AbsoluteUri.ToLower()) == 0)
+                {
+                    var msg = "JP2HandlerBase.ProcessRequest() source and destination Urls are the same";
+                    //var r = new HttpWebResponse(null, null, null)
+                    //{
+                    //    r.StatusCode = 500,
+                    //    r.StatusDescription = "Internal server error"
+                    //};
+                    throw new WebException(msg);
+                }
+
+                //create the web request to get the remote stream
+                var request = (HttpWebRequest)WebRequest.Create(remoteUrl);
+
+                //request.Credentials = CredentialCache.DefaultCredentials;
+
+                // throw new WebException("moo!");
                 response = (HttpWebResponse)request.GetResponse();
+
+                if (JP2ConfigHelper.DebugJp2HandlerRequests)
+                    LogHelper.StatsLog(null, "JP2HandlerBase.ProcessRequest()", String.Format("Ok, Response status code: {0} , Response status desc: {1}, HandlerHelper.ViewerUri: {2}, HandlerHelper.ResolverUri: {3}, ApplicationBaseUri: {4}, context.Request.Url.AbsoluteUri: {5}, Constructed remoteUrl: {6}", (int)response.StatusCode, response.StatusDescription, JP2ConfigHelper.ViewerUri, JP2ConfigHelper.ResolverUri, JP2ConfigHelper.ApplicationBaseUri, context.Request.Url.AbsoluteUri, remoteUrl), null, null);
             }
             catch (WebException ex)
             {
-                //remote url not found, send 404 to client 
-                context.Response.StatusCode = (int)((HttpWebResponse)ex.Response).StatusCode;
-                context.Response.StatusDescription = "Not Found";
-                context.Response.Write("<h2>Page not found</h2>");
+                //remote url not found, log an error and send 404 to client 
+                var err_response = ex.Response != null ? (HttpWebResponse)ex.Response : null;
+                var status_code = 404;
+                var status_desc = "No response";
+
+                if (err_response != null)
+                {
+                    status_code = (int)err_response.StatusCode;
+                    status_desc = err_response.StatusDescription;
+                }
+
+                LogHelper.StatsLog(null, "JP2HandlerBase.ProcessRequest()", String.Format("Failed, Response status code: {0} , Response status desc: {1}, WebExceptionMessage: {2}, HandlerHelper.ViewerUri: {3}, HandlerHelper.ResolverUri: {4}, ApplicationBaseUri: {5}, context.Request.Url.AbsoluteUri: {6}, Constructed remoteUrl: {7}", status_code, status_desc, ex.Message, JP2ConfigHelper.ViewerUri, JP2ConfigHelper.ResolverUri, JP2ConfigHelper.ApplicationBaseUri, context.Request.Url.AbsoluteUri, remoteUrl), null, null);
+
+                context.Response.StatusCode = status_code;
+                context.Response.StatusDescription = status_desc ;
+                context.Response.Write("<h2>Error getting JP2 metadata</h2>");
                 context.Response.End();
                 return;
             }
@@ -86,10 +124,10 @@ namespace iNQUIRE.Helper
                     {
                         //the response is not HTML Content
 
-                        if (is_jpeg)
+                        if (IsJpeg(remoteUrl))
                             context.Response.ContentType = "image/jpeg";
 
-                        if (is_json)
+                        if (IsJson(remoteUrl))
                         {
                             context.Response.ContentType = "application/json";
                             context.Response.ContentEncoding = Encoding.UTF8;

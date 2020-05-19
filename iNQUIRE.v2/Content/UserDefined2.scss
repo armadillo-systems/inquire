@@ -19,7 +19,7 @@ div .result-title-inset {
 {
     overflow-y: hidden;
     /*height: 100%;*/
-    background:transparent url(images/site/bckgd_centre_panel.jpg) repeat 0 0;
+    /*background:transparent url(images/site/bckgd_centre_panel.jpg) repeat 0 0;*/
 }
 
 #results .grid-thumbnail-i-m, #results .grid-thumbnail-i-sm, #results .grid-thumbnail-i-xl
@@ -137,15 +137,3 @@ div .result-title-inset {
         margin-left: 300px;
     }
 }
-
-
-/* found this extra ref in Site.css, not sure what it does
-    @media (min-width: 600px) {
-    .result-list-text{
-        width: 320px;
-        width: calc(100% - 200px);
-        margin-top: 0px;
-        padding-left: 10px;
-    }
-}
-*/

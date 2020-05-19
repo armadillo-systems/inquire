@@ -28,7 +28,7 @@ namespace DjatokaIIS
         {
             var is_img_request = context.Request.Url.Query.Contains("_files/");
             string qs = context.Request.QueryString.ToString();
-            int tile_width = HandlerHelper.TileSize;
+            int tile_width = JP2ConfigHelper.TileSize;
 
             if (!is_img_request)
             {
@@ -164,7 +164,7 @@ namespace DjatokaIIS
 
             var region = string.Format("{0},{1},{2},{2}", y_float, x_float, tile_width); // y_float, x_float, tw);
 
-            return string.Format("{0}?url_ver=Z39.88-2004&{1}&svc_id=info:lanl-repo/svc/getRegion&svc_val_fmt=info:ofi/fmt:kev:mtx:jpeg2000&svc.format=image/jpeg&svc.level={2}&svc.rotate=0&svc.region={3}", HandlerHelper.ResolverUri, id, level, region);
+            return string.Format("{0}?url_ver=Z39.88-2004&{1}&svc_id=info:lanl-repo/svc/getRegion&svc_val_fmt=info:ofi/fmt:kev:mtx:jpeg2000&svc.format=image/jpeg&svc.level={2}&svc.rotate=0&svc.region={3}", JP2ConfigHelper.ResolverUri, id, level, region);
         }
 
         private DziMetaData GetDziMetadata(string id, int tile_width)

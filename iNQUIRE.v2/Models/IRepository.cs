@@ -14,7 +14,7 @@ namespace iNQUIRE.Models
 
         SolrSearchResults Search(SearchQuery query, List<KeyValuePair<string, string>> facets, List<FacetRange> facet_ranges);
         SolrSearchResults GetRecord(string id);
-        SolrSearchResults GetSearchSuggestions(string str);
+        SolrSearchResults GetSearchSuggestions(string lang_id, string str);
 
         bool UpdateFileFieldToJpeg2000(string id, string value);
         // String GetBaseUri(HttpRequestBase req, UrlHelper url_helper);

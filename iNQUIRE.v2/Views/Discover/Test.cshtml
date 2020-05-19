@@ -1,0 +1,295 @@
+﻿@using iNQUIRE.Models
+@model LoginViewModel
+@{
+    ViewBag.Title = "Test Page";
+}
+
+<h2>@ViewBag.Title</h2>
+<div class="row">
+    <div class="col-md-12">
+        <div id="test-page">
+            <div data-bind="visible: error, text: error"></div>
+
+            <div>
+                <h3>Reload Solr Core (fixes search auto suggestions not appearing)</h3>
+                <button data-bind="click: reloadSolrCore, enable: !testInProgress()">
+                    Reload Core (iNQUIRE Server -> Solr Admin)
+                </button>
+                <div data-bind="visible: reloadSolrCoreInProgress" class="loader" id="loader-1"></div>
+                <pre data-bind="text: ko.toJSON(reloadSolrCoreResult, null, 2)"></pre>
+            </div>
+            <br />
+
+            <div data-bind="visible: !error()">
+                <div>
+                    <h3>Search</h3>
+                    <span data-bind="text: testSearchUrl"></span><br />
+                    <input class="form-control" style="width: 500px;" data-bind="textInput: searchDebugParameters">
+                    <div>
+                        <div>
+                            <a data-bind="attr: { href: testSearchUrl() }" target="_blank">Click here to test in your browser.</a> (Client Browser -> iNQUIRE Server [Reverse Proxy] -> Solr Server). This should return Json data.
+                        </div>
+                    </div>
+                </div>
+                <br />
+
+                <div>
+                    <h3>Solr Search</h3>
+                    <span data-bind="text: testSolrUrl"></span><br />
+                    <div><input class="form-control" style="width: 500px;" data-bind="textInput: solrDebugParameters"></div>
+                    <div>
+                        <button data-bind="click: function () { testUrl(testSolrUrl(), solrTestInProgress, 1); }, enable: !testInProgress()">Test On Server (iNQUIRE Server -> Solr Server)</button>
+                        <div data-bind="visible: solrTestInProgress" class="loader" id="loader-1"></div>
+                    </div>
+                    <pre data-bind="text: ko.toJSON(solrTestResult, null, 2)"></pre>
+                    <div>
+                        <div><a data-bind="attr: { href: testSolrUrl() }" target="_blank">Click here to test in your browser.</a> (Client Browser -> Solr Server). This should return Json data.</div>
+                        This Url <strong>is not required</strong> to work from a client browser (eg if your Solr Server is not public internet facing), but it must work on the iNQUIRE server.
+                    </div>
+
+                </div>
+                <br />
+
+
+                <div>
+                    <h3>Image Service</h3>
+                    <span data-bind="text: testReverseProxyUrl"></span><br />
+                    <div><input class="form-control" style="width: 500px;" data-bind="textInput: iipDebugParameters"></div>
+                    <div>
+                        <div><a data-bind="attr: { href: testReverseProxyUrl() }" target="_blank">Click here to test in your browser.</a> (Client Browser -> iNQUIRE Server IIP Image Handler [Reverse Proxy] -> IIP Image Server). This should return an image.</div>
+                    </div>
+
+                </div>
+                <br />
+                <div>
+                    <h3>DeepZoom Image Service</h3>
+                    <span data-bind="text: testDeepZoomReverseProxyUrl"></span><br />
+                    <input class="form-control" style="width: 500px;" data-bind="textInput: deepZoomDebugParameters">
+                    <div>
+                        <a data-bind="attr: { href: testDeepZoomReverseProxyUrl() }" target="_blank">Click here to test in your browser.</a> (Client Browser -> iNQUIRE Server DeepZoom Handler [Reverse Proxy] -> IIP Image Server). This should return an image.
+
+                    </div>
+                </div>
+                <br />
+                <div>
+                    <h3>IIP Image Server</h3>
+                    <span data-bind="text: testResolverUrl"></span><br />
+                    <div><input class="form-control" style="width: 500px;" data-bind="textInput: iipDebugParameters"></div>
+                    <button data-bind="click: function () { testUrl(testResolverUrl(), iipTestInProgress, 0); }, enable: !testInProgress()">
+                        Test On Server (iNQUIRE Server -> IIP Image Server)
+                    </button>
+                    <div data-bind="visible: iipTestInProgress" class="loader" id="loader-1"></div>
+                    <pre data-bind="text: ko.toJSON(iipTestResult, null, 2)"></pre>
+                    <div>
+                        <div><a data-bind="attr: { href: testResolverUrl() }" target="_blank">Click here to test in your browser.</a> (Client Browser -> IIP Image Server). This should return an image.</div>
+                        This Url <strong>is not required</strong> to work from a client browser (eg if your image server is not public internet facing), but it must work on the iNQUIRE server.
+                    </div>
+                </div>
+                <br />
+
+                <div>
+                    <h3>Database</h3>
+                    <button data-bind="click: testDatabase, enable: !testInProgress()">
+                        Test Database (iNQUIRE Server -> Database)
+                    </button>
+                    <div data-bind="visible: dbTestInProgress" class="loader" id="loader-1"></div>
+                    <pre data-bind="text: ko.toJSON(dbTestResult, null, 2)"></pre>
+                </div>
+                <br />
+
+                <div>
+                    <h3>View Log</h3>
+                    <div>
+                        <a data-bind="attr: { href: logUrl() }" target="_blank">Click here to view the iNQUIRE error log in your browser.</a>
+                        <div>For better readability copy and paste in to an advanced text editor and replace instances of /r/n with linebreaks.</div>
+                    </div>
+                </div>
+                <br />
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
+
+    <script type="text/javascript">
+    function TestPageViewModel() {
+
+        var self = this;
+
+        self.adminPage = true;
+        self.error = ko.observable('@ViewBag.Error');
+        self.viewerUrl = '@ViewBag.ViewerUrl';
+        self.resolverUrl = '@ViewBag.ResolverUrl';
+        self.reverseProxyUrl = '@ViewBag.ReverseProxyUrl';
+        self.deepZoomReverseProxyUrl = '@ViewBag.DeepZoomReverseProxyUrl';
+        self.searchUrl = '@ViewBag.SearchUrl';
+        self.solrUrl = '@ViewBag.SolrUrl';
+        
+        self.searchTestInProgress = ko.observable(false);
+        self.solrTestInProgress = ko.observable(false);
+        self.iipTestInProgress = ko.observable(false);
+        self.deepZoomTestInProgress = ko.observable(false);
+        self.dbTestInProgress = ko.observable(false);
+        self.reloadSolrCoreInProgress = ko.observable(false);
+
+        self.solrTestResult = ko.observable();
+        self.iipTestResult = ko.observable();
+        self.dbTestResult = ko.observable();
+        self.reloadSolrCoreResult = ko.observable();
+
+        self.searchDebugParameters = ko.observable('@Html.Raw(ViewBag.SearchDebugParameters)');
+        self.solrDebugParameters = ko.observable('@Html.Raw(ViewBag.SolrDebugParameters)');
+        self.iipDebugParameters = ko.observable('@Html.Raw(ViewBag.IIPDebugParameters)');
+        self.deepZoomDebugParameters = ko.observable('@Html.Raw(ViewBag.DeepZoomDebugParameters)');
+
+        var d = new Date();
+        self.logUrl = ko.observable('@Url.Content("~/Discover/GetLog")' + '?month=' +  (d.getMonth() + 1) + '&year=' + d.getFullYear());
+        //self.testUrl = ko.observable(self.resolverUrl + self.iipDebugParameters);
+
+        self.testInProgress = ko.pureComputed(function () {
+            return self.searchTestInProgress() || self.solrTestInProgress() || self.iipTestInProgress() || self.deepZoomTestInProgress() || self.dbTestInProgress();
+        }, self).extend({ rateLimit: 100 });
+
+        self.testReverseProxyUrl = ko.pureComputed(function () {
+            return self.reverseProxyUrl + '?' + self.iipDebugParameters();
+        }, self).extend({ rateLimit: 100 });
+
+        self.testResolverUrl = ko.pureComputed(function () {
+            return self.resolverUrl + '?' + self.iipDebugParameters();
+        }, self).extend({ rateLimit: 100 });
+
+        self.testDeepZoomReverseProxyUrl = ko.pureComputed(function () {
+            return self.deepZoomReverseProxyUrl + '?' + self.deepZoomDebugParameters();
+        }, self).extend({ rateLimit: 100 });
+
+        self.testSearchUrl = ko.pureComputed(function () {
+            return self.searchUrl + '?' + self.searchDebugParameters();
+        }, self).extend({ rateLimit: 100 });
+
+        self.testSolrUrl = ko.pureComputed(function () {
+            return self.solrUrl + self.solrDebugParameters();
+        }, self).extend({ rateLimit: 100 });
+
+        self.testReverseProxyClick = function (data) {
+            if (!self.testInProgress()) {
+                self.testUrl(self.reverseProxyUrl());
+            }
+        }
+
+        self.testResolverClick = function (data) {
+            if (!self.testInProgress()) {
+                self.testUrl(self.resolverUrl());
+            }
+        }
+
+        self.testUrl = function (test_url, test_in_progress, is_solr) {
+            if (!self.testInProgress()) {
+                test_in_progress(true);
+                var url = '@Url.Content("~/Discover/TestUrl/")';
+                var fail;
+                // test_url = JSON.stringify(test_url);
+                var d = { 'url': encodeURI(test_url) }
+
+                if (is_solr === 1)
+                    self.solrTestResult("");
+                else
+                    self.iipTestResult("");
+
+                $.ajax({
+                    method: 'POST',
+                    url: url,
+                    dataType: 'JSON',
+                    contentType: 'application/json',
+                    data: JSON.stringify(d)
+                })
+                    .done(function (data) {
+                        //self.networkTestResult(data);
+                        if (is_solr === 1)
+                            self.solrTestResult(data);
+                        else
+                            self.iipTestResult(data);
+                    })
+                    .fail(function () {
+                        fail = 'Server error /Discover/TestUrl/';
+                    })
+                    .always(function () {
+                        if (fail) {
+                            alert('Error testing url: ' + test_url + ' ' + fail);
+                        }
+                        test_in_progress(false);
+                    });
+            }
+        };
+
+        self.testDatabase = function () {
+            if (!self.testInProgress()) {
+                self.dbTestInProgress(true);
+                var url = '@Url.Content("~/Discover/TestDatabase/")';
+                var fail;
+                self.dbTestResult("");
+
+                $.ajax({
+                    method: 'GET',
+                    url: url,
+                    dataType: 'JSON',
+                    contentType: 'application/json'
+                })
+                    .done(function (data) {
+                        self.dbTestResult(data);
+                    })
+                    .fail(function () {
+                        fail = 'Server error /Discover/TestDatabase/';
+                    })
+                    .always(function () {
+                        if (fail) {
+                            alert('Error testing database: ' + fail);
+                        }
+                        self.dbTestInProgress(false);
+                    });
+            }
+        };
+
+
+        self.reloadSolrCore = function () {
+            if (!self.testInProgress()) {
+                self.reloadSolrCoreInProgress(true);
+                var url = '@Url.Content("~/Discover/ReloadSolrCore/")';
+                var fail;
+                self.reloadSolrCoreResult("");
+
+                $.ajax({
+                    method: 'GET',
+                    url: url,
+                    dataType: 'JSON',
+                    contentType: 'application/json'
+                })
+                    .done(function (data) {
+                        self.reloadSolrCoreResult(data);
+                    })
+                    .fail(function () {
+                        fail = 'Server error /Discover/ReloadSolrCore/';
+                    })
+                    .always(function () {
+                        if (fail) {
+                            alert('Error reloading Solr core: ' + fail);
+                        }
+                        self.reloadSolrCoreInProgress(false);
+                    });
+            }
+        };
+    }
+
+    var _pageVm;
+
+        window.onload = function () {
+            setupPage();
+    };
+
+    function setupPage(dirs) {
+        _pageVm = new TestPageViewModel();
+        ko.applyBindings(_pageVm, document.getElementById('test-page'));
+    }
+    </script>

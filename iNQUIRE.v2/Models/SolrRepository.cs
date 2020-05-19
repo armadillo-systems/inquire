@@ -13,6 +13,7 @@ using iNQUIRE.Helpers;
 using SolrNet;
 using SolrNet.Commands.Parameters;
 using Microsoft.Practices.ServiceLocation;
+using SolrNet.Impl;
 
 namespace iNQUIRE.Models
 {
@@ -26,13 +27,13 @@ namespace iNQUIRE.Models
 
         public static List<KeyValuePair<string, bool>> HyperlinkFields { get; set; }
         
-        private static ISolrOperations<InqItemBodIIIF> _solr;
-        private static ISolrOperations<InqItemBodIIIF> Solr
+        private static ISolrOperations<InqItemRKD> _solr;
+        private static ISolrOperations<InqItemRKD> Solr
         {
             get
             {
                 if (_solr == null)
-                    _solr = ServiceLocator.Current.GetInstance<ISolrOperations<InqItemBodIIIF>>();
+                    _solr = ServiceLocator.Current.GetInstance<ISolrOperations<InqItemRKD>>();
 
                 return _solr;
             }
@@ -45,6 +46,7 @@ namespace iNQUIRE.Models
         public string ObjectIdFieldName { get; set; }
         public string ParentIdFieldName { get; set; }
         public string ServerRootDirectory { get; set; }
+        public string DefaultSolrSearchField { get; set; }
 
         protected string _solrUri;
         protected string _solrIdField;
@@ -56,12 +58,13 @@ namespace iNQUIRE.Models
             AppDataXml = ConfigurationManager.AppSettings["XmlDataFile"];
             ObjectIdFieldName = ConfigurationManager.AppSettings["ObjectIdFieldName"];
             ParentIdFieldName = ConfigurationManager.AppSettings["ParentIdFieldName"];
+            DefaultSolrSearchField = "text_";
         }
 
-        protected string makeSolrTerm(string term, List<string> ids)
+        protected string makeSolrTerm(string lang_id, string term, List<string> ids)
         {
             if (!String.IsNullOrEmpty(term))
-                return term; // search for "term" in the default field
+                return MakeSolrSearchTerm(lang_id, term); // search for "term" in the relevant language field (usually text_[country_code])
 
             if ((ids != null) && ids.Count > 0)
             {
@@ -81,7 +84,12 @@ namespace iNQUIRE.Models
                 return sb.ToString(); // String.Format("{0}:", _solrIdField) + string.Join(" ", ids.ToArray());
             }
 
-            return "*:*";
+            return MakeSolrSearchTerm(lang_id, "*"); //"*:*";
+        }
+
+        public string MakeSolrSearchTerm(string lang_id, string term)
+        {
+            return term.Contains(":") ? term : string.Format("{0}{1}:{2}", DefaultSolrSearchField, lang_id, term);
         }
 
         public void Load()
@@ -123,11 +131,19 @@ namespace iNQUIRE.Models
         // public abstract SolrSearchResults GetRecord(string id);
         // public abstract SolrSearchResults GetSearchSuggestions(string str);
 
+        public virtual bool ReloadCore()
+        {
+            //var headerParser = ServiceLocator.Current.GetInstance<ISolrHeaderResponseParser>();
+            //var statusParser = ServiceLocator.Current.GetInstance<ISolrStatusResponseParser>();
+            //ISolrCoreAdmin solrCoreAdmin = new SolrCoreAdmin(new SolrConnection(_solrUri), headerParser, statusParser);
+            //solrCoreAdmin.Reload("core1");
+            throw new Exception("Not implemented yet.");
+        }
 
         public virtual SolrSearchResults Search(SearchQuery query, List<KeyValuePair<string, string>> facets, List<FacetRange> facet_ranges)
         {
             // string solr_term = (ids.Count > 0) ? String.Format("{0}:^", _solrIdField) : makeSolrTerm(term, ids);
-            string solr_term = makeSolrTerm(query.Term, query.IDs);
+            string solr_term = makeSolrTerm(query.LanguageID, query.Term, query.IDs);
 
             //if (String.IsNullOrEmpty(query.ParentID))
             //    solr_term = String.Format("{0} AND -{1}:[* TO *]", solr_term, ParentIdFieldName);
@@ -306,26 +322,29 @@ namespace iNQUIRE.Models
         {
             // var solr = ServiceLocator.Current.GetInstance<ISolrOperations<InqItemArmNode>>();
             // var solr = ServiceLocator.Current.GetInstance<ISolrOperations<InqItemBod>>();
-            var results = Solr.Query(new SolrQuery(String.Format("{0}:{1}", ObjectIdFieldName, id)), new QueryOptions { Rows = 1, Start = 0 });
+            var results = Solr.Query(new SolrQuery(string.Format("{0}:{1}", ObjectIdFieldName, id)), new QueryOptions { Rows = 1, Start = 0 });
             return makeSolrSearchResults(results);
         }
 
-        public SolrSearchResults GetSearchSuggestions(string str)
+        public SolrSearchResults GetSearchSuggestions(string lang_id, string str)
         {
             // var solr = ServiceLocator.Current.GetInstance<ISolrOperations<InqItemArmNode>>();
             // var solr = ServiceLocator.Current.GetInstance<ISolrOperations<InqItemBod>>();
-            var results = Solr.Query(new SolrQuery(str), new QueryOptions { SpellCheck = new SpellCheckingParameters { } });
+            var q = new SolrQuery(MakeSolrSearchTerm(lang_id, str));
+            var sc = new SpellCheckingParameters { };
+            sc.Dictionary = string.Format("suggest_{0}", lang_id);
+            var results = Solr.Query(q, new QueryOptions { SpellCheck = sc });
             return makeSolrSearchResults(results);
         }
 
-        protected SolrSearchResults makeSolrSearchResults(SolrQueryResults<InqItemBodIIIF> results)
+        protected SolrSearchResults makeSolrSearchResults(SolrQueryResults<InqItemRKD> results)
         //protected SolrSearchResults makeSolrSearchResults(SolrQueryResults<InqItemArmNode> results)
         // protected SolrSearchResults makeSolrSearchResults(SolrQueryResults<InqItemBase> results)
         {
             return makeSolrSearchResults(results, new List<KeyValuePair<string, string>>(), new List<FacetRange>());
         }
 
-        protected SolrSearchResults makeSolrSearchResults(SolrQueryResults<InqItemBodIIIF> results, List<KeyValuePair<string, string>> facets, List<FacetRange> facet_ranges)
+        protected SolrSearchResults makeSolrSearchResults(SolrQueryResults<InqItemRKD> results, List<KeyValuePair<string, string>> facets, List<FacetRange> facet_ranges)
         //protected SolrSearchResults makeSolrSearchResults(SolrQueryResults<InqItemArmNode> results, List<KeyValuePair<string, string>> facets, List<FacetRange> facet_ranges)
         // protected SolrSearchResults makeSolrSearchResults(SolrQueryResults<InqItemBase> results, List<KeyValuePair<string, string>> facets, List<FacetRange> facet_ranges)
         {

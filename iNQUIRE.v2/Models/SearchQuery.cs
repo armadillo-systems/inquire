@@ -50,13 +50,14 @@ namespace iNQUIRE.Models
         // public SortedDictionary<string, List<string>> FacetConstraintsDictionary { get; set; }
 
         public string UserID { get; set; }
+        public string LanguageID { get; set; }
 
         public string DisplayName { get; set; }
         public DateTime Date { get; set; }
 
         public SearchQuery() { }
 
-        public SearchQuery(string user_id, string term, string collection_ids, int rows, int row_start, string parent_id, string sort_orders, string facet_constraints)
+        public SearchQuery(string user_id, string term, string collection_ids, int rows, int row_start, string parent_id, string sort_orders, string facet_constraints, string lang_id)
         {
             if (String.IsNullOrEmpty(term) && (String.IsNullOrEmpty(facet_constraints)) && (String.IsNullOrEmpty(parent_id)))
                 Empty = true;
@@ -69,6 +70,7 @@ namespace iNQUIRE.Models
             else
                 UserID = user_id;
 
+            LanguageID = lang_id;
             Term = term;
 
             var ids = new string[0];

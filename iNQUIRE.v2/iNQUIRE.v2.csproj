@@ -45,8 +45,71 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DotNetOpenAuth">
-      <HintPath>..\packages\DotNetOpenAuth.3.4.7.11121\lib\DotNetOpenAuth.dll</HintPath>
+    <Reference Include="DotNetOpenAuth.Core, Version=4.3.0.0, Culture=neutral, PublicKeyToken=2780ccd10d57b246, processorArchitecture=MSIL">
+      <HintPath>..\packages\DotNetOpenAuth.Core.4.3.4.13329\lib\net45-full\DotNetOpenAuth.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="DotNetOpenAuth.Core.UI, Version=4.3.0.0, Culture=neutral, PublicKeyToken=2780ccd10d57b246, processorArchitecture=MSIL">
+      <HintPath>..\packages\DotNetOpenAuth.Core.UI.4.3.4.13329\lib\net45-full\DotNetOpenAuth.Core.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="DotNetOpenAuth.InfoCard, Version=4.3.0.0, Culture=neutral, PublicKeyToken=2780ccd10d57b246, processorArchitecture=MSIL">
+      <HintPath>..\packages\DotNetOpenAuth.InfoCard.4.3.4.13329\lib\net45-full\DotNetOpenAuth.InfoCard.dll</HintPath>
+    </Reference>
+    <Reference Include="DotNetOpenAuth.InfoCard.UI, Version=4.3.0.0, Culture=neutral, PublicKeyToken=2780ccd10d57b246, processorArchitecture=MSIL">
+      <HintPath>..\packages\DotNetOpenAuth.InfoCard.UI.4.3.4.13329\lib\net45-full\DotNetOpenAuth.InfoCard.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="DotNetOpenAuth.OAuth, Version=4.3.0.0, Culture=neutral, PublicKeyToken=2780ccd10d57b246, processorArchitecture=MSIL">
+      <HintPath>..\packages\DotNetOpenAuth.OAuth.Core.4.3.4.13329\lib\net45-full\DotNetOpenAuth.OAuth.dll</HintPath>
+    </Reference>
+    <Reference Include="DotNetOpenAuth.OAuth.Common, Version=4.3.0.0, Culture=neutral, PublicKeyToken=2780ccd10d57b246, processorArchitecture=MSIL">
+      <HintPath>..\packages\DotNetOpenAuth.OAuth.Common.4.3.4.13329\lib\net45-full\DotNetOpenAuth.OAuth.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="DotNetOpenAuth.OAuth.Consumer, Version=4.3.0.0, Culture=neutral, PublicKeyToken=2780ccd10d57b246, processorArchitecture=MSIL">
+      <HintPath>..\packages\DotNetOpenAuth.OAuth.Consumer.4.3.4.13329\lib\net45-full\DotNetOpenAuth.OAuth.Consumer.dll</HintPath>
+    </Reference>
+    <Reference Include="DotNetOpenAuth.OAuth.ServiceProvider, Version=4.3.0.0, Culture=neutral, PublicKeyToken=2780ccd10d57b246, processorArchitecture=MSIL">
+      <HintPath>..\packages\DotNetOpenAuth.OAuth.ServiceProvider.4.3.4.13329\lib\net45-full\DotNetOpenAuth.OAuth.ServiceProvider.dll</HintPath>
+    </Reference>
+    <Reference Include="DotNetOpenAuth.OAuth2, Version=4.3.0.0, Culture=neutral, PublicKeyToken=2780ccd10d57b246, processorArchitecture=MSIL">
+      <HintPath>..\packages\DotNetOpenAuth.OAuth2.Core.4.3.4.13329\lib\net45-full\DotNetOpenAuth.OAuth2.dll</HintPath>
+    </Reference>
+    <Reference Include="DotNetOpenAuth.OAuth2.AuthorizationServer, Version=4.3.0.0, Culture=neutral, PublicKeyToken=2780ccd10d57b246, processorArchitecture=MSIL">
+      <HintPath>..\packages\DotNetOpenAuth.OAuth2.AuthorizationServer.4.3.4.13329\lib\net45-full\DotNetOpenAuth.OAuth2.AuthorizationServer.dll</HintPath>
+    </Reference>
+    <Reference Include="DotNetOpenAuth.OAuth2.Client, Version=4.3.0.0, Culture=neutral, PublicKeyToken=2780ccd10d57b246, processorArchitecture=MSIL">
+      <HintPath>..\packages\DotNetOpenAuth.OAuth2.Client.4.3.4.13329\lib\net45-full\DotNetOpenAuth.OAuth2.Client.dll</HintPath>
+    </Reference>
+    <Reference Include="DotNetOpenAuth.OAuth2.Client.UI, Version=4.3.0.0, Culture=neutral, PublicKeyToken=2780ccd10d57b246, processorArchitecture=MSIL">
+      <HintPath>..\packages\DotNetOpenAuth.OAuth2.Client.UI.4.3.4.13329\lib\net45-full\DotNetOpenAuth.OAuth2.Client.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="DotNetOpenAuth.OAuth2.ClientAuthorization, Version=4.3.0.0, Culture=neutral, PublicKeyToken=2780ccd10d57b246, processorArchitecture=MSIL">
+      <HintPath>..\packages\DotNetOpenAuth.OAuth2.ClientAuthorization.4.3.4.13329\lib\net45-full\DotNetOpenAuth.OAuth2.ClientAuthorization.dll</HintPath>
+    </Reference>
+    <Reference Include="DotNetOpenAuth.OAuth2.ResourceServer, Version=4.3.0.0, Culture=neutral, PublicKeyToken=2780ccd10d57b246, processorArchitecture=MSIL">
+      <HintPath>..\packages\DotNetOpenAuth.OAuth2.ResourceServer.4.3.4.13329\lib\net45-full\DotNetOpenAuth.OAuth2.ResourceServer.dll</HintPath>
+    </Reference>
+    <Reference Include="DotNetOpenAuth.OpenId, Version=4.3.0.0, Culture=neutral, PublicKeyToken=2780ccd10d57b246, processorArchitecture=MSIL">
+      <HintPath>..\packages\DotNetOpenAuth.OpenId.Core.4.3.4.13329\lib\net45-full\DotNetOpenAuth.OpenId.dll</HintPath>
+    </Reference>
+    <Reference Include="DotNetOpenAuth.OpenId.Provider, Version=4.3.0.0, Culture=neutral, PublicKeyToken=2780ccd10d57b246, processorArchitecture=MSIL">
+      <HintPath>..\packages\DotNetOpenAuth.OpenId.Provider.4.3.4.13329\lib\net45-full\DotNetOpenAuth.OpenId.Provider.dll</HintPath>
+    </Reference>
+    <Reference Include="DotNetOpenAuth.OpenId.Provider.UI, Version=4.3.0.0, Culture=neutral, PublicKeyToken=2780ccd10d57b246, processorArchitecture=MSIL">
+      <HintPath>..\packages\DotNetOpenAuth.OpenId.Provider.UI.4.3.4.13329\lib\net45-full\DotNetOpenAuth.OpenId.Provider.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="DotNetOpenAuth.OpenId.RelyingParty, Version=4.3.0.0, Culture=neutral, PublicKeyToken=2780ccd10d57b246, processorArchitecture=MSIL">
+      <HintPath>..\packages\DotNetOpenAuth.OpenId.RelyingParty.4.3.4.13329\lib\net45-full\DotNetOpenAuth.OpenId.RelyingParty.dll</HintPath>
+    </Reference>
+    <Reference Include="DotNetOpenAuth.OpenId.RelyingParty.UI, Version=4.3.0.0, Culture=neutral, PublicKeyToken=2780ccd10d57b246, processorArchitecture=MSIL">
+      <HintPath>..\packages\DotNetOpenAuth.OpenId.RelyingParty.UI.4.3.4.13329\lib\net45-full\DotNetOpenAuth.OpenId.RelyingParty.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="DotNetOpenAuth.OpenId.UI, Version=4.3.0.0, Culture=neutral, PublicKeyToken=2780ccd10d57b246, processorArchitecture=MSIL">
+      <HintPath>..\packages\DotNetOpenAuth.OpenId.Core.UI.4.3.4.13329\lib\net45-full\DotNetOpenAuth.OpenId.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="DotNetOpenAuth.OpenIdInfoCard.UI, Version=4.3.0.0, Culture=neutral, PublicKeyToken=2780ccd10d57b246, processorArchitecture=MSIL">
+      <HintPath>..\packages\DotNetOpenAuth.OpenIdInfoCard.UI.4.3.4.13329\lib\net45-full\DotNetOpenAuth.OpenIdInfoCard.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="DotNetOpenAuth.OpenIdOAuth, Version=4.3.0.0, Culture=neutral, PublicKeyToken=2780ccd10d57b246, processorArchitecture=MSIL">
+      <HintPath>..\packages\DotNetOpenAuth.OpenIdOAuth.4.3.4.13329\lib\net45-full\DotNetOpenAuth.OpenIdOAuth.dll</HintPath>
     </Reference>
     <Reference Include="Facebook, Version=6.0.10.0, Culture=neutral, PublicKeyToken=58cb4f2111d1e6de, processorArchitecture=MSIL">
       <HintPath>..\packages\Facebook.7.0.6\lib\net45\Facebook.dll</HintPath>
@@ -70,22 +133,21 @@
       <HintPath>..\packages\ImageResizer.Plugins.DiskCache.3.4.3\lib\ImageResizer.Plugins.DiskCache.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="Microsoft.Owin, Version=4.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Owin.4.0.1\lib\net45\Microsoft.Owin.dll</HintPath>
+    <Reference Include="Microsoft.Owin, Version=4.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.4.1.0\lib\net45\Microsoft.Owin.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Owin.Host.SystemWeb, Version=3.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Microsoft.Owin.Host.SystemWeb.3.0.1\lib\net45\Microsoft.Owin.Host.SystemWeb.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Owin.Security, Version=4.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Owin.Security.4.0.1\lib\net45\Microsoft.Owin.Security.dll</HintPath>
+    <Reference Include="Microsoft.Owin.Security, Version=4.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.Security.4.1.0\lib\net45\Microsoft.Owin.Security.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Owin.Security.Facebook, Version=4.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Owin.Security.Facebook.4.0.1\lib\net45\Microsoft.Owin.Security.Facebook.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Owin.Security.Google, Version=3.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Microsoft.Owin.Security.Google.3.0.1\lib\net45\Microsoft.Owin.Security.Google.dll</HintPath>
+    <Reference Include="Microsoft.Owin.Security.Google, Version=4.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.Security.Google.4.1.0\lib\net45\Microsoft.Owin.Security.Google.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Owin.Security.MicrosoftAccount, Version=3.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -130,7 +192,6 @@
       <HintPath>..\packages\Sendgrid.6.1.0\lib\SendGridMail.dll</HintPath>
     </Reference>
     <Reference Include="SolrNet, Version=0.4.0.4001, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\SolrNet.0.4.0.4001\lib\SolrNet.dll</HintPath>
     </Reference>
     <Reference Include="System" />
@@ -142,6 +203,9 @@
     </Reference>
     <Reference Include="System.Net.Http.Primitives">
       <HintPath>..\packages\Microsoft.Net.Http.2.2.29\lib\net45\System.Net.Http.Primitives.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=4.0.4.1, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.4.5.2\lib\netstandard1.0\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
     </Reference>
     <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
@@ -281,6 +345,8 @@
     <Compile Include="Models\InqItemBase.cs" />
     <Compile Include="Models\InqItemBod.cs" />
     <Compile Include="Models\InqItemIIIFBase.cs" />
+    <Compile Include="Models\InqItemImageMetadataWidthAndHeightBase.cs" />
+    <Compile Include="Models\InqItemRKD.cs" />
     <Compile Include="Models\InqItemXml.cs" />
     <Compile Include="Models\InqItemBodIIIF.cs" />
     <Compile Include="Models\IRepository.cs" />
@@ -309,6 +375,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="banned_words.xml" />
+    <Content Include="changelog.txt" />
     <Content Include="Content\bootstrap-social.css" />
     <Content Include="Content\bootstrap-theme.css" />
     <Content Include="Content\bootstrap-theme.min.css" />
@@ -332,8 +399,8 @@
     <Content Include="Content\images\cd-arrow.svg" />
     <Content Include="Content\images\cd-nav-icons.svg" />
     <Content Include="Content\images\cd-search.svg" />
-    <Content Include="Content\images\inquire_120x32.png" />
-    <Content Include="Content\images\inquire_34x40.png" />
+    <Content Include="Content\images\logo_120x32.png" />
+    <Content Include="Content\images\logo_34x40.png" />
     <Content Include="Content\images\openid-providers-en.png" />
     <Content Include="Content\images\rings_loader_128.gif" />
     <Content Include="Content\images\Seadragon\fullpage_grouphover.png" />
@@ -389,6 +456,8 @@
     <Content Include="Content\jquery-ui.structure.min.css" />
     <Content Include="Content\jquery-ui.theme.css" />
     <Content Include="Content\jquery-ui.theme.min.css" />
+    <Content Include="Content\RKD\logos\RKD_header.jpg" />
+    <Content Include="Content\RKD\logos\RKD_HOOFDLOGO_218x310.jpg" />
     <Content Include="Content\materialize\css\materialize.css" />
     <Content Include="Content\materialize\css\materialize.min.css" />
     <Content Include="Content\materialize\font\material-design-icons\LICENSE.txt" />
@@ -398,7 +467,6 @@
     <Content Include="Content\overlay-apple.css" />
     <Content Include="Content\cd-rsn.scss" />
     <Content Include="Content\cd-3dnav.scss" />
-    <Content Include="App_Data\INQUIRE_Lite.dacpac" />
     <Content Include="ConnectionStrings.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -411,8 +479,62 @@
     <Content Include="ConnectionStrings_empty.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="App_Data\INQUIRE_Lite.bacpac" />
+    <Content Include="App_Data\INQUIRE_Lite.dacpac" />
     <None Include="Content\simple-sidebar.scss" />
     <Content Include="Content\reset.css" />
+    <None Include="Content\RKD\_rkd-cd-properties.scss" />
+    <Content Include="Documentation\css\inquire.css" />
+    <Content Include="Documentation\google-code-prettify\lang-apollo.js" />
+    <Content Include="Documentation\google-code-prettify\lang-clj.js" />
+    <Content Include="Documentation\google-code-prettify\lang-css.js" />
+    <Content Include="Documentation\google-code-prettify\lang-go.js" />
+    <Content Include="Documentation\google-code-prettify\lang-hs.js" />
+    <Content Include="Documentation\google-code-prettify\lang-lisp.js" />
+    <Content Include="Documentation\google-code-prettify\lang-lua.js" />
+    <Content Include="Documentation\google-code-prettify\lang-ml.js" />
+    <Content Include="Documentation\google-code-prettify\lang-n.js" />
+    <Content Include="Documentation\google-code-prettify\lang-proto.js" />
+    <Content Include="Documentation\google-code-prettify\lang-scala.js" />
+    <Content Include="Documentation\google-code-prettify\lang-sql.js" />
+    <Content Include="Documentation\google-code-prettify\lang-tex.js" />
+    <Content Include="Documentation\google-code-prettify\lang-vb.js" />
+    <Content Include="Documentation\google-code-prettify\lang-vhdl.js" />
+    <Content Include="Documentation\google-code-prettify\lang-wiki.js" />
+    <Content Include="Documentation\google-code-prettify\lang-xq.js" />
+    <Content Include="Documentation\google-code-prettify\lang-yaml.js" />
+    <Content Include="Documentation\google-code-prettify\prettify.css" />
+    <Content Include="Documentation\google-code-prettify\prettify.js" />
+    <Content Include="Documentation\html_images\env_var_sys_var.png" />
+    <Content Include="Documentation\html_images\env_var_user_var.png" />
+    <Content Include="Documentation\html_images\iis_install.png" />
+    <Content Include="Documentation\html_images\mvc3_install.png" />
+    <Content Include="Documentation\html_images\sql_server_auth_mode1.png" />
+    <Content Include="Documentation\html_images\sql_server_auth_mode2.png" />
+    <Content Include="Documentation\html_images\sql_server_browser1.png" />
+    <Content Include="Documentation\html_images\sql_server_browser2.png" />
+    <Content Include="Documentation\html_images\sql_server_browser3.png" />
+    <Content Include="Documentation\html_images\sql_server_connect.png" />
+    <Content Include="Documentation\html_images\sql_server_create_user0.png" />
+    <Content Include="Documentation\html_images\sql_server_create_user1.png" />
+    <Content Include="Documentation\html_images\sql_server_create_user2.png" />
+    <Content Include="Documentation\html_images\sql_server_manager.png" />
+    <Content Include="Documentation\html_images\sql_server_restore_inquire_db.png" />
+    <Content Include="Documentation\html_images\sql_server_restore_inquire_db2.png" />
+    <Content Include="Documentation\html_images\tomcat_install1.png" />
+    <Content Include="Documentation\html_images\tomcat_install2.png" />
+    <Content Include="Documentation\html_images\tomcat_install3.png" />
+    <Content Include="Documentation\html_images\tomcat_install4.png" />
+    <Content Include="Documentation\html_images\tomcat_install5.png" />
+    <Content Include="Documentation\html_images\tomcat_install6.png" />
+    <Content Include="Documentation\Install.htm" />
+    <Content Include="RKD_export.xsl" />
+    <Content Include="Content\RKD\_rkd-cd-properties.css">
+      <DependentUpon>_rkd-cd-properties.scss</DependentUpon>
+    </Content>
+    <Content Include="Content\RKD\_rkd-cd-properties.min.css">
+      <DependentUpon>_rkd-cd-properties.css</DependentUpon>
+    </Content>
     <Content Include="Content\simple-sidebar.css">
       <DependentUpon>simple-sidebar.scss</DependentUpon>
     </Content>
@@ -439,8 +561,9 @@
     <Content Include="Content\UserDefined2.min.css">
       <DependentUpon>UserDefined2.css</DependentUpon>
     </Content>
+    <Content Include="Content\RKD\RKD_Theme.css" />
     <Content Include="Content\_cd-header-properties.css">
-      <DependentUpon>_cd-header-properties.scss</DependentUpon>
+      <DependentUpon>_cd-properties.scss</DependentUpon>
     </Content>
     <Content Include="Content\_cd-header-properties.min.css">
       <DependentUpon>_cd-header-properties.css</DependentUpon>
@@ -487,11 +610,11 @@
     <Content Include="Content\bootstrap.css.map" />
     <Content Include="Content\Site.scss" />
     <None Include="compilerconfig.json" />
-    <Content Include="compilerconfig.json.defaults">
+    <None Include="compilerconfig.json.defaults">
       <DependentUpon>compilerconfig.json</DependentUpon>
-    </Content>
+    </None>
     <Content Include="Content\Site2.scss" />
-    <Content Include="Content\_cd-header-properties.scss" />
+    <Content Include="Content\_cd-properties.scss" />
     <Content Include="iNQUIRE_export.xsl">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -561,7 +684,6 @@
     <Content Include="Views\Discover\Search\_ResultTemplates.cshtml" />
     <Content Include="Views\Discover\Search\_SearchBox.cshtml" />
     <Content Include="Views\Discover\Search\_Templates.cshtml" />
-    <Content Include="SolrNet.chm" />
     <Content Include="Views\Discover\Search.cshtml" />
     <Content Include="Views\Discover\Search\_SearchJS.cshtml" />
     <Content Include="Views\Discover\Search\_SearchJSOld.cshtml" />
@@ -597,6 +719,11 @@
     <Content Include="Views\Shared\_LayoutPrint.cshtml" />
     <Content Include="Views\Shared\_Logo.cshtml" />
     <Content Include="Views\Shared\_fbMeta.cshtml" />
+    <Content Include="Views\Shared\_Facebook.cshtml" />
+    <Content Include="Views\Shared\_GoogleAnalytics.cshtml" />
+    <Content Include="Views\Shared\_HeaderJS.cshtml" />
+    <Content Include="Views\Discover\Test.cshtml" />
+    <Content Include="SolrNet.chm" />
     <None Include="Web.armserv.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

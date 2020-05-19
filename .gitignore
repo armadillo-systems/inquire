@@ -217,6 +217,12 @@ Web.armserv.config
 AppSettingsSecrets.config
 ConnectionStrings.config
 
+# Organisation specific styling
+/iNQUIRE.v2/Content/RKD/
+
+# Organisation specific data mapping class, original data -> iNQUIRE fields
+/iNQUIRE.v2/Models/InqItemRKD.cs
+
 # Other files
 /iNQUIRE.v2/changelog.txt
 /iNQUIRE.v2/Todo Aug2015.txt

@@ -14,12 +14,12 @@ namespace IIIFIIS
 
         public override bool IsJpeg(string url)
         {
-            return url.EndsWith(".jpg", StringComparison.CurrentCultureIgnoreCase);
+            return !string.IsNullOrEmpty(url) ? url.EndsWith(".jpg", StringComparison.CurrentCultureIgnoreCase) : false;
         }
 
         public override bool IsJson(string url)
         {
-            return url.EndsWith(".json", StringComparison.CurrentCultureIgnoreCase);
+            return !string.IsNullOrEmpty(url) ? url.EndsWith(".json", StringComparison.CurrentCultureIgnoreCase) : false;
         }
 
         public override string ProxyFixHTML(string content)
@@ -48,7 +48,7 @@ namespace IIIFIIS
             if (rsplit[1].EndsWith("default.jpg", StringComparison.CurrentCultureIgnoreCase))
                 rsplit[1] = rsplit[1].Replace("default.jpg", String.Format("{0}.jpg", IIIFDefaultQuality));
 
-            return string.Format("{0}?IIIF={1}", HandlerHelper.ResolverUri, rsplit[1]);
+            return string.Format("{0}?IIIF={1}", JP2ConfigHelper.ResolverUri, rsplit[1]);
         }
 
     }

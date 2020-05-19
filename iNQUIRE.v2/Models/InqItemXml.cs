@@ -98,22 +98,22 @@ namespace iNQUIRE.Models
 
         public ImageMetadata ImageMetadata { get; set; }
 
-        public XElement ExportXml()
+        public XElement ExportXml(string lang_id = null)
         {
             throw new Exception("Not implemented yet");
         }
 
-        public string ExportRis()
+        public string ExportRis(string lang_id)
         {
             throw new Exception("Not implemented yet");
         }
 
-        public string ExportHtml(string content_id)
+        public string ExportHtml(string content_id, string lang_id)
         {
             throw new Exception("Not implemented yet");
         }
 
-        public string ExportHtmlFields(string content_id)
+        public string ExportHtmlFields(string lang_id)
         {
             throw new Exception("Not implemented yet");
         }

@@ -1,0 +1,12 @@
+body {
+font-family: Tahoma;
+}
+
+section { margin: 0 0 30px 20px; }
+
+img
+{
+    float: none;
+    display: block;
+    margin: 10px 10px 10px 0;
+}

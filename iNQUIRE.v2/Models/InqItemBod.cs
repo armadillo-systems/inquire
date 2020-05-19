@@ -10,11 +10,9 @@ using iNQUIRE.Helpers;
 
 namespace iNQUIRE.Models
 {
-    public class InqItemBod : InqItemBase
+    public class InqItemBod : InqItemImageMetadataWidthAndHeightBase
     {
         #region IInqItem properties implementation
-        public override ImageMetadata ImageMetadata { get; set; }
-
         public override string ID { get { return id; } set { } }
 
         public override string Title
@@ -206,12 +204,14 @@ namespace iNQUIRE.Models
 
         [SolrField("dcterms:publisher")]
         public ICollection<string> dcterms_publisher { get; set; }
+
+        public override string Collection { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
         #endregion
 
 
         #region IInqItem implementation of methods
 
-        public override XElement ExportXml()
+        public override XElement ExportXml(string lang_id = null)
         {
             return new XElement("item",
                                 new XElement("Title", Title),
@@ -222,7 +222,7 @@ namespace iNQUIRE.Models
                                 );
         }
 
-        public override string ExportRis()
+        public override string ExportRis(string lang_id)
         {
             var sb = new StringBuilder(System.Environment.NewLine);
             var ris_type = ox_risType;
@@ -264,7 +264,7 @@ namespace iNQUIRE.Models
             return sb.Append("ER  - ").ToString();
         }
 
-        public override string ExportHtmlFields(string content_id)
+        public override string ExportHtmlFields(string lang_id)
         {
             var html = new StringBuilder();
 

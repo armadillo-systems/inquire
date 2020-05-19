@@ -1,4 +1,5 @@
-﻿@import '_cd-header-properties.scss';
+﻿@import '_cd-properties.scss';
+@import 'RKD/_rkd-cd-properties.scss'; /* line can be removed if this file not found, it's custom css settings */
 
 $cd-3dnav-height: auto;
 
@@ -43,7 +44,7 @@ Main Components
     -o-transform: translateY(80px);
     transform: translateY(80px); }
 
-  @media only screen and (min-width: 768px) {
+  @media only screen and (min-width: $cd-width-md) {
     .cd-header.nav3d-is-visible {
       -webkit-transform: translateY($cd-3dnav-height);
       -moz-transform: translateY($cd-3dnav-height);
@@ -129,7 +130,9 @@ Main Components
   transform: translateY(-100%);
   -webkit-transition: -webkit-transform 0.5s 0s, visibility 0s 0.5s;
   -moz-transition: -moz-transform 0.5s 0s, visibility 0s 0.5s;
-  transition: transform 0.5s 0s, visibility 0s 0.5s; }
+  transition: transform 0.5s 0s, visibility 0s 0.5s;
+
+}
 
   .cd-3d-nav-container.nav3d-is-visible {
     visibility: visible;
@@ -140,14 +143,24 @@ Main Components
     transform: translateY(0);
     -webkit-transition: -webkit-transform 0.5s 0s, visibility 0.5s 0s;
     -moz-transition: -moz-transform 0.5s 0s, visibility 0.5s 0s;
-    transition: transform 0.5s 0s, visibility 0.5s 0s; }
+    transition: transform 0.5s 0s, visibility 0.5s 0s;
 
-  @media only screen and (min-width: 768px) {
+  }
+
+@media only screen and (min-width: $cd-width-sm) {
+    .cd-3d-nav-container {
+        /*height: $cd-3dnav-height;*/
+        top: $cd-main-header-h-sm;
+    }
+}
+
+  @media only screen and (min-width: $cd-width-md) {
     .cd-3d-nav-container {
       height: $cd-3dnav-height;
       top: $cd-main-header-h;
     }
   }
+
 
 .cd-3d-nav {
   /* this is the 3D rotating navigation */
@@ -244,7 +257,7 @@ Main Components
       -moz-transition: opacity 0.5s 0s, visibility 0s 0.5s;
       transition: opacity 0.5s 0s, visibility 0s 0.5s; }
 
-  @media only screen and (min-width: 768px) {
+  @media only screen and (min-width: $cd-width-md) {
     .cd-3d-nav a {
       padding: 7.6em 1em 0;
       color: #ffffff;
@@ -297,7 +310,7 @@ Main Components
     -o-transform: translateY(80px);
     transform: translateY(80px); }
 
-  @media only screen and (min-width: 768px) {
+  @media only screen and (min-width: $cd-width-md) {
     .cd-main-content.nav3d-is-visible {
       -webkit-transform: translateY($cd-3dnav-height);
       -moz-transform: translateY($cd-3dnav-height);

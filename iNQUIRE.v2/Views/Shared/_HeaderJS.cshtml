@@ -1,0 +1,33 @@
+<script type="text/javascript">
+    $(function () {
+        openid.init('openid_identifier');
+        openid.locale = 'en';
+        openid.sprite = 'en'; // reused in german& japan localization
+        openid.demo_text = 'In client demo mode. Normally would have submitted OpenID:';
+        openid.signin_text = 'Sign-In';
+        openid.image_title = 'log in with {provider}';
+
+        var cache = {}, lastXhr;
+        $("#search-term").autocomplete({
+            minLength: 2,
+            close: function(event, ui) { _vm.searchTerm(this.value); }, // need this otherwise for some reason _vm.searchTerm doesn't get the autosuggested word via the data binding, will just be left as whatever the user typed (eg typed "bala" and selected "balaclava")
+            source:  function( request, response ) {
+                var term = request.term;
+                var langid_term = _vm.languageId() + '^^' + term;
+
+                if (langid_term in cache) {
+                    response(cache[langid_term]);
+                    return;
+                }
+
+                lastXhr = $.getJSON('@Url.Content("~/Discover/GetSearchSuggestionsAjax")', { "lang_id": _vm.languageId(), "str": term },
+                    function( data, status, xhr ) {
+                        cache[langid_term] = data;
+                        if (xhr === lastXhr) {
+                            response(data);
+                        }
+                    });
+            }
+        });
+    });
+</script>

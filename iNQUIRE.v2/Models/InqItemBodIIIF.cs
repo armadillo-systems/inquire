@@ -45,11 +45,10 @@ namespace iNQUIRE.Models
         [SolrField("Date")]
         public Int32 DateInt { get; set; }
 
-        public override ImageMetadata ImageMetadata { get; set; }
-
         [SolrField("ParentNodes")]
         public string ParentNode { get; set; }
 
+        // use this to maintain ParentNodes override as a collection, just make the single result in to a collection
         private ICollection<string> _privateNodes;
         public override ICollection<string> ParentNodes {
             get
@@ -67,11 +66,10 @@ namespace iNQUIRE.Models
         [SolrField("ChildNodes")]
         public override ICollection<string> ChildNodes { get; set; }
 
-        public override string File { get; set; }
         public override string Author { get; set; }
         //public override string Description { get; set; }
 
-        public override XElement ExportXml()
+        public override XElement ExportXml(string lang_id = null)
         {
             return new XElement("item",
                                 new XElement("Title", Title),
@@ -82,7 +80,7 @@ namespace iNQUIRE.Models
                                 );
         }
 
-        public override string ExportRis()
+        public override string ExportRis(string lang_id)
         {
             var sb = new StringBuilder(System.Environment.NewLine);
             sb.AppendLine("TY  - BOOK");
@@ -94,7 +92,7 @@ namespace iNQUIRE.Models
             return sb.Append("ER  - ").ToString();
         }
 
-        public override string ExportHtmlFields(string content_id)
+        public override string ExportHtmlFields(string lang_id)
         {
             var html = new StringBuilder();
 
@@ -145,7 +143,7 @@ namespace iNQUIRE.Models
         public string Accessrights { get; set; }
 
         [SolrField("Collection")]
-        public string Collection { get; set; }
+        public override string Collection { get; set; }
 
         [SolrField("Identifier")]
         public string Identifier { get; set; }

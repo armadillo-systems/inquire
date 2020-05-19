@@ -9,11 +9,13 @@ namespace iNQUIRE.Models
     {
         public IInqItem Item { get; set; }
         public string ImageUri { get; set; }
+        public string LanguageId { get; set; }
 
-        public ExportItem(IInqItem item, string image_uri)
+        public ExportItem(IInqItem item, string image_uri, string lang_id)
         {
             Item = item;
             ImageUri = image_uri;
+            LanguageId = lang_id;
         }
     }
 }
