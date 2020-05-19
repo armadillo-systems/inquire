@@ -13,6 +13,7 @@ using iNQUIRE.Helpers;
 using SolrNet;
 using SolrNet.Commands.Parameters;
 using Microsoft.Practices.ServiceLocation;
+using SolrNet.Impl;
 
 namespace iNQUIRE.Models
 {
@@ -130,6 +131,14 @@ namespace iNQUIRE.Models
         // public abstract SolrSearchResults GetRecord(string id);
         // public abstract SolrSearchResults GetSearchSuggestions(string str);
 
+        public virtual bool ReloadCore()
+        {
+            //var headerParser = ServiceLocator.Current.GetInstance<ISolrHeaderResponseParser>();
+            //var statusParser = ServiceLocator.Current.GetInstance<ISolrStatusResponseParser>();
+            //ISolrCoreAdmin solrCoreAdmin = new SolrCoreAdmin(new SolrConnection(_solrUri), headerParser, statusParser);
+            //solrCoreAdmin.Reload("core1");
+            throw new Exception("Not implemented yet.");
+        }
 
         public virtual SolrSearchResults Search(SearchQuery query, List<KeyValuePair<string, string>> facets, List<FacetRange> facet_ranges)
         {

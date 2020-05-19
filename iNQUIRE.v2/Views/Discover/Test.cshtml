@@ -9,7 +9,17 @@
     <div class="col-md-12">
         <div id="test-page">
             <div data-bind="visible: error, text: error"></div>
-            
+
+            <div>
+                <h3>Reload Solr Core (fixes search auto suggestions not appearing)</h3>
+                <button data-bind="click: reloadSolrCore, enable: !testInProgress()">
+                    Reload Core (iNQUIRE Server -> Solr Admin)
+                </button>
+                <div data-bind="visible: reloadSolrCoreInProgress" class="loader" id="loader-1"></div>
+                <pre data-bind="text: ko.toJSON(reloadSolrCoreResult, null, 2)"></pre>
+            </div>
+            <br />
+
             <div data-bind="visible: !error()">
                 <div>
                     <h3>Search</h3>
@@ -123,10 +133,12 @@
         self.iipTestInProgress = ko.observable(false);
         self.deepZoomTestInProgress = ko.observable(false);
         self.dbTestInProgress = ko.observable(false);
+        self.reloadSolrCoreInProgress = ko.observable(false);
 
         self.solrTestResult = ko.observable();
         self.iipTestResult = ko.observable();
         self.dbTestResult = ko.observable();
+        self.reloadSolrCoreResult = ko.observable();
 
         self.searchDebugParameters = ko.observable('@Html.Raw(ViewBag.SearchDebugParameters)');
         self.solrDebugParameters = ko.observable('@Html.Raw(ViewBag.SolrDebugParameters)');
@@ -236,6 +248,35 @@
                             alert('Error testing database: ' + fail);
                         }
                         self.dbTestInProgress(false);
+                    });
+            }
+        };
+
+
+        self.reloadSolrCore = function () {
+            if (!self.testInProgress()) {
+                self.reloadSolrCoreInProgress(true);
+                var url = '@Url.Content("~/Discover/ReloadSolrCore/")';
+                var fail;
+                self.reloadSolrCoreResult("");
+
+                $.ajax({
+                    method: 'GET',
+                    url: url,
+                    dataType: 'JSON',
+                    contentType: 'application/json'
+                })
+                    .done(function (data) {
+                        self.reloadSolrCoreResult(data);
+                    })
+                    .fail(function () {
+                        fail = 'Server error /Discover/ReloadSolrCore/';
+                    })
+                    .always(function () {
+                        if (fail) {
+                            alert('Error reloading Solr core: ' + fail);
+                        }
+                        self.reloadSolrCoreInProgress(false);
                     });
             }
         };

@@ -192,7 +192,6 @@
       <HintPath>..\packages\Sendgrid.6.1.0\lib\SendGridMail.dll</HintPath>
     </Reference>
     <Reference Include="SolrNet, Version=0.4.0.4001, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\SolrNet.0.4.0.4001\lib\SolrNet.dll</HintPath>
     </Reference>
     <Reference Include="System" />
@@ -376,6 +375,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="banned_words.xml" />
+    <Content Include="changelog.txt" />
     <Content Include="Content\bootstrap-social.css" />
     <Content Include="Content\bootstrap-theme.css" />
     <Content Include="Content\bootstrap-theme.min.css" />
@@ -684,7 +684,6 @@
     <Content Include="Views\Discover\Search\_ResultTemplates.cshtml" />
     <Content Include="Views\Discover\Search\_SearchBox.cshtml" />
     <Content Include="Views\Discover\Search\_Templates.cshtml" />
-    <Content Include="SolrNet.chm" />
     <Content Include="Views\Discover\Search.cshtml" />
     <Content Include="Views\Discover\Search\_SearchJS.cshtml" />
     <Content Include="Views\Discover\Search\_SearchJSOld.cshtml" />
@@ -724,6 +723,7 @@
     <Content Include="Views\Shared\_GoogleAnalytics.cshtml" />
     <Content Include="Views\Shared\_HeaderJS.cshtml" />
     <Content Include="Views\Discover\Test.cshtml" />
+    <Content Include="SolrNet.chm" />
     <None Include="Web.armserv.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

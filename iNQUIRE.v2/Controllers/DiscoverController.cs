@@ -191,7 +191,7 @@ namespace iNQUIRE.Controllers
                 ViewBag.DeepZoomDebugParameters = DeepZoomDebugParameters;
             }
             else
-                ViewBag.Error = "To enable this page set DebugJp2HandlerRequests to true in the web.config, remember to set back to false when testing is complete.";
+                ViewBag.Error = "To fully enable this page set DebugJp2HandlerRequests to true in the web.config, remember to set back to false when testing is complete.";
 
             return View();
         }
@@ -1082,6 +1082,73 @@ namespace iNQUIRE.Controllers
         //    return Json(sb.ToString(), JsonRequestBehavior.AllowGet);
         //}
 
+
+        public ActionResult ReloadSolrCore()
+        {
+            // Just use a simple http request.
+            // Ideally would make this a method of SolrRepository but I think currently used version of SolrNet (0.4) doesn't support
+            // the core Admin and Reload methods? Could update in the future and try again.
+
+            // SolrUrl: http://inquire.westeurope.cloudapp.azure.com:8983/solr/core_rkd_1
+            // Need to generate: http://inquire.westeurope.cloudapp.azure.com:8983/solr/admin/cores?action=RELOAD&core=core_rkd_1
+
+            HttpWebResponse response;
+            var result = new JObject();
+            string url = null;
+
+            try
+            {
+                var solr_url = System.Configuration.ConfigurationManager.AppSettings["SolrUri"];
+                var last_slash_pos = solr_url.LastIndexOf("/");
+                var core_name = solr_url.Substring(last_slash_pos + 1);
+                var solr_url_base = solr_url.Substring(0, last_slash_pos + 1);
+                url = string.Format("{0}admin/cores?action=RELOAD&core={1}", solr_url_base, core_name);
+                var request = (HttpWebRequest)WebRequest.Create(url);
+                response = (HttpWebResponse)request.GetResponse();
+                result.Add("StatusCode", (int)response.StatusCode);
+                result.Add("StatusDescription", response.StatusDescription);
+            }
+            catch (WebException ex)
+            {
+                //remote url not found, log an error and send 404 to client 
+                var err_response = ex.Response != null ? (HttpWebResponse)ex.Response : null;
+                var status_code = 404;
+                var status_desc = "No response";
+
+                if (err_response != null)
+                {
+                    status_code = (int)err_response.StatusCode;
+                    status_desc = err_response.StatusDescription;
+                }
+
+                LogHelper.StatsLog(null, "DiscoverController.ReloadSolrCore()", String.Format("Failed, Response status code: {0} , Response status desc: {1}, WebExceptionMessage: {2}, Url: {3}", status_code, status_desc, ex.Message, url), null, null);
+
+                result.Add("Error", ex.Message);
+                result.Add("StatusCode", status_code);
+                result.Add("StatusDescription", status_desc);
+                return Json(result, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception e)
+            {
+                result.Add("Error", e.Message);
+                return Json(result, JsonRequestBehavior.AllowGet);
+            }
+
+            using (Stream receiveStream = response.GetResponseStream())
+            {
+                if (receiveStream != null)
+                {
+                    using (var readStream = new StreamReader(receiveStream, Encoding.Default))
+                    {
+                        string content = readStream.ReadToEnd();// HandlerHelper.ParseHtmlResponse(readStream.ReadToEnd(), "");
+                        result.Add("Data", content);
+                    }
+                }
+            }
+            response.Close();
+
+            return Content(result.ToString(), "application/json");
+        }
 
         public ActionResult TestDatabase()
         {
