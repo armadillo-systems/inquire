@@ -16,6 +16,7 @@ using Ninject.Web;
 using iNQUIRE.Models;
 using iNQUIRE.Helpers;
 using SolrNet;
+using System.Net;
 
 namespace iNQUIRE
 {
@@ -39,6 +40,7 @@ namespace iNQUIRE
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
 
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
 
             //NinjectContainer.RegisterModules(NinjectModules.Modules);
 

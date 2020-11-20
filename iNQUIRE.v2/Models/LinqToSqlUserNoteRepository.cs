@@ -14,7 +14,7 @@ namespace iNQUIRE.Models
         {
             try
             {
-                if ((public_note) && (ContainsRudeWord(text)))
+                if (!IsTextModerationPassed(text)) // && public_note
                     throw new Exception(BANNED_WORD_DETECTED);
 
                 var note = new Note();
@@ -42,7 +42,7 @@ namespace iNQUIRE.Models
             {
                 var err = new Note();
                 err.NoteID = Guid.Empty;
-                err.Text = ex.Message;
+                err.Text = string.Format("{0}. {1}", ex.Message, ex.InnerException?.Message);
                 return err;
             }
         }
@@ -51,7 +51,7 @@ namespace iNQUIRE.Models
         {
             try
             {
-                if ((public_note) && (ContainsRudeWord(text)))
+                if (!IsTextModerationPassed(text))  // && public_note
                     throw new Exception(BANNED_WORD_DETECTED);
 
                 // user_id not technically needed, but kept in for slightly more security

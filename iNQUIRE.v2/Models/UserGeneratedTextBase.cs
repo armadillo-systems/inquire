@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
 using System.Web;
+using System.Text.RegularExpressions;
+using iNQUIRE.Helpers;
+using Microsoft.CognitiveServices.ContentModerator;
 
 namespace iNQUIRE.Models
 {
@@ -12,8 +15,8 @@ namespace iNQUIRE.Models
     /// 
     public abstract class UserGeneratedTextBase
     {
-        protected const string BANNED_WORD_DETECTED = "Disallowed word detected, please edit your text and try again";
-        public IEnumerable<string> BannedWords;
+        protected const string BANNED_WORD_DETECTED = "Disallowed text detected, please edit your text and try again";
+        public static IEnumerable<string> BannedWords;
 
         public UserGeneratedTextBase()
         {
@@ -26,7 +29,7 @@ namespace iNQUIRE.Models
             BannedWords = words;
         }
 
-        public bool IsRudeWord(string word)
+        private static bool IsRudeWord(string word)
         {
             var rude = from bw in BannedWords
                        where bw == word.ToLower()
@@ -36,12 +39,40 @@ namespace iNQUIRE.Models
             else
                 return true;
         }
-        public bool ContainsRudeWord(string text)
+        private static bool ContainsRudeWord(string text)
         {
             var words = text.Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries);
             foreach (string w in words)
                 if (IsRudeWord(w)) return true;
             return false;
+        }
+
+        private static bool ContainsUrl(string text)
+        {
+            return Regex.IsMatch(text, "www|http|https|ftp|mailto", RegexOptions.IgnoreCase) ||
+                Regex.IsMatch(text, @"[^\b]\.([a-zA-Z]{2}|aero|asia|biz|cat|com|coop|edu|gov|info|int|jobs|mil|mobi|museum|name|net|org|pro|tel|travel)[\b/]", RegexOptions.IgnoreCase);
+        }
+
+        private static bool ContainsEmail(string text)
+        {
+            return Regex.IsMatch(text, @"\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*", RegexOptions.IgnoreCase);
+        }
+
+        public bool IsTextModerationPassed(string text)
+        {
+            // do these first as they are Regex based, no request to external service needed
+            if (ContainsEmail(text) || ContainsUrl(text) || ContainsRudeWord(text))
+                return false;
+
+            var moderated_ok = true;
+            if (ContentModeratorHelper.IsContentModeratorEnabled)
+            {
+                using (var cmclient = ContentModeratorHelper.NewClient())
+                {
+                    moderated_ok = ContentModeratorHelper.IsTextModerationPassed(cmclient, text);
+                }
+            }
+            return moderated_ok;
         }
     }
 }

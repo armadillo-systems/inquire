@@ -16,7 +16,7 @@ namespace iNQUIRE.Models
             try
             {
                 // is new tag a naughty word
-                if (IsRudeWord(title))
+                if (!IsTextModerationPassed(title))
                     throw new Exception(BANNED_WORD_DETECTED);
 
                 // check to see if tag already exists
