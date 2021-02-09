@@ -17,8 +17,12 @@ using SolrNet.Impl;
 
 namespace iNQUIRE.Models
 {
+    /// <summary>
+    /// Important: Update this class with references to your Solr data class eg InqItemBod
+    /// </summary>
     public abstract class SolrRepository : IRepository
     {
+        // TODO: Use Unity DI so we don't have to update the class references and recompile
         public static string XmlPath { get; set; }
         public static bool MultiFacetConstraints { get; set; }
         public static int FacetLimit { get; set; }
@@ -27,13 +31,13 @@ namespace iNQUIRE.Models
 
         public static List<KeyValuePair<string, bool>> HyperlinkFields { get; set; }
         
-        private static ISolrOperations<InqItemRKD> _solr;
-        private static ISolrOperations<InqItemRKD> Solr
+        private static ISolrOperations<InqItemBodIIIF> _solr;
+        private static ISolrOperations<InqItemBodIIIF> Solr
         {
             get
             {
                 if (_solr == null)
-                    _solr = ServiceLocator.Current.GetInstance<ISolrOperations<InqItemRKD>>();
+                    _solr = ServiceLocator.Current.GetInstance<ISolrOperations<InqItemBodIIIF>>();
 
                 return _solr;
             }
@@ -58,7 +62,10 @@ namespace iNQUIRE.Models
             AppDataXml = ConfigurationManager.AppSettings["XmlDataFile"];
             ObjectIdFieldName = ConfigurationManager.AppSettings["ObjectIdFieldName"];
             ParentIdFieldName = ConfigurationManager.AppSettings["ParentIdFieldName"];
-            DefaultSolrSearchField = "text_";
+            DefaultSolrSearchField = ConfigurationManager.AppSettings["DefaultSolrSearchField"];
+
+            if (string.IsNullOrEmpty(DefaultSolrSearchField))
+                DefaultSolrSearchField = "text";
         }
 
         protected string makeSolrTerm(string lang_id, string term, List<string> ids)
@@ -89,7 +96,13 @@ namespace iNQUIRE.Models
 
         public string MakeSolrSearchTerm(string lang_id, string term)
         {
-            return term.Contains(":") ? term : string.Format("{0}{1}:{2}", DefaultSolrSearchField, lang_id, term);
+            if (term.Contains(":"))
+                return term;
+
+            if ((Solr as IInqItemMultiLingual) == null)
+                return string.Format("{0}:{1}", DefaultSolrSearchField, term);
+            else
+                return string.Format("{0}_{1}:{2}", DefaultSolrSearchField, lang_id, term);
         }
 
         public void Load()
@@ -337,14 +350,14 @@ namespace iNQUIRE.Models
             return makeSolrSearchResults(results);
         }
 
-        protected SolrSearchResults makeSolrSearchResults(SolrQueryResults<InqItemRKD> results)
+        protected SolrSearchResults makeSolrSearchResults(SolrQueryResults<InqItemBodIIIF> results)
         //protected SolrSearchResults makeSolrSearchResults(SolrQueryResults<InqItemArmNode> results)
         // protected SolrSearchResults makeSolrSearchResults(SolrQueryResults<InqItemBase> results)
         {
             return makeSolrSearchResults(results, new List<KeyValuePair<string, string>>(), new List<FacetRange>());
         }
 
-        protected SolrSearchResults makeSolrSearchResults(SolrQueryResults<InqItemRKD> results, List<KeyValuePair<string, string>> facets, List<FacetRange> facet_ranges)
+        protected SolrSearchResults makeSolrSearchResults(SolrQueryResults<InqItemBodIIIF> results, List<KeyValuePair<string, string>> facets, List<FacetRange> facet_ranges)
         //protected SolrSearchResults makeSolrSearchResults(SolrQueryResults<InqItemArmNode> results, List<KeyValuePair<string, string>> facets, List<FacetRange> facet_ranges)
         // protected SolrSearchResults makeSolrSearchResults(SolrQueryResults<InqItemBase> results, List<KeyValuePair<string, string>> facets, List<FacetRange> facet_ranges)
         {

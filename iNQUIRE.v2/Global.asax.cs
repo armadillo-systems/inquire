@@ -17,6 +17,7 @@ using iNQUIRE.Models;
 using iNQUIRE.Helpers;
 using SolrNet;
 using System.Net;
+using System.Web.Http;
 
 namespace iNQUIRE
 {
@@ -36,6 +37,7 @@ namespace iNQUIRE
         protected void Application_Start()
         {
             AreaRegistration.RegisterAllAreas();
+            GlobalConfiguration.Configure(WebApiConfig.Register);
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
@@ -76,11 +78,13 @@ namespace iNQUIRE
             iNQUIRE.ApplicationViewPage<object>.TwitterHashtag = ConfigurationManager.AppSettings["TwitterHashtag"];
             iNQUIRE.ApplicationViewPage<object>.TwitterActivityCaption = ConfigurationManager.AppSettings["TwitterActivityCaption"];
 
-            Controllers.DiscoverController.FacetsString = ConfigurationManager.AppSettings["Facets"];
-            Controllers.DiscoverController.SortFieldsString = ConfigurationManager.AppSettings["SortFields"];
+            Helpers.SolrHelper.FacetsString = ConfigurationManager.AppSettings["Facets"];
+            Helpers.SolrHelper.SortFieldsString = ConfigurationManager.AppSettings["SortFields"];
+
             // Controllers.DiscoverController.HyperlinkFields = new List<string>(ConfigurationManager.AppSettings["HyperlinkFields"].Split(new[] { "^" }, StringSplitOptions.RemoveEmptyEntries));
             Controllers.DiscoverController.ApplicationIdAspNet = new Guid(ConfigurationManager.AppSettings["ApplicationIdAspNet"]);
             Controllers.DiscoverController.ApplicationIdInquire = new Guid(ConfigurationManager.AppSettings["ApplicationIdInquire"]);
+            Controllers.WebApi.WebApiControllerBase.ApplicationIdInquire = new Guid(ConfigurationManager.AppSettings["ApplicationIdInquire"]);
             Controllers.DiscoverController.ExportFilename = ConfigurationManager.AppSettings["ExportFilename"];
             Controllers.DiscoverController.ExportImageWidth = Convert.ToInt32(ConfigurationManager.AppSettings["ExportImageWidth"]);
             Controllers.DiscoverController.ExportImageHeight = Convert.ToInt32(ConfigurationManager.AppSettings["ExportImageHeight"]);
@@ -97,7 +101,10 @@ namespace iNQUIRE
             Controllers.DiscoverController.IIPDebugParameters = ConfigurationManager.AppSettings["IIPDebugParameters"];
             Controllers.DiscoverController.DeepZoomDebugParameters = ConfigurationManager.AppSettings["DeepZoomDebugParameters"];
 
-        Helper.EmailHelper.FromAddress = ConfigurationManager.AppSettings["FromEmailAddress"];
+            Controllers.DiscoverController.Languages = MakeKeyValuePairStringStringListFromConfigString(ConfigurationManager.AppSettings["Languages"]);
+            Controllers.DiscoverController.MultiLingualSolrFields = ConfigurationManager.AppSettings["MultiLingualSolrFields"].Split(new[] { "^" }, StringSplitOptions.RemoveEmptyEntries).ToList();
+
+            Helper.EmailHelper.FromAddress = ConfigurationManager.AppSettings["FromEmailAddress"];
             Helper.EmailHelper.Subject = ConfigurationManager.AppSettings["ExportEmailSubject"];
             Helper.EmailHelper.SmtpHost = ConfigurationManager.AppSettings["SMTPHost"];
             var port = ConfigurationManager.AppSettings["SMTPPort"];
@@ -111,17 +118,7 @@ namespace iNQUIRE
             SolrRepository.HyperlinkTargetBlank = Convert.ToBoolean(ConfigurationManager.AppSettings["HyperlinkTargetBlank"]);
 
             // parse fields to mark up hyperlinks
-            var hlf = new List<KeyValuePair<string, bool>>();
-            var f = ConfigurationManager.AppSettings["HyperlinkFields"].Split(new[] { "^" }, StringSplitOptions.RemoveEmptyEntries);
-
-            foreach (string s in f)
-            {
-                var f2 = s.Split(new[] { "|" }, StringSplitOptions.RemoveEmptyEntries);
-                var kvp = new KeyValuePair<string, bool>(f2[0], Convert.ToBoolean(f2[1]));
-                hlf.Add(kvp);
-            }
-
-            SolrRepository.HyperlinkFields = hlf;
+            SolrRepository.HyperlinkFields = MakeKeyValuePairStringBoolListFromConfigString(ConfigurationManager.AppSettings["HyperlinkFields"]);
 
             SolrRepository.NakedHyperlinkPrefix = ConfigurationManager.AppSettings["NakedHyperlinkPrefix"];
             SolrRepository.FacetLimit = Convert.ToInt32(ConfigurationManager.AppSettings["FacetLimit"]);
@@ -129,15 +126,25 @@ namespace iNQUIRE
             SolrRepository.XmlPath = Server.MapPath(@"~\App_Data\");
             InqItemBase.ViewItemBaseUri = ConfigurationManager.AppSettings["ViewItemBaseUri"];
 
-            AreaRegistration.RegisterAllAreas();
+            // AreaRegistration.RegisterAllAreas();
 
             // RegisterGlobalFilters(GlobalFilters.Filters);
             // RegisterRoutes(RouteTable.Routes);
 
+            // IMPORTANT: Supply your Solr specific data class here, eg:
+            // 
+            // SolrNet.Startup.Init<YourItemDataClass>(ConfigurationManager.AppSettings["SolrUri"]);
+
+            // You data class should be derived from InqItemBase or InqItemImageMetadataWidthAndHeightBase
+            // see InqItemBod.cs, InqItemArmNode.cs as examples
+
+            // TODO: Replace Ninject DI with Unity DI?
+
             // this is annoying, Solr .net throws an error if you try to supply it with an interface or abstract class, so can't use eg ninject DI?
             // Startup.Init<InqItemXml>(ConfigurationManager.AppSettings["SolrUriXml"]);
             //SolrNet.Startup.Init<InqItemArmNode>(ConfigurationManager.AppSettings["SolrUri"]);
-            SolrNet.Startup.Init<InqItemRKD>(ConfigurationManager.AppSettings["SolrUri"]);
+            //SolrNet.Startup.Init<InqItemRKD>(ConfigurationManager.AppSettings["SolrUri"]);
+            SolrNet.Startup.Init<InqItemBodIIIF>(ConfigurationManager.AppSettings["SolrUri"]);
             // Startup.Init<InqItemBod>(ConfigurationManager.AppSettings["SolrUri"]);
 
             // throw new Exception("moo!");
@@ -150,6 +157,34 @@ namespace iNQUIRE
             email_worker.RunWorkerAsync();
 
             Application["email_queue"] = _emailQueue;
+        }
+
+        private static List<KeyValuePair<string, bool>> MakeKeyValuePairStringBoolListFromConfigString(string config_str)
+        {
+            var kvp_list = new List<KeyValuePair<string, bool>>();
+            var f = config_str.Split(new[] { "^" }, StringSplitOptions.RemoveEmptyEntries);
+
+            foreach (string s in f)
+            {
+                var f2 = s.Split(new[] { "|" }, StringSplitOptions.RemoveEmptyEntries);
+                var kvp = new KeyValuePair<string, bool>(f2[0], Convert.ToBoolean(f2[1]));
+                kvp_list.Add(kvp);
+            }
+            return kvp_list;
+        }
+
+        private static List<KeyValuePair<string, string>> MakeKeyValuePairStringStringListFromConfigString(string config_str)
+        {
+            var kvp_list = new List<KeyValuePair<string, string>>();
+            var f = config_str.Split(new[] { "^" }, StringSplitOptions.RemoveEmptyEntries);
+
+            foreach (string s in f)
+            {
+                var f2 = s.Split(new[] { "|" }, StringSplitOptions.RemoveEmptyEntries);
+                var kvp = new KeyValuePair<string, string>(f2[0], f2[1]);
+                kvp_list.Add(kvp);
+            }
+            return kvp_list;
         }
 
         void email_DoWork(object sender, DoWorkEventArgs e)

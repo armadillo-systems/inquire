@@ -124,7 +124,8 @@
 
         self.userID = '@ViewBag.UserID';
         self.userEmail = ko.observable('@ViewBag.UserEmail');
-        self.languages = [{ 'code': 'nl', 'name': 'Nederlands' }, { 'code': 'en', 'name': 'English' }];
+
+        self.languages = JSON.parse('@Html.Raw(ViewBag.Languages)'); // [{ 'code': 'nl', 'name': 'Nederlands' }, { 'code': 'en', 'name': 'English' }];
         self.languageId = ko.observable(self.languages[0].code);
         self.savedSearches = ko.observableArray([]);
 
@@ -634,7 +635,7 @@
             }
         }
 
-        @*deprecated from the Facebook API 01 Aug 2018 
+        @*deprecated from the Facebook API 01 Aug 2018
             self.fbPhotoUpload = function () {
             var t = _gvm.fbAccessToken();
             if( !IsFieldNullOrEmpty(t) ) {
@@ -1456,7 +1457,7 @@
 
         self.collectionViewToggle = function (id)
         {
-            
+
             for(var i = 0; i < self.collections().length; i++)
             {
                 if(self.collections()[i].id == id)
@@ -1477,7 +1478,7 @@
 
         self.setupDiscoveryColumn = function () {
             if(self.isAuthenticated()) {
-                $.post("@Url.Content("~/Discover/CollectionsListUserAjax")", { "user_id": self.userID },
+                $.post("@Url.Content("~/Discover/Collections/User")", { "user_id": self.userID },
                     function (data) {
                         if(data.length == 0)
                             self.makeCollection("My Collection"); // create an initial empty collection, addCollectionEvents will be automatically run by the after render template method
@@ -2869,14 +2870,14 @@
     $(function () {
         _vm = new InquireViewModel();
         ko.applyBindings(_vm, document.body);
-        
+
         _vm.videoVisible.subscribe(function(value) {
             if(value)
                 playVideo();
             else
             {
                 stopVideo();
-                clearMedia('#video-player', '#video-overlay');  
+                clearMedia('#video-player', '#video-overlay');
             }
         });
 
@@ -2886,7 +2887,7 @@
             else
             {
                 stopAudio();
-                clearMedia('#audio-player', '#audio-overlay');  
+                clearMedia('#audio-player', '#audio-overlay');
             }
         });
 
