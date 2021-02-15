@@ -3,24 +3,26 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web.Http;
 using System.Net.Http.Headers;
-// using Microsoft.Practices.Unity;
-// using Microsoft.Practices.Unity.Configuration;
+using Microsoft.Practices.Unity;
+using Microsoft.Practices.Unity.Configuration;
 using Newtonsoft.Json;
+using iNQUIRE.Models;
+using iNQUIRE.Helper;
 
 namespace iNQUIRE
 {
     public static class WebApiConfig
     {
-        // public static IUnityContainer UnityContainer;
+        public static IUnityContainer UnityContainer;
 
         public static void Register(HttpConfiguration config)
         {
             GlobalConfiguration.Configuration.Formatters.JsonFormatter.SerializerSettings.Re‌​ferenceLoopHandling = ReferenceLoopHandling.Ignore;
 
-            //var container = CreateConfiguredUnityContainer();
-            //// container.RegisterType<ISipRepository, SipDatabaseRepository>(new HierarchicalLifetimeManager());
-            //config.DependencyResolver = new UnityResolver(container);
-            //UnityContainer = container;
+            var container = CreateConfiguredUnityContainer();
+            // container.RegisterType<ISipRepository, SipDatabaseRepository>(new HierarchicalLifetimeManager());
+            config.DependencyResolver = new UnityResolver(container);
+            UnityContainer = container;
 
             // Web API configuration and services
             config.Formatters.JsonFormatter.SupportedMediaTypes.Add(new MediaTypeHeaderValue("text/html"));
@@ -40,19 +42,23 @@ namespace iNQUIRE
                 config.Filters.Add(new AuthorizeAttribute());
         }
 
-        //private static IUnityContainer CreateConfiguredUnityContainer()
-        //{
-        //    IUnityContainer container = new UnityContainer();
+        private static IUnityContainer CreateConfiguredUnityContainer()
+        {
+            IUnityContainer container = new UnityContainer();
 
-        //    // (optional) default mapping
-        //    container.RegisterType<ISipRepository, SipDatabaseRepository>();
-        //    container.RegisterType<IIngestService, IngestService>();
-        //    container.RegisterType<ITransformationService, TransformationService>();
+            // (optional) default mapping
+            //container.RegisterType<ITest<Workspace, Workspace>, Test>();
+            container.RegisterType<IUserCollectionRepository<Workspace, WorkspaceItem, string>, LinqToSqlUserCollectionRepository>();
+            container.RegisterType<IUserTagRepository<Tag, TaggedItem, string>, LinqToSqlUserTagRepository>();
+            container.RegisterType<IUserNoteRepository<Note, string>, LinqToSqlUserNoteRepository>();
+            container.RegisterType<IRepository, iNQUIRESolrRepository>();
+            container.RegisterType<IUserSearchRepository, LinqToSqlUserSearchRepository>();
+            container.RegisterType<IJP2Helper, IIPImageHelper>();
 
-        //    // (optional) load static config from the *.xml file
-        //    container.LoadConfiguration();
+            // (optional) load static config from the *.xml file
+            container.LoadConfiguration();
 
-        //    return container;
-        //}
+            return container;
+        }
     }
 }

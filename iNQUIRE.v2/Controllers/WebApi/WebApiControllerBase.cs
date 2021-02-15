@@ -17,10 +17,10 @@ namespace iNQUIRE.Controllers.WebApi
         //private readonly IUserCollectionRepository<Workspace, WorkspaceItem, string> _IUserCollectionRepository;
         //private readonly IUserSearchRepository _IUserSearchRepository;
 
-        public WebApiControllerBase()
-        {
+        //public WebApiControllerBase()
+        //{
 
-        }
+        //}
 
 
 

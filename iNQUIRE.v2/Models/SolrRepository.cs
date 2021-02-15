@@ -105,6 +105,11 @@ namespace iNQUIRE.Models
                 return string.Format("{0}_{1}:{2}", DefaultSolrSearchField, lang_id, term);
         }
 
+        public string MakeSolrSuggestDictionaryName(string lang_id)
+        {
+            return (Solr as IInqItemMultiLingual) == null ? "suggest" : string.Format("suggest_{0}", lang_id);
+        }
+
         public void Load()
         {
             try
@@ -345,7 +350,7 @@ namespace iNQUIRE.Models
             // var solr = ServiceLocator.Current.GetInstance<ISolrOperations<InqItemBod>>();
             var q = new SolrQuery(MakeSolrSearchTerm(lang_id, str));
             var sc = new SpellCheckingParameters { };
-            sc.Dictionary = string.Format("suggest_{0}", lang_id);
+            sc.Dictionary = MakeSolrSuggestDictionaryName(lang_id);
             var results = Solr.Query(q, new QueryOptions { SpellCheck = sc });
             return makeSolrSearchResults(results);
         }

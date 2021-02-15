@@ -124,14 +124,21 @@ namespace iNQUIRE.Models
         {
             try
             {
-                var item = _db.WorkspaceItems.Single(i => i.ObjectID == (string)item_id);
-                var workspace = _db.Workspaces.Single(w => w.WorkspaceID == collection_id);
-                workspace.WorkspaceItems.Remove(item);
+                var item = _db.WorkspaceItems.Single(i => (i.ObjectID == item_id) && (i.WorkspaceID == collection_id));
+                item.LanguageID = lang_id;
+                item.Notes = notes;
+                item.PosX = pos_x;
+                item.PosY = pos_y;
+                item.Position = position;
+                item.Keywords = keywords;
+                item.SearchTerm = search_term;
+                item.LastEdited = DateTime.Now;
                 _db.SubmitChanges();
                 return true;
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                Helper.LogHelper.StatsLog(collection_id, "Collection", "CollectionUpdateItem() failed", e.Message, e.InnerException?.Message);
                 return false;
             }
         }
