@@ -30,9 +30,6 @@ namespace iNQUIRE.Controllers
         public static Guid ApplicationIdAspNet { get; set; }
         public static Guid ApplicationIdInquire { get; set; }
         public static string ExportFilename { get; set; }
-        public static int ExportImageWidth { get; set; }
-        public static int ExportImageHeight { get; set; }
-        public static int ExportMaxImages { get; set; }
         // public static string ViewItemUri { get; set; }
         public static int SavedSearchesDisplayMax { get; set; }
         public static int TouchDoubleClickDelayMs { get; set; }
@@ -66,16 +63,6 @@ namespace iNQUIRE.Controllers
         /// </summary>
         protected UserManager<ApplicationUser> _UserManager { get; set; }
 
-
-        private string MediaDirectoryFullUri
-        {
-            get { return String.Format("http://{0}{1}", Request.Url.Host, Url.Content(String.Format("~/{0}", _IJP2Helper.MediaDirectory))); }
-        }
-
-        private string ImageNotFound
-        {
-            get { return String.Format("http://{0}{1}", Request.Url.Host, Url.Content("~/Content/images/export_image_not_found.gif")); }
-        }
 
         static DiscoverController()
         {
@@ -134,40 +121,40 @@ namespace iNQUIRE.Controllers
             return View();
         }
 
-        public ActionResult EmailExportAjax(string email_to, string message, string id_str, string lang_id)
-        {
-            // setResolvers();
+        //public ActionResult EmailExportAjax(string email_to, string message, string id_str, string lang_id)
+        //{
+        //    // setResolvers();
 
-            if (email_to == null)
-                return Json("No destination email address", JsonRequestBehavior.AllowGet);
+        //    if (email_to == null)
+        //        return Json("No destination email address", JsonRequestBehavior.AllowGet);
 
-            if (id_str == null)
-                return Json("No items selected", JsonRequestBehavior.AllowGet);
+        //    if (id_str == null)
+        //        return Json("No items selected", JsonRequestBehavior.AllowGet);
 
-            var results = SolrHelper.GetItemsFromIDStringList(id_str, false, _IRepository, _IJP2Helper);
+        //    var results = SolrHelper.GetItemsFromIDStringList(id_str, false, _IRepository, _IJP2Helper);
 
-            var export_items = new List<ExportItem>();
-            var count = 0;
-            foreach (IInqItem r in results)
-            {
-                var img_src = GetImageUri(r, ExportImageWidth, ExportImageHeight);
-                // var img_src = _IJP2Helper.GetImageUri(r.ImageMetadata, MediaDirectoryFullUri, _IJP2Helper.ResolverUri, ExportImageWidth, ExportImageHeight);
-                export_items.Add(new ExportItem(r, img_src, lang_id));
-                count++;
+        //    var export_items = new List<ExportItem>();
+        //    var count = 0;
+        //    foreach (IInqItem r in results)
+        //    {
+        //        var img_src = ImageHelper.GetImageUri(r, ExportImageWidth, ExportImageHeight, Request.Url.Host, );
+        //        // var img_src = _IJP2Helper.GetImageUri(r.ImageMetadata, MediaDirectoryFullUri, _IJP2Helper.ResolverUri, ExportImageWidth, ExportImageHeight);
+        //        export_items.Add(new ExportItem(r, img_src, lang_id));
+        //        count++;
 
-                if (count >= ExportMaxImages)
-                    break;
-            }
+        //        if (count >= ExportMaxImages)
+        //            break;
+        //    }
 
-            var export = new EmailExport(email_to, message, export_items, ImageNotFound);
-            var queue = HttpContext.Application["email_queue"] as Queue<EmailExport>;
-            queue.Enqueue(export);
+        //    var export = new EmailExport(email_to, message, export_items, ImageHelper.ImageNotFound(Request.Url.Host, Url.Content("~/Content/images/export-image-not-found.png")));
+        //    var queue = HttpContext.Application["email_queue"] as Queue<EmailExport>;
+        //    queue.Enqueue(export);
 
-            //var res = _IRepository.GetRecord(_IRepository.GetBaseUri(Request, Url), id);
-            //var results_vm = new SearchAjaxViewModel(res) { Rows = 1, RowStart = 0 };
+        //    //var res = _IRepository.GetRecord(_IRepository.GetBaseUri(Request, Url), id);
+        //    //var results_vm = new SearchAjaxViewModel(res) { Rows = 1, RowStart = 0 };
 
-            return Json("ok", JsonRequestBehavior.AllowGet);
-        }
+        //    return Json("ok", JsonRequestBehavior.AllowGet);
+        //}
 
         private List<DownloadFormat> getFormatsFromStringList(string str)
         {
@@ -286,16 +273,16 @@ namespace iNQUIRE.Controllers
 
                     foreach (IInqItem r in results)
                     {
-                        string img_src = GetImageUri(r, ExportImageWidth, ExportImageHeight);
+                        string img_src = ImageHelper.GetImageUri(r, ImageHelper.ExportImageWidth, ImageHelper.ExportImageHeight, Request.Url.Host, JP2MediaDir, _IJP2Helper);
 
                         // images
-                        using (Stream fs = ImageHelper.GetImageStream(img_src, ImageNotFound))
+                        using (Stream fs = ImageHelper.GetImageStream(img_src, Url.Content("~/Content/images/export-image-not-found.png")))
                         {
                             ZipHelper.ZipAdd(Response, zipOutputStream, String.Format("{0}.jpg", r.ID), fs);
                         }
                         count++;
 
-                        if (count >= ExportMaxImages)
+                        if (count >= ImageHelper.ExportMaxImages)
                             break;
                     }
                 }
@@ -306,19 +293,6 @@ namespace iNQUIRE.Controllers
                 Response.End();
                 return File(zipOutputStream, "application/zip");
             }
-        }
-
-        public string GetImageUri(IInqItem r, int max_width, int max_height)
-        {
-            string img_src;
-            var r_iiif = r as InqItemIIIFBase;
-
-            if (r_iiif == null)
-                img_src = _IJP2Helper.GetImageUri(r.ImageMetadata, MediaDirectoryFullUri, _IJP2Helper.ResolverUri, max_width, max_height);
-            else
-                img_src = r_iiif.GetImageUri(max_width, max_height);
-
-            return img_src;
         }
 
         public void SetupSearchViewBag(string id)
@@ -348,7 +322,7 @@ namespace iNQUIRE.Controllers
                         ViewBag.ogTitle = r.Title;
 
                         ViewBag.ogDescription = r.Description;
-                        ViewBag.ogImage = GetImageUri(r, fb_img_w, fb_img_h);
+                        ViewBag.ogImage = ImageHelper.GetImageUri(r, fb_img_w, fb_img_h, Request.Url.Host, JP2MediaDir, _IJP2Helper);
 
                         var preview_img_w = 0;
                         var preview_img_h = 0;
@@ -444,12 +418,39 @@ namespace iNQUIRE.Controllers
 
             var r = res.Results[0];
 
-            ViewBag.ImageUri = GetImageUri(r, (int)w, (int)h);//  _IJP2Helper.GetImageUri(r.ImageMetadata, MediaDirectoryFullUri, _IJP2Helper.ResolverReverseProxy, (double)w, (double)h);
+            ViewBag.ImageUri = ImageHelper.GetImageUri(r, (int)w, (int)h, Request.Url.Host, JP2MediaDir, _IJP2Helper); //  _IJP2Helper.GetImageUri(r.ImageMetadata, MediaDirectoryFullUri, _IJP2Helper.ResolverReverseProxy, (double)w, (double)h);
             return View(r);
         }
 
 
+       private string JP2MediaDir
+        {
+            get { return Url.Content(String.Format("~/{0}", _IJP2Helper.MediaDirectory)); }
+        }
+        #region moved to ImageHelper.cs
+        //private string MediaDirectoryFullUri
+        //{
+        //    get { return String.Format("http://{0}{1}", Request.Url.Host, Url.Content(String.Format("~/{0}", _IJP2Helper.MediaDirectory))); }
+        //}
 
+        //private string ImageNotFound
+        //{
+        //    get { return String.Format("http://{0}{1}", Request.Url.Host, Url.Content("~/Content/images/export-image-not-found.png")); }
+        //}
+
+        //public string GetImageUri(IInqItem r, int max_width, int max_height)
+        //{
+        //    string img_src;
+        //    var r_iiif = r as InqItemIIIFBase;
+
+        //    if (r_iiif == null)
+        //        img_src = _IJP2Helper.GetImageUri(r.ImageMetadata, MediaDirectoryFullUri, _IJP2Helper.ResolverUri, max_width, max_height);
+        //    else
+        //        img_src = r_iiif.GetImageUri(max_width, max_height);
+
+        //    return img_src;
+        //}
+        #endregion
 
         #region facebook
         // could store it here but not sure we really need to, as can be re-requested via JS methods easily, and search page doesn't reload anyway so shouldn't lose it..?

@@ -25,6 +25,6 @@ namespace iNQUIRE.Helper
         string DeepZoomQueryParameter { get; }
 
         string GetJpeg2000Metadata(string id, bool use_reverse_proxy);
-        string GetImageUri(ImageMetadata imd, string media_directory, string djatoka_resolver, double w_img, double h_img);
+        string GetImageUri(ImageMetadata imd, string media_directory, double w_img, double h_img);
     }
 }

@@ -15,6 +15,7 @@ using SendGrid;
 using System.Net;
 using System.Configuration;
 using System.Diagnostics;
+using System.Net.Mail;
 
 namespace iNQUIRE
 {
@@ -34,25 +35,7 @@ namespace iNQUIRE
             myMessage.Subject = message.Subject;
             myMessage.Text = message.Body;
             myMessage.Html = message.Body;
-
-            var credentials = new NetworkCredential(
-                       ConfigurationManager.AppSettings["mailAccount"],
-                       ConfigurationManager.AppSettings["mailPassword"]
-                       );
-
-            // Create a Web transport for sending email.
-            var transportWeb = new Web(credentials);
-
-            // Send the email.
-            if (transportWeb != null)
-            {
-                await transportWeb.DeliverAsync(myMessage);
-            }
-            else
-            {
-                Trace.TraceError("Failed to create Web transport.");
-                await Task.FromResult(0);
-            }
+            await Helper.EmailHelper.SendEmail(message.Destination, message.Subject, message.Body, null);
         }
     }
 

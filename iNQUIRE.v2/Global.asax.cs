@@ -10,9 +10,9 @@ using System.Configuration;
 using System.Threading;
 using System.Text;
 using System.Reflection;
-using Ninject;
-using Ninject.MVC;
-using Ninject.Web;
+//using Ninject;
+//using Ninject.MVC;
+//using Ninject.Web;
 using iNQUIRE.Models;
 using iNQUIRE.Helpers;
 using SolrNet;
@@ -25,6 +25,7 @@ namespace iNQUIRE
     {
         Queue<EmailExport> _emailQueue;
         int _emailQueueProcessDelayMS;
+        string _exportEmailSubject;
 
         //protected override IKernel CreateKernel()
         //{
@@ -86,9 +87,6 @@ namespace iNQUIRE
             Controllers.DiscoverController.ApplicationIdInquire = new Guid(ConfigurationManager.AppSettings["ApplicationIdInquire"]);
             Controllers.WebApi.WebApiControllerBase.ApplicationIdInquire = new Guid(ConfigurationManager.AppSettings["ApplicationIdInquire"]);
             Controllers.DiscoverController.ExportFilename = ConfigurationManager.AppSettings["ExportFilename"];
-            Controllers.DiscoverController.ExportImageWidth = Convert.ToInt32(ConfigurationManager.AppSettings["ExportImageWidth"]);
-            Controllers.DiscoverController.ExportImageHeight = Convert.ToInt32(ConfigurationManager.AppSettings["ExportImageHeight"]);
-            Controllers.DiscoverController.ExportMaxImages = Convert.ToInt32(ConfigurationManager.AppSettings["ExportMaxImages"]);
             Controllers.DiscoverController.SavedSearchesDisplayMax = Convert.ToInt32(ConfigurationManager.AppSettings["SavedSearchesDisplayMax"]);
             Controllers.DiscoverController.TouchDoubleClickDelayMs = Convert.ToInt32(ConfigurationManager.AppSettings["TouchDoubleClickDelayMs"]);
             Controllers.DiscoverController.OpenDeepZoomTouchIcon = ConfigurationManager.AppSettings["OpenDeepZoomTouchIcon"];
@@ -104,8 +102,12 @@ namespace iNQUIRE
             Controllers.DiscoverController.Languages = MakeKeyValuePairStringStringListFromConfigString(ConfigurationManager.AppSettings["Languages"]);
             Controllers.DiscoverController.MultiLingualSolrFields = ConfigurationManager.AppSettings["MultiLingualSolrFields"].Split(new[] { "^" }, StringSplitOptions.RemoveEmptyEntries).ToList();
 
+            ImageHelper.ExportImageWidth = Convert.ToInt32(ConfigurationManager.AppSettings["ExportImageWidth"]);
+            ImageHelper.ExportImageHeight = Convert.ToInt32(ConfigurationManager.AppSettings["ExportImageHeight"]);
+            ImageHelper.ExportMaxImages = Convert.ToInt32(ConfigurationManager.AppSettings["ExportMaxImages"]);
+
             Helper.EmailHelper.FromAddress = ConfigurationManager.AppSettings["FromEmailAddress"];
-            Helper.EmailHelper.Subject = ConfigurationManager.AppSettings["ExportEmailSubject"];
+            _exportEmailSubject = ConfigurationManager.AppSettings["ExportEmailSubject"];
             Helper.EmailHelper.SmtpHost = ConfigurationManager.AppSettings["SMTPHost"];
             var port = ConfigurationManager.AppSettings["SMTPPort"];
             int port_num = 0;
@@ -138,13 +140,13 @@ namespace iNQUIRE
             // You data class should be derived from InqItemBase or InqItemImageMetadataWidthAndHeightBase
             // see InqItemBod.cs, InqItemArmNode.cs as examples
 
-            // TODO: Replace Ninject DI with Unity DI?
 
             // this is annoying, Solr .net throws an error if you try to supply it with an interface or abstract class, so can't use eg ninject DI?
             // Startup.Init<InqItemXml>(ConfigurationManager.AppSettings["SolrUriXml"]);
             //SolrNet.Startup.Init<InqItemArmNode>(ConfigurationManager.AppSettings["SolrUri"]);
             //SolrNet.Startup.Init<InqItemRKD>(ConfigurationManager.AppSettings["SolrUri"]);
-            SolrNet.Startup.Init<InqItemBodIIIF>(ConfigurationManager.AppSettings["SolrUri"]);
+            //var inq_type = WebApiConfig.UnityContainer.Resolve(typeof(InqItemBase), null, null);
+            SolrNet.Startup.Init<InqItemRKD>(ConfigurationManager.AppSettings["SolrUri"]);
             // Startup.Init<InqItemBod>(ConfigurationManager.AppSettings["SolrUri"]);
 
             // throw new Exception("moo!");
@@ -187,7 +189,7 @@ namespace iNQUIRE
             return kvp_list;
         }
 
-        void email_DoWork(object sender, DoWorkEventArgs e)
+        async void email_DoWork(object sender, DoWorkEventArgs e)
         {
             // System.Diagnostics.Debugger.Break();
             while (true)
@@ -235,7 +237,7 @@ namespace iNQUIRE
 
                     email_html.Append("</body></html>");
 
-                    Helper.EmailHelper.SendEmail(email_export.EmailTo, email_html.ToString(), email_resources);
+                    await Helper.EmailHelper.SendEmail(email_export.EmailTo, _exportEmailSubject, email_html.ToString(), email_resources);
                 }
             }
         }

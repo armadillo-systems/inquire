@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web.Http;
+﻿using System.Web.Http;
 using System.Net.Http.Headers;
-using Microsoft.Practices.Unity;
-using Microsoft.Practices.Unity.Configuration;
 using Newtonsoft.Json;
 using iNQUIRE.Models;
 using iNQUIRE.Helper;
+using Unity;
+using Microsoft.Practices.Unity.Configuration;
 
 namespace iNQUIRE
 {
@@ -55,6 +52,7 @@ namespace iNQUIRE
             container.RegisterType<IUserSearchRepository, LinqToSqlUserSearchRepository>();
             container.RegisterType<IJP2Helper, IIPImageHelper>();
 
+            container.RegisterType<IInqItem, InqItemBase>();
             // (optional) load static config from the *.xml file
             container.LoadConfiguration();
 

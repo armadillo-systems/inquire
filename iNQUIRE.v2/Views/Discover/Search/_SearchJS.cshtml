@@ -136,6 +136,7 @@
         self.searchTerm = ko.observable();
         self.searchTermOld = self.searchTerm('');
         self.searchTitle = 'Results';
+        self.searchCollectionId = ko.observable('');
         self.searchCollectionIds = ko.observable('');
         // searchCollectionIdsOld = '',
         self.searchParentId = ko.observable('');
@@ -489,16 +490,21 @@
 
             if(self.isAuthenticated()) {
                 var del = true;
-                $.post('@Url.Content("~/Discover/SearchDeleteAjax")', {  "user_id": self.userID, "search_id": id },
-                function (data) {
+                $.ajax({
+                    method: 'DELETE',
+                    url: "@Url.Content("~/api/Search/")" + id + '/' + self.userID,
+                    dataType: 'JSON',
+                    contentType: 'application/json',
+                })
+                .done(function (data) {
 
                     if(data == false) {
                         alert("Error deleting search");
                         del = false;
                     }
                 })
-                .error(function() { alert("Error deleting search, server returned an error"); del = false; })
-                .complete(function() {
+                .fail(function() { alert("Error deleting search, server returned an error"); del = false; })
+                .always(function() {
                     if (del) {
                         self.searchDeleteClientOnly(id);
                     }
@@ -695,19 +701,28 @@
             //$('#email-items-container').fadeIn('slow');
         }
 
+        var err = undefined;
         self.emailSend = function (id) {
             if(IsFieldNullOrEmpty(id)) {
                 id = self.exportId;
             }
             var ids = self.getItemIds(id);
-            $.post("@Url.Content("~/Discover/EmailExportAjax")", { "email_to": $('#email-to').val(), "message": $('#email-message').val(), "id_str": ids, "lang_id": self.languageId() },
-                function(data) {
+            var email_params = { 'UserId': self.userID, 'EmailTo': $('#email-to').val(), 'Message': $('#email-message').val(), 'ItemIds': ids, 'LangId': self.languageId() };
+            $.post("@Url.Content("~/api/Search/Email/")", email_params)
+                .done(function (data) {
                     if (data != 'ok') {
-                        alert('Error: Email could not be sent');
+                        err = 'Server error, email not sent';
                     }
                     else {
                         alert('Email sent');
                     }
+                })
+                .fail(function () {
+                    err = 'Error calling send method, email not sent';
+                })
+                .always(function () {
+                    if (err)
+                        alert(err);
                 });
             $('#email-modal').modal('hide');
         }
@@ -759,7 +774,10 @@
                 self.resetRecordsetPageNavigation();
             }
 
-            if(reset_collection) {
+            if (reset_collection) {
+                if (self.searchCollectionId() != '') {
+                    self.searchCollectionId('');
+                }
                 if (self.searchCollectionIds() != '') {
                     // console.log("search complete");
                     self.searchCollectionIds('');
@@ -1016,8 +1034,8 @@
 
         self.getFacetFields = function () {
             self.searchInProgress(true);
-            self.searchRequest = $.get("@Url.Content("~/Discover/SearchAjax")",
-                { "term": '', "collection_ids": '', "rows": 0, "row_start": 0, "parent_id": '', "sort_orders": '', "facet_constraints": '', "lang_id": self.languageId() },
+            self.searchRequest = $.post("@Url.Content("~/api/Search/Items")",
+                { "Term": '', "CollectionIds": '', "Rows": 0, "RowStart": 0, "ParentId": '', "SortOrders": '', "FacetConstraints": '', "LangId": self.languageId() },
                 function (data) {
                     var d = data.SearchResults;
                     self.populateFacetFields(d.FacetFields, d.FacetQueries);
@@ -1105,6 +1123,7 @@
                     self.searchTerm('');
                     //alert('cleared search term box');
 
+                    self.searchCollectionId(collection.id);
                     self.searchCollectionIds(ids);
 
                     //if(self.searchCollectionIdsOld != self.searchCollectionIds()) {
@@ -1183,52 +1202,62 @@
             });
         }
 
-        self.collectionUpdateItemPosition = function  (collection_id, item_id, position) {
-            $.post('@Url.Content("~/Discover/CollectionUpdateItemPositionAjax")', { "collection_id": collection_id, "item_id": item_id, "position": position },
-                function (data) {
+        self.collectionUpdateItemPosition = function (collection_id, item_id, position) {
+            $.ajax({
+                    method: 'PATCH',
+                    url: '@Url.Content("~/api/Collections/Collection/Item/Position/")' + collection_id + '/' + item_id + '/' + position,
+                    dataType: 'JSON',
+                    contentType: 'application/json',
                 })
-                .error(function() { })
-                .complete(function() { });
+                .fail(function () { })
+                .always(function () { });
         }
 
         self.addItemToCollectionDb = function (collection_selector, title, id) {
             // alert(collection_selector + ' ' + title + ' ' + id);
             var c = self.findCollectionBySelector(collection_selector);
 
-            if(c) {
+            if (c) {
                 // alert('collection id: ' + collection.id + ', item id: ' + id);
-                // ajax call to update db
-                var err = null;
                 var position = c.items().length + 1;
                 // alert('addItemToCollectionDb position: ' + position);
 
-                $.post('@Url.Content("~/Discover/CollectionAddItemAjax")', { "collection_id": c.id, "item_id": id, "title": title, "search_term": self.searchTerm(), "language_id": self.languageId(), "position": position },
-                    function (data) {
-                        if(data == 'ok') {
-                            /*@* might be able to get fade-in animation working, add to collection, then display:none immediately, then fadeInSlideDown...*@*/
-                            c.items.push({ title: title, id: id, position: position });
-                        }
+                var err = null;
+                if (title)
+                    title = title.trim();
+
+                $.ajax({
+                    method: 'PUT',
+                    url: '@Url.Content("~/api/Collections/Collection/Item/")' + c.id + "/" + id + "/" + title + "/" + self.languageId() + "/" + position + "/" + self.searchTerm(),
+                    dataType: 'JSON',
+                    contentType: 'application/json',
+                })
+                .done(function (data) {
+                    if (data == 'ok') {
+                        /*@* might be able to get fade-in animation working, add to collection, then display:none immediately, then fadeInSlideDown...*@*/
+                        c.items.push({ title: title, id: id, position: position });
+                    }
+                    else
+                        err = data;
+                    })
+                .fail(function() {
+                    err = 'Failed to add item to collection';
+                })
+                .always(function() {
+                    if (err) {
+                        if (err.match('exists'))
+                            alert('Item already exists in this collection');
                         else
-                            err = data;
-                    })
-                    .error(function() {
-                        err = 'Failed to add item to collection';
-                    })
-                    .complete(function() {
-                        if(err) {
-                            if(err.match('exists'))
-                                alert('Item already exists in this collection');
-                            else
-                                alert(err);
-                        }
-                    })
-                ;
+                            alert(err);
+                    }
+                });
                 return true;
             }
             else {
                 return false;
             }
-        }
+        };
+
 
         self.findCollectionBySelector = function (s) {
             for(var i = 0; i < self.collections().length; i++) {
@@ -1261,16 +1290,21 @@
             if(!self.isAuthenticated())
                 return;
 
-            $.get("@Url.Content("~/Discover/CollectionNewAjax")", { "user_id": self.userID, "title": name },
-            function (data) {
+            $.ajax({
+                method: 'PUT',
+                url: "@Url.Content("~/api/Collections/")" + self.userID + "/" + name,
+                dataType: 'JSON',
+                contentType: 'application/json',
+            })
+            .done(function (data) {
                 // alert("new collection id: " + data);
                 self.makeCollection(name, data)
             })
-            .error(function() { })
-            .complete(function() {
+            .fail(function() { })
+            .always(function() {
                 // $('#collection-settings-options').fadeOut("slow");
             });
-        }
+        };
 
         self.makeCollection = function (name, id) {
             if(!self.isAuthenticated())
@@ -1285,7 +1319,7 @@
                 selector = self.makeCollectionSelector(id);
 
                 // get any existing items
-                $.post("@Url.Content("~/Discover/CollectionGetItemsAjax")", { "collection_id": id },
+                $.get("@Url.Content("~/api/Collections/Collection/Items/")" + id,
                 function (data) {
                     // alert('name: ' + name + ', selector: ' + selector + ', items: ' + data.WorkspaceItems.length);
                     var collection = self.findCollectionBySelector(selector);
@@ -1334,17 +1368,23 @@
                 $(tid_input_sel).remove();
                 $(tid_sel).html(new_t);
 
-                $.get('@Url.Content("~/Discover/CollectionRenameAjax")', { "collection_id": cid, "new_title": new_t },
-                    function (data) { r = data; })
-                    .error(function() { r = false; })
-                    .complete(function() {
-                        if(r) {
-                            col.title(new_t); /*@* must remember to update the collection in the data array that the visual element is bound to *@*/
-                        } else {
-                            alert('Could not rename collection');
-                            $(tid_sel).html(t); /*@* rename has failed, revert the html to the original title *@*/
-                        }
-                    });
+                var r = undefined;
+                $.ajax({
+                    method: 'PATCH',
+                    url: "@Url.Content("~/api/Collections/Collection/Rename/")" + cid + "/" + new_t,
+                    dataType: 'JSON',
+                    contentType: 'application/json',
+                })
+                .done(function (data) { r = data; })
+                .fail(function() { r = false; })
+                .always(function() {
+                    if(r) {
+                        col.title(new_t); /*@* must remember to update the collection in the data array that the visual element is bound to *@*/
+                    } else {
+                        alert('Could not rename collection');
+                        $(tid_sel).html(t); /*@* rename has failed, revert the html to the original title *@*/
+                    }
+                });
             });
         }
 
@@ -1360,33 +1400,38 @@
 
             if(r) {
                 var r_db = false;
-                $.get('@Url.Content("~/Discover/CollectionDeleteAjax")', { "collection_id": c_id },
-                    function (data) {
-                        r_db = data;
-                    })
-                    .error(function (data) {
-                        r_db = 'Ajax request error';
-                    })
-                    .complete(function () {
-                        if (IsFieldNullOrEmpty(r_db)) {
-                            // remove collection from underlying array, which will be automatically reflected in the UI
+                $.ajax({
+                    method: 'DELETE',
+                    url: "@Url.Content("~/api/Collections/Collection/")" + c_id,
+                    dataType: 'JSON',
+                    contentType: 'application/json',
+                })
+                .done(function (data) {
+                    r_db = data;
+                })
+                .fail(function (data) {
+                    r_db = 'Ajax request error';
+                })
+                .always(function () {
+                    if (IsFieldNullOrEmpty(r_db)) {
+                        // remove collection from underlying array, which will be automatically reflected in the UI
 
-                            if(c) {
-                                var p = -1;
+                        if(c) {
+                            var p = -1;
 
-                                for (var i = 0; i < self.collections().length; i++) {
-                                    var col = self.collections()[i];
-                                    var col_selector = '#' + col.selector;
-                                    if(col.id == c_id) {
-                                        fadeOutAndSlideUp($(col_selector), function() { $(col_selector).remove();  self.collections.remove(col); });
-                                        break;
-                                    }
+                            for (var i = 0; i < self.collections().length; i++) {
+                                var col = self.collections()[i];
+                                var col_selector = '#' + col.selector;
+                                if(col.id == c_id) {
+                                    fadeOutAndSlideUp($(col_selector), function() { $(col_selector).remove();  self.collections.remove(col); });
+                                    break;
                                 }
                             }
-                        } else {
-                            alert('Could not delete collection, ' + r_db);
                         }
-                    });
+                    } else {
+                        alert('Could not delete collection, ' + r_db);
+                    }
+                });
             }
         }
 
@@ -1405,38 +1450,71 @@
                     var item_id = $(this).attr('data-id');
                     var elem = $(this).parents('#' + item_id)[0];
                     var r_db = false;
-                    $.post('@Url.Content("~/Discover/CollectionDeleteItemAjax")', { "collection_id": c_id, "item_id": item_id },
-                        function (data) { r_db = data; })
-                        .error(function() { r_db = false; })
-                        .complete(function() {
-                            if(r_db) {
-                                // remove item from underlying array, which will be automatically reflected in the UI
-                                var c = self.findCollectionByID(c_id);
 
-                                if(c) {
-                                    var p = -1;
+                    $.ajax({
+                        method: 'DELETE',
+                        url: "@Url.Content("~/api/Collections/Collection/Item/")" + c_id + '/' + item_id,
+                        dataType: 'JSON',
+                        contentType: 'application/json',
+                    })
+                    .done(function (data) {
+                        r_db = data;
+                    })
+                    .fail(function () {
+                        r_db = false;
+                    })
+                    .always(function() {
+                        if(r_db) {
+                            // remove item from underlying array, which will be automatically reflected in the UI
+                            var c = self.findCollectionByID(c_id);
 
-                                    for (var i = 0; i < c.items().length; i++) {
-                                        if(c.items()[i].id == item_id) {
-                                            if(elem)
-                                                fadeOutAndSlideUp(elem, function() { $(elem).remove();  c.items.remove(c.items()[i]); });
-                                            p = i;
+                            if(c) {
+                                var p = -1;
+
+                                for (var i = 0; i < c.items().length; i++) {
+                                    if (c.items()[i].id == item_id) {
+                                        if (elem) {
+                                            fadeOutAndSlideUp(elem, function () { $(elem).remove(); c.items.remove(c.items()[i]); });
+                                        }
+                                        p = i;
+                                        break;
+                                    }
+                                }
+
+                                // remove item from results if this collection is the one being viewed
+                                if (c_id == self.searchCollectionId()) {
+                                    for (var x = 0; x < self.results().length; x++) {
+                                        if (self.results()[x].ID == item_id) {
+                                            var result_element = $("#results .result[data-id|='" + item_id + "']");
+
+                                            if (self.resultsLayout() == 'masonry') {
+                                                $(result_element).fadeOut(_fadeMsMax, _animType, function () {
+                                                    self.results.remove(self.results()[x]);
+                                                    updateMasonryLayout(self.resultSizePx.ImageWidth, false);
+                                                });
+                                            } else {
+                                                fadeOutAndSlideUp(result_element, function () { self.results.remove(self.results()[x]); });
+                                            }
                                             break;
                                         }
                                     }
-                                    // if the object was removed then we need to update all the sort positions of the other items in the collection (otherwise if there was 1,2,3 and 2 is removed then get a sort gap)
-                                    if(p > -1) {
-                                        for (var j = p; j < c.items().length; j++) {
+                                }
+
+                                // if the object was removed then we need to update all the sort positions of the other items in the collection (otherwise if there was 1,2,3 and 2 is removed then get a sort gap)
+                                if(p > -1) {
+                                    for (var j = p; j < c.items().length; j++) {
+                                        if (item_id !== c.items()[j].id) {
                                             var new_pos = c.items()[j].position - 1;
                                             c.items()[j].position = new_pos;
-                                            self.collectionUpdateItemPosition (c_id, c.items()[j].id, new_pos);
+                                            self.collectionUpdateItemPosition(c_id, c.items()[j].id, new_pos);
                                         }
                                     }
                                 }
-                            } else {
-                                alert('Could not remove item from collection');
                             }
-                        });
+                        } else {
+                            alert('Could not remove item from collection');
+                        }
+                    });
                 }
             }
             else {
@@ -1477,9 +1555,14 @@
         }
 
         self.setupDiscoveryColumn = function () {
-            if(self.isAuthenticated()) {
-                $.post("@Url.Content("~/Discover/Collections/User")", { "user_id": self.userID },
-                    function (data) {
+            if (self.isAuthenticated()) {
+                $.ajax({
+                    method: 'GET',
+                    url: "@Url.Content("~/api/Collections/User/")" + self.userID,
+                    dataType: 'JSON',
+                    contentType: 'application/json',
+                })
+                .done(function (data) {
                         if(data.length == 0)
                             self.makeCollection("My Collection"); // create an initial empty collection, addCollectionEvents will be automatically run by the after render template method
                         else {
@@ -1487,17 +1570,24 @@
                                 self.makeCollection(data[i].Title, data[i].WorkspaceID);
                             }
                         }
-                    }).error(function() { }).complete(function() {});
+                })
+                .fail(function () { })
+                .always(function () { });
 
-                $.post("@Url.Content("~/Discover/GetSearchesForUserAjax")", { "user_id": self.userID },
-                function (data) {
+                $.ajax({
+                    method: 'GET',
+                    url: "@Url.Content("~/api/Search/User/")" + self.userID,
+                    dataType: 'JSON',
+                    contentType: 'application/json',
+                })
+                .done(function (data) {
                     var d = new Array();
                     /*@* need to flatten out facet constraints property for the JS code *@*/
                     for(var j = 0; j < data.length; j++) {
                         d.push(searchQueryDecode(data[j]));
                     }
                     self.savedSearches(d);
-                }).error(function() { }).complete(function() {});
+                }).fail(function() { }).always(function() {});
             }
 
             //$('#but-collection-visibility').click(function () {
@@ -1547,8 +1637,13 @@
                 return;
             }
 
-            $.post("@Url.Content("~/Discover/NoteAddAjax")", { "lang_id": self.languageId(), "user_id": self.userID, "item_id": item_id, "text": note_text, "public_note": public_note },
-            function (data) {
+            $.ajax({
+                method: 'PUT',
+                url: "@Url.Content("~/api/Notes/")" + item_id + '/' + self.userID + '/' + self.languageId() + '/' + note_text + '/' + public_note,
+                dataType: 'JSON',
+                contentType: 'application/json',
+            })
+            $.done(function (data) {
                 if(data.NoteID == '00000000-0000-0000-0000-000000000000') {
                     alert("Error adding note: " + data.Text);
                 }
@@ -1565,8 +1660,8 @@
                     }
                 }
             })
-            .error(function() { alert("Error adding note to item, server returned an error"); })
-            .complete(function() { });
+            .fail(function() { alert("Error adding note to item, server returned an error"); })
+            .always(function() { });
         }
 
         self.noteDelete = function () {
@@ -1583,8 +1678,13 @@
                 if(IsFieldNullOrEmpty(note_id))
                     return;
 
-                $.post('@Url.Content("~/Discover/NoteDeleteAjax")', {  "user_id": self.userID, "note_id": note_id },
-                function (data) {
+                $.ajax({
+                    method: 'DELETE',
+                    url: "@Url.Content("~/api/Notes/")" + note_id + '/' + self.userID,
+                    dataType: 'JSON',
+                    contentType: 'application/json',
+                })
+                .done(function (data) {
                     if(data == false) {
                         alert("Error deleting note");
                     }
@@ -1605,8 +1705,8 @@
                         }
                     }
                 })
-                .error(function() { alert("Error deleting note, server returned an error"); })
-                .complete(function() { });
+                .fail(function() { alert("Error deleting note, server returned an error"); })
+                .always(function() { });
             }
         }
         // End: Notes
@@ -1632,8 +1732,14 @@
             for (var i = 0; i < tags_array.length; i++) {
                 var title = tags_array[i];
                 title = jQuery.trim(title);
-                $.post("@Url.Content("~/Discover/TagItemAjax")", { "lang_id": self.languageId(), "user_id": self.userID, "title": title, "item_id": item_id  },
-                function (data) {
+
+                $.ajax({
+                    method: 'PUT',
+                    url: "@Url.Content("~/api/Tags/")" + item_id + '/' + self.userID + '/' + self.languageId() + '/' + title,
+                    dataType: 'JSON',
+                    contentType: 'application/json',
+                })
+                .done(function (data) {
                     if(data.Result == false) {
                         if(data.Message.toLowerCase().indexOf("error") != -1) // @* if not an error it's probably because the item is already tagged by this user with this tag *@
                             alert("Error tagging item: " + data.Title);
@@ -1643,8 +1749,8 @@
                         $('#tags #input-tags').val('');
                     }
                 })
-                .error(function() { alert("Error tagging item, server returned an error: " + title); })
-                .complete(function() { });
+                .fail(function() { alert("Error tagging item, server returned an error: " + title); })
+                .always(function() { });
             }
         }
 
@@ -1663,8 +1769,13 @@
                 return;
             }
 
-            $.post("@Url.Content("~/Discover/UnTagItemAjax")", {  "user_id": self.userID, "tag_id": tag_id, "item_id": item_id  },
-            function (data) {
+            $.ajax({
+                method: 'DELETE',
+                url: "@Url.Content("~/api/Tags/Item/User/")" + item_id + '/' + self.userID + '/' + tag_id,
+                dataType: 'JSON',
+                contentType: 'application/json',
+            })
+            .done(function (data) {
                 if(data == false) {
                     alert("Error un-tagging item");
                 }
@@ -1679,8 +1790,8 @@
                     }
                 }
             })
-            .error(function() { alert("Error tagging item, server returned an error: " + title); })
-            .complete(function() { });
+            .fail(function() { alert("Error tagging item, server returned an error: " + title); })
+            .always(function() { });
         }
 
         // End: Tags
@@ -2192,8 +2303,13 @@
 
 
         self.getRecord = function (id, lang_id) {
-            $.get("@Url.Content("~/Discover/GetRecordAjax")", { "id": id, "lang_id": lang_id },
-            function (data) {
+            $.ajax({
+                method: 'GET',
+                url: "@Url.Content("~/api/Search/Item/")" + item_id + '/' + lang_id,
+                dataType: 'JSON',
+                contentType: 'application/json',
+            })
+            .done(function (data) {
                 // alert('GetRecordAjax returned: ' + data.SearchResults.Results.length);
                 var d = data.SearchResults;
                 if (d.Results.length == 1) {
@@ -2231,26 +2347,38 @@
                 else {
                     alert('getRecord error, results found: ' + d.Results.length);
                 }
-            });
+                })
+                .fail(function () {
+                    alert('Error getting Item info');
+                })
+                .always(function () {});
         }
 
-        self.getParentRecord = function (id) {
-            $.get("@Url.Content("~/Discover/GetRecordAjax")", { "id": id },
-                function (data) {
-                    // alert('GetRecordAjax returned: ' + data.SearchResults.Results.length);
-                    if (data.SearchResults.Results.length == 1) {
-                        var p = data.SearchResults.Results[0];
-                        self.recordChildIds(p.ChildNodes);
-                        setupSlider(self.recordChildIds().length);
-                        // alert(self.recordChildIds.indexOf(self._viewItem));
-                        self.recordCurrentPosition(self.recordChildIds.indexOf(self.viewItem())); // self._viewItem
-                    }
-                    else {
-                        alert('getRecord error, results found: ' + data.SearchResults.Results.length);
-                    }
-                });
+        self.getParentRecord = function (id, lang_id) {
+            $.ajax({
+                method: 'GET',
+                url: "@Url.Content("~/api/Search/Item/")" + id + '/' + lang_id,
+                dataType: 'JSON',
+                contentType: 'application/json',
+            })
+            .done(function (data) {
+                // alert('GetRecordAjax returned: ' + data.SearchResults.Results.length);
+                if (data.SearchResults.Results.length == 1) {
+                    var p = data.SearchResults.Results[0];
+                    self.recordChildIds(p.ChildNodes);
+                    setupSlider(self.recordChildIds().length);
+                    // alert(self.recordChildIds.indexOf(self._viewItem));
+                    self.recordCurrentPosition(self.recordChildIds.indexOf(self.viewItem())); // self._viewItem
+                }
+                else {
+                    alert('getRecord error, results found: ' + data.SearchResults.Results.length);
+                }
+            })
+            .fail(function () {
+                alert('Error getting Parent Item info');
+            })
+            .always(function () { });
         }
-
 
         self.openResult = function (item_id, item_index, children_count, children_string)
         {
@@ -2457,18 +2585,25 @@
             _fadeMsTags = 0;
 
             self.resultCurrentTags([]);
-            $.post("@Url.Content("~/Discover/GetUserItemTagsAjax")",
-                    { "lang_id": this.languageId(), "item_id": item_id,
-                        "user_id": this.userID },
-                    function(data) {
+            $.ajax({
+                method: 'GET',
+                url: "@Url.Content("~/api/Tags/Item/User/")" + item_id + '/' + this.languageId() + '/' + this.userID,
+                dataType: 'JSON',
+                contentType: 'application/json',
+            })
+            .done(function(data) {
                         self.resultCurrentTags(data);
                         _fadeMsTags = _fadeMsMax;
                     } );
 
             self.notesPrivate([]);
-            $.post("@Url.Content("~/Discover/GetNotesForItemAjax")",
-                    { "item_id": item_id, "user_id": this.userID },
-                    function(data) {
+            $.ajax({
+                method: 'GET',
+                url: "@Url.Content("~/api/Notes/Item/")" + item_id + '/' + this.userID,
+                dataType: 'JSON',
+                contentType: 'application/json',
+            })
+            .done(function(data) {
                         self.notesPrivate(data);
                         _fadeMsTags = _fadeMsMax;
                     } );
@@ -2476,9 +2611,13 @@
             /*@* including this causes infinte loop...? if(self.notesPublic().length != 0) *@*/
             self.notesPublic([]);
 
-            $.post("@Url.Content("~/Discover/GetPublicNotesForItemAjax")",
-                    {"item_id": item_id, "approved": true },
-                    function(data) {
+            $.ajax({
+                method: 'GET',
+                url: "@Url.Content("~/api/Notes/Item/")" + item_id + '/true',
+                dataType: 'JSON',
+                contentType: 'application/json',
+            })
+            .done(function(data) {
                         self.notesPublic(data);
                         _fadeMsTags = _fadeMsMax;
                     } );
@@ -2493,7 +2632,7 @@
             // if visiting a shared fb link you can get a scenario where the sortField() gets set to an object, so check for that here and fix
             // how it ends up as an object needs to be invstigated
             var sort_str = (self.sortField().OptionValue) ? self.sortField().OptionValue : self.sortField();
-            var params_str = 't+' + encodeURIComponent(self.searchTerm()) + ',rsrs+' + self.recordsetRowStart() + ',rsps+' + self.recordsetPageSize() + ',fa+' + encodeURIComponent(self.facetsAppliedString()) + ',so+' + encodeURIComponent(sort_str) + ',scids+' + self.searchCollectionIds() + ',pid+' + self.searchParentId() + ',vi+' + self.viewItem() + ',l+' + self.languageId();
+            var params_str = 't+' + encodeURIComponent(self.searchTerm()) + ',rsrs+' + self.recordsetRowStart() + ',rsps+' + self.recordsetPageSize() + ',fa+' + encodeURIComponent(self.facetsAppliedString()) + ',so+' + encodeURIComponent(sort_str) + ',cid+' + self.searchCollectionId() + ',scids+' + self.searchCollectionIds() + ',pid+' + self.searchParentId() + ',vi+' + self.viewItem() + ',l+' + self.languageId();
             // console.log('searchParamsString read: ' + params_str);
             return params_str;
         }).extend({ rateLimit: 100 });
@@ -2548,7 +2687,7 @@
             var pid = decodeURIComponent(self.searchParentId());
             // alert('searchParentId set: ' + pid);
             if(IsFieldNullOrEmpty(pid) == false) { @* need to make sure if coming straight to a child object from a url that we populate the parent info too, else child navigation will not work *@
-                self.getParentRecord(pid);
+                self.getParentRecord(pid, self.languageId());
             }
             else {
                 if(self.recordChildIds().length > 0)
@@ -2584,7 +2723,9 @@
             // then on hitting back the collection id is lost, so the user ends up back at general search, rather than in the collection they were in.
             // so let's try disabling the collection search if we find we have a parent id parameter defined.
             var scids = self.searchCollectionIds();
+            var cid = self.searchCollectionId();
             if (!IsFieldNullOrEmpty(self.searchParentId())) {
+                cid = ''; // not used below (atm)
                 scids = '';
             }
 
@@ -2594,7 +2735,7 @@
             // (their original search would be lost)
             var search_term = IsFieldNullOrEmpty(self.searchParentId()) ? self.searchTerm() : '';
 
-            self.searchRequest = $.get("@Url.Content("~/Discover/SearchAjax")", { "user_id": self.userID, "term": search_term, "rows": self.recordsetPageSize(), "row_start": self.recordsetRowStart(), "sort_orders": self.sortField(), "facet_constraints": self.facetsAppliedString(),"collection_ids": scids, "parent_id": self.searchParentId(), "lang_id": self.languageId() },
+            self.searchRequest = $.post("@Url.Content("~/api/Search/Items")", { "UserId": self.userID, "Term": search_term, "Rows": self.recordsetPageSize(), "RowStart": self.recordsetRowStart(), "SortOrders": self.sortField(), "FacetConstraints": self.facetsAppliedString(),"CollectionIds": scids, "ParentId": self.searchParentId(), "LangId": self.languageId() },
                 function (data) {
                     var d = data.SearchResults;
                     self.applyHighlights(d);
@@ -2640,10 +2781,10 @@
                         }
                     }
                 })
-                .error(function() {
+                .fail(function(data) {
                     console.log("search error");
                 })
-                .complete(function() {
+                .always(function() {
                     self.searchInProgress(false);
                 });
         }
@@ -2740,6 +2881,11 @@
                     // sort order
                     if(self.sortField() != ps.so) {
                         self.sortField(ps.so);
+                    }
+
+                    // collection id
+                    if(self.searchCollectionId() != ps.cid) {
+                        self.searchCollectionId(ps.cid);
                     }
 
                     // collection ids

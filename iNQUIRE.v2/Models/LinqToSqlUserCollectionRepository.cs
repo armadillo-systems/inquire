@@ -153,8 +153,9 @@ namespace iNQUIRE.Models
                 _db.SubmitChanges();
                 return true;
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                Helper.LogHelper.StatsLog(collection_id, "Collection", string.Format("CollectionUpdateItemPosition() failed, item id {0}", item_id), e.Message, e.InnerException?.Message);
                 return false;
             }
         }
@@ -170,8 +171,9 @@ namespace iNQUIRE.Models
                 _db.SubmitChanges();
                 return true;
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                Helper.LogHelper.StatsLog(collection_id, "Collection", string.Format("CollectionUpdateItemPositionXY() failed, item id {0}", item_id), e.Message, e.InnerException?.Message);
                 return false;
             }
         }

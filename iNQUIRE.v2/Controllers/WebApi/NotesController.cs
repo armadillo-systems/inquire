@@ -48,8 +48,8 @@ namespace iNQUIRE.Controllers.WebApi
             return Ok(r);
         }
 
-        [HttpGet, Route("Item/{item_id}/{user_id}")]
-        public IHttpActionResult GetItemNotes(string item_id, string user_id)
+        [HttpGet, Route("Item/{item_id}/{user_id?}")]
+        public IHttpActionResult GetItemNotes(string item_id, string user_id = null)
         {
             List<NoteInfo> r;
 

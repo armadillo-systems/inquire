@@ -20,7 +20,7 @@
                     return;
                 }
 
-                lastXhr = $.getJSON('@Url.Content("~/Discover/GetSearchSuggestionsAjax")', { "lang_id": _vm.languageId(), "str": term },
+                lastXhr = $.getJSON('@Url.Content("~/api/Search/Suggestions/")' +  _vm.languageId() + '/' + term ,
                     function( data, status, xhr ) {
                         cache[langid_term] = data;
                         if (xhr === lastXhr) {

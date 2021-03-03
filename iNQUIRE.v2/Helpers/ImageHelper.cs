@@ -27,6 +27,11 @@ namespace iNQUIRE.Helpers
         public static string ImageDirectory { get; set; }
         public static string ImageFilenameAppend { get; set; }
 
+        public static int ExportImageWidth { get; set; }
+        public static int ExportImageHeight { get; set; }
+        public static int ExportMaxImages { get; set; }
+
+
         static ImageHelper()
         {
             _bw = new BackgroundWorker
@@ -137,7 +142,7 @@ namespace iNQUIRE.Helpers
                 LogHelper.StatsLog(null, "onBw_DoWork", "Nothing to do", null, null);
         }
 
-        [DebuggerNonUserCodeAttribute]
+        [DebuggerNonUserCode]
         private static void createJpeg2000(string input_file, string output_file)
         {
             try
@@ -200,7 +205,7 @@ namespace iNQUIRE.Helpers
             }
         }
 
-        [DebuggerNonUserCodeAttribute]
+        [DebuggerNonUserCode]
         static void onBw_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             if (e.Result == null)
@@ -253,6 +258,34 @@ namespace iNQUIRE.Helpers
             {
                 return ReadFully(s);
             }
+        }
+
+        //private string MediaDirectoryFullUri
+        //{
+        //    get { return String.Format("http://{0}{1}", Request.Url.Host, Url.Content(String.Format("~/{0}", _IJP2Helper.MediaDirectory))); }
+        //}
+
+        public static string JP2MediaDirectoryFullUri(string request_url_host, string url_jp2_mediadir)
+        {
+            return string.Format("http://{0}{1}", request_url_host, url_jp2_mediadir);
+        }
+
+        //public static string ImageNotFound(string request_url_host, string export_image_not_found)
+        //{
+        //    return string.Format("http://{0}{1}", request_url_host, export_image_not_found);
+        //}
+
+        public static string GetImageUri(IInqItem r, int max_width, int max_height, string request_url_host, string url_jp2_mediadir, IJP2Helper ijp2_helper)
+        {
+            string img_src;
+            var r_iiif = r as InqItemIIIFBase;
+            
+            if (r_iiif == null)
+                img_src = ijp2_helper.GetImageUri(r.ImageMetadata, JP2MediaDirectoryFullUri(request_url_host, url_jp2_mediadir), max_width, max_height);
+            else
+                img_src = r_iiif.GetImageUri(max_width, max_height);
+
+            return img_src;
         }
     }
 }

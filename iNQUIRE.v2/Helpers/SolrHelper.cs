@@ -3,7 +3,7 @@ using System.Configuration;
 using System.Collections.Generic;
 using System.Text;
 using iNQUIRE.Models;
-using Microsoft.Practices.ServiceLocation;
+//using Microsoft.Practices.ServiceLocation;
 //using Ninject;
 using SolrNet;
 using SolrNet.Exceptions;
@@ -12,6 +12,7 @@ using System.Reflection;
 using System.Linq;
 using System.Web.Script.Serialization;
 using iNQUIRE.Helper;
+using CommonServiceLocator;
 
 namespace iNQUIRE.Helpers
 {

@@ -39,7 +39,7 @@ namespace iNQUIRE.Controllers.WebApi
             return Ok(r);
         }
 
-        [HttpPatch, Route("Collection/{collection_id}/{new_title}")]
+        [HttpPatch, Route("Collection/Rename/{collection_id}/{new_title}")]
         public IHttpActionResult RenameCollection(string collection_id, string new_title)
         {
             if (String.IsNullOrEmpty(collection_id))
@@ -49,8 +49,8 @@ namespace iNQUIRE.Controllers.WebApi
             return Ok(r);
         }
 
-        [HttpPut, Route("Collection/Item/{collection_id}/{item_id}/{title}/{search_term}/{lang_id}/{position:int}")]
-        public IHttpActionResult AddCollectionItem(string collection_id, string item_id, string title, string search_term, string lang_id, int position)
+        [HttpPut, Route("Collection/Item/{collection_id}/{item_id}/{title}/{lang_id}/{position:int}/{search_term?}")]
+        public IHttpActionResult AddCollectionItem(string collection_id, string item_id, string title, string lang_id, int position, string search_term = "")
         {
             if (String.IsNullOrEmpty(collection_id) || String.IsNullOrEmpty(item_id))
                 return null;

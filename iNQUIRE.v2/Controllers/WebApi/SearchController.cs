@@ -12,7 +12,7 @@ namespace iNQUIRE.Controllers.WebApi
 {
     public class SearchParameters
     {
-        public string IserId { get; set; }
+        public string UserId { get; set; }
         public string LangId { get; set; }
         public string Term { get; set; }
         public string CollectionIds { get; set; }
@@ -22,6 +22,15 @@ namespace iNQUIRE.Controllers.WebApi
         public string SortOrders { get; set; }
         public string FacetConstraints { get; set; }
         // SearchFacetViewModel facet)
+    }
+
+    public class EmailExportParameters
+    {
+        public string UserId { get; set; }
+        public string LangId { get; set; }
+        public string ItemIds { get; set; }
+        public string EmailTo { get; set; }
+        public string Message { get; set; }
     }
 
     [RoutePrefix("api/Search")]
@@ -92,34 +101,71 @@ namespace iNQUIRE.Controllers.WebApi
         #endregion
 
 
-        //[HttpPost, Route("Items/{rows:int}/{row_start:int}")]// /{user_id}/{lang_id}/{term}/{collection_ids}/{parent_id}/{sort_orders}/{facet_constraints}")]
-        //public IHttpActionResult GetItems([FromBody] SearchParameters)
-        //{
-        //    var sq = new SearchQuery(user_id, term, collection_ids, rows, row_start, parent_id, sort_orders, facet_constraints, lang_id);
+        [HttpPost, Route("Items")]// /{rows:int}/{row_start:int}/{user_id}/{lang_id}/{term}/{collection_ids}/{parent_id}/{sort_orders}/{facet_constraints}")]
+        public IHttpActionResult GetItems([FromBody] SearchParameters search_params)
+        {
+            var sq = new SearchQuery(search_params.UserId, search_params.Term, search_params.CollectionIds, search_params.Rows, search_params.RowStart, search_params.ParentId, search_params.SortOrders, search_params.FacetConstraints, search_params.LangId);
 
-        //    if (string.IsNullOrEmpty(user_id))
-        //        user_id = Guid.Empty.ToString();
+            var user_id = string.IsNullOrEmpty(search_params.UserId) ? Guid.Empty.ToString() : search_params.UserId;
 
-        //    //XmlDataHelper.SearchXml(Request.GetBaseUri(Url), term, new List<string>(ids), collection_search)
-        //    var results = SolrHelper.SearchSolr(sq, _IRepository, _IJP2Helper);
+            //XmlDataHelper.SearchXml(Request.GetBaseUri(Url), term, new List<string>(ids), collection_search)
+            var results = SolrHelper.SearchSolr(sq, _IRepository, _IJP2Helper);
 
-        //    // save all searches, even if user not logged in (for complete stats). if start row == 0 assume new search (and not a seach page nav click)
-        //    var kvp = new KeyValuePair<Guid, String>(Guid.Empty, null);
-        //    if (row_start == 0)
-        //        kvp = _IUserSearchRepository.SearchSave(ApplicationIdInquire, lang_id, user_id, sq, results.NumFound);
+            // save all searches, even if user not logged in (for complete stats). if start row == 0 assume new search (and not a seach page nav click)
+            var kvp = new KeyValuePair<Guid, String>(Guid.Empty, null);
+            if (search_params.RowStart == 0)
+                kvp = _IUserSearchRepository.SearchSave(ApplicationIdInquire, search_params.LangId, user_id, sq, results.NumFound);
 
-        //    results.SearchID = kvp.Key; // if search was saved this will NOT be Guid.Empty, so then add it to users list as a newly saved search
-        //    sq.SearchID = kvp.Key;
+            results.SearchID = kvp.Key; // if search was saved this will NOT be Guid.Empty, so then add it to users list as a newly saved search
+            sq.SearchID = kvp.Key;
 
-        //    results.SearchDisplayName = kvp.Value;
-        //    sq.DisplayName = kvp.Value;
+            results.SearchDisplayName = kvp.Value;
+            sq.DisplayName = kvp.Value;
 
-        //    sq.NumFound = results.NumFound;
-        //    results.SearchQuery = sq;
+            sq.NumFound = results.NumFound;
+            results.SearchQuery = sq;
 
-        //    var results_vm = new SearchAjaxViewModel(results) { Rows = rows, RowStart = row_start };
-        //    return Ok(results_vm);
-        //}
+            var results_vm = new SearchAjaxViewModel(results) { Rows = search_params.Rows, RowStart = search_params.RowStart };
+            return Ok(results_vm);
+        }
 
+        [HttpPost, Route("Email")]
+        public IHttpActionResult EmailExport([FromBody] EmailExportParameters email_params)
+        {
+            //email_to, string message, string id_str, string lang_id
+            // setResolvers();
+            if (email_params == null)
+                return BadRequest();
+
+            if (string.IsNullOrEmpty(email_params.EmailTo))
+                return BadRequest("No destination email address");
+
+            if (string.IsNullOrEmpty(email_params.ItemIds))
+                return BadRequest("No items selected");
+
+            var results = SolrHelper.GetItemsFromIDStringList(email_params.ItemIds, false, _IRepository, _IJP2Helper);
+
+            var export_items = new List<ExportItem>();
+            var count = 0;
+            foreach (IInqItem r in results)
+            {
+                var img_src = ImageHelper.GetImageUri(r, ImageHelper.ExportImageWidth, ImageHelper.ExportImageHeight, Request.RequestUri.Host, Url.Content(String.Format("~/{0}", _IJP2Helper.MediaDirectory)), _IJP2Helper);
+                // var img_src = _IJP2Helper.GetImageUri(r.ImageMetadata, MediaDirectoryFullUri, _IJP2Helper.ResolverUri, ExportImageWidth, ExportImageHeight);
+                export_items.Add(new ExportItem(r, img_src, email_params.LangId));
+                count++;
+
+                if (count >= ImageHelper.ExportMaxImages)
+                    break;
+            }
+
+            var export = new EmailExport(email_params.EmailTo, email_params.Message, export_items, Url.Content("~/Content/images/export-image-not-found.png"));
+            var queue = HttpContextCurrent.Application["email_queue"] as Queue<EmailExport>;
+            queue.Enqueue(export);
+
+            //var res = _IRepository.GetRecord(_IRepository.GetBaseUri(Request, Url), id);
+            //var results_vm = new SearchAjaxViewModel(res) { Rows = 1, RowStart = 0 };
+
+            return Ok("ok");
+        }
     }
 }
