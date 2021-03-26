@@ -117,7 +117,7 @@ namespace iNQUIRE.Helper
             }
         }
 
-        public virtual String GetImageUri(ImageMetadata imd, string media_directory, string jp2resolver, double w_img, double h_img)
+        public virtual String GetImageUri(ImageMetadata imd, string media_directory, double w_img, double h_img)
         {
             string img_src = "";
 
@@ -158,7 +158,7 @@ namespace iNQUIRE.Helper
                 int r_x = Convert.ToInt32(w * 2);
                 int r_y = Convert.ToInt32(h * 2);
 
-                img_src = MakeJP2ImageUri(jp2resolver, imd.Identifier, level, r_y, r_x);
+                img_src = MakeJP2ImageUri(ResolverUri, imd.Identifier, level, r_y, r_x);
             }
             else
             {

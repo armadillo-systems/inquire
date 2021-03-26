@@ -6,6 +6,16 @@ using System.ComponentModel;
 
 namespace iNQUIRE.Models
 {
+    public class Test : ITest<Workspace, Workspace>
+    {
+        public string Name { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+    }
+
+    public interface ITest<T, U>
+    {
+        string Name { get; set; }
+    }
+
     public interface IUserCollectionRepository<T, U, V> // T: Workspace type, U: WorkspaceItem type, V: item id type
     {
         string CollectionNew(Guid application_id, string user_id, string title); // returns guid of new collection

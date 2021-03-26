@@ -359,7 +359,7 @@ footer {
 #email-modal #email-to, #email-modal #email-message {
   width: 100%; }
 
-.tag-rem, .recordset-page, .saved-search, #comment-new, #note-new, #tag-new, .saved-search-holder .search-del {
+.collection-option, .but-collection-del-item, .collection-list-header-text, .tag-rem, .recordset-page, .saved-search, #comment-new, #note-new, #tag-new, .saved-search-holder .search-del {
   cursor: pointer; }
 
 .results-count, .results-pager {

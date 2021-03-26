@@ -1,5 +1,5 @@
 ﻿@import '_cd-properties.scss';
-@import 'RKD/_rkd-cd-properties.scss'; /* line can be removed if this file not found, it's custom css settings */
+//@import 'RKD/_rkd-cd-properties.scss'; /* line can be removed if this file not found, it's custom css settings */
 
 .nav-desc {
     display: none;
@@ -408,6 +408,7 @@ Top Navigation
     top: 0;
     right: 0;
     display: block;
+    height: 24px;
 }
 
 #cd-top-lang li {
@@ -418,7 +419,7 @@ Top Navigation
 }
 
 #cd-top-lang a, a:visited, a:hover, a:active {
-    color: inherit;
+    color: white;
 }
 
 

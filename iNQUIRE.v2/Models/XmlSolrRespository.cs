@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
-using Microsoft.Practices.ServiceLocation;
+//using Microsoft.Practices.ServiceLocation;
 //using Ninject;
 //using Ninject.Integration.SolrNet;
 using SolrNet;
 using SolrNet.Commands.Parameters;
+using CommonServiceLocator;
 
 namespace iNQUIRE.Models
 {

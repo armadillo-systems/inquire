@@ -34,9 +34,11 @@
                 <!--<a href="#0" class="cd-3d-nav-trigger">Facets<span></span></a>-->
 
                 <nav class="cd-nav">
-                    <ul id="cd-top-lang" data-bind="foreach: languages">
-                        <li><a data-bind="attrib: {'href' : code }, text: name, click: $root.languageClick, css: { 'strong': ($root.languageId() === code) }"></a></li>
-                    </ul>
+                    <div data-bind="visible: languages.length > 1">
+                        <ul id="cd-top-lang" data-bind="foreach: languages">
+                            <li><a data-bind="attrib: {'href' : code }, text: name, click: $root.languageClick, css: { 'strong': ($root.languageId() === code) }"></a></li>
+                        </ul>
+                    </div>
                     <ul class="cd-top-nav">
                         <li data-bind="visible: backButton()"><a href="" onclick="return false;" id="nav-back"><span class="glyphicon glyphicon-circle-arrow-left"></span><span class="nav-desc"> Back</span></a></li>
                         @*<li data-bind="visible: childPrevAvailable()"><a href="" onclick="return false;" id="nav-prev"><span class="glyphicon glyphicon-arrow-left"></span><span class="nav-desc"> Prev</span></a></li>

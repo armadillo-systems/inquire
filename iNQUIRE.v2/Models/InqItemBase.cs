@@ -5,6 +5,7 @@ using System.Web;
 using System.Text;
 using System.Xml.Linq;
 using iNQUIRE.Helper;
+using System.Reflection;
 
 namespace iNQUIRE.Models
 {
@@ -26,6 +27,8 @@ namespace iNQUIRE.Models
 
         public abstract int Width { get; set; }
         public abstract int Height { get; set; }
+
+        public virtual int Levels { get { return 0; }  set { } }
 
         public abstract string ExportRis(string lang_id = null);
         public abstract XElement ExportXml(string lang_id = null);
@@ -79,6 +82,43 @@ namespace iNQUIRE.Models
             }
 
             return sb.ToString();
+        }
+
+        public Dictionary<string, List<string>> MakeMultilingualStringListDictionary(string property_name)
+        {
+            var d = new Dictionary<string, List<string>>();
+
+            Type t = this.GetType();
+            IList<PropertyInfo> mlprops = new List<PropertyInfo>(t.GetProperties(BindingFlags.Public | BindingFlags.Instance).Where(p => p.Name.StartsWith(string.Format("_{0}_", property_name.ToLower()))).ToList());
+
+            foreach (PropertyInfo mlprop in mlprops)
+            {
+                var lang_id = mlprop.Name.Split('_')[2];
+                var strings = mlprop.GetValue(this, null) as List<string>;
+
+                if (!d.ContainsKey(lang_id))
+                    d.Add(lang_id, new List<string>());
+
+                d[lang_id].AddRange(strings);
+            }
+
+            return d;
+        }
+
+        public Dictionary<string, List<string>> ParseMultilingualStringListToDictionary(ICollection<string> strings)
+        {
+            var d = new Dictionary<string, List<string>>();
+
+            if (strings != null)
+            {
+                foreach (var k in strings)
+                {
+                    var sp = k.Split(new string[] { "^^" }, StringSplitOptions.RemoveEmptyEntries);
+                    d.Add(sp[0], new List<string>(sp[1].Split(',')));
+                }
+            }
+
+            return d;
         }
     }
 }
