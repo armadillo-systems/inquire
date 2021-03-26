@@ -36,6 +36,7 @@
     var _videoFileExt = new Array(".wmv", ".mov", ".m4v", ".ogv", ".mp4");
     var _audioFileExt = new Array(".mp3", ".oga", ".wav");
     var _textMore = '...';
+    var _useTimeSince = @(ViewBag.UseTimeSince.ToString().ToLower());
 
     var _oldResults;
     var _oldResultsBgColour;
@@ -1423,7 +1424,7 @@
                                 var col = self.collections()[i];
                                 var col_selector = '#' + col.selector;
                                 if(col.id == c_id) {
-                                    fadeOutAndSlideUp($(col_selector), function() { $(col_selector).remove();  self.collections.remove(col); });
+                                    fadeOutThenSlideUp($(col_selector), function() { $(col_selector).remove();  self.collections.remove(col); });
                                     break;
                                 }
                             }
@@ -1474,7 +1475,7 @@
                                 for (var i = 0; i < c.items().length; i++) {
                                     if (c.items()[i].id == item_id) {
                                         if (elem) {
-                                            fadeOutAndSlideUp(elem, function () { $(elem).remove(); c.items.remove(c.items()[i]); });
+                                            fadeOutThenSlideUp(elem, function () { $(elem).remove(); c.items.remove(c.items()[i]); });
                                         }
                                         p = i;
                                         break;
@@ -1493,7 +1494,7 @@
                                                     updateMasonryLayout(self.resultSizePx.ImageWidth, false);
                                                 });
                                             } else {
-                                                fadeOutAndSlideUp(result_element, function () { self.results.remove(self.results()[x]); });
+                                                fadeOutThenSlideUp(result_element, function () { self.results.remove(self.results()[x]); });
                                             }
                                             break;
                                         }
@@ -1540,7 +1541,16 @@
             {
                 if(self.collections()[i].id == id)
                 {
-                    self.collections()[i].visible(!self.collections()[i].visible());
+                    var col = self.collections()[i];
+                    var col_element = $('#collections #collection-list-' + col.id);
+
+                    if (col.visible()) {
+                        // col.visible(false);
+                        fadeOutThenSlideUp(col_element, function () { col.visible(false); });
+                    } else {
+                        //col.visible(true);
+                        fadeInAndSlideDown(col_element, function () { col.visible(true); });
+                    }
                     break;
                 }
             }
@@ -1643,7 +1653,7 @@
                 dataType: 'JSON',
                 contentType: 'application/json',
             })
-            $.done(function (data) {
+            .done(function (data) {
                 if(data.NoteID == '00000000-0000-0000-0000-000000000000') {
                     alert("Error adding note: " + data.Text);
                 }
@@ -1897,9 +1907,14 @@
             if (dz.height() <= 1)
                 adjustLayout(); *@
 
-            var dz_url = "@Url.Content(String.Format("{0}?{1}=", ViewBag.DeepZoomViewer, "DeepZoom"))" + id + "_files/";
-            //_dzViewer = goOpenSeadragonIIIF(id, self.zoomFrameSelector, img_w, img_h);
-             _dzViewer = goOpenSeadragon(dz_url, self.zoomFrameSelector, img_w, img_h);
+            var dz_url = null;
+
+            if (id.indexOf('/iiif/') === -1) {
+                dz_url = "@Url.Content(String.Format("{0}?{1}=", ViewBag.DeepZoomViewer, "DeepZoom"))" + id + "_files/";
+            } else {
+                dz_url = id;
+            }
+            _dzViewer = goOpenSeadragon(dz_url, self.zoomFrameSelector, img_w, img_h);
         }
 
         self.resizeDeepZoom = function (timeout) {
@@ -2209,23 +2224,24 @@
             var img = $(element).find('.' + self.classNameThumbnail);
 
             // Start: IIIF
-            //// for .mp3 and .mov files so jpg icon can be located
-            //if((ext == 'mp3') || (ext == 'mov') || (ext == 'wmv') || (ext == 'webm') || (ext == 'ogg') || (ext == 'ogv') || (ext == 'oga') ) {
-            //    file = file.substr(0, file.lastIndexOf('.')) + '.jpg';
-            //}
+            // for .mp3 and .mov files so jpg icon can be located
+
+            if (file.indexOf('/iiif/') > -1) {
+                if ((ext == 'mp3') || (ext == 'mov') || (ext == 'wmv') || (ext == 'webm') || (ext == 'ogg') || (ext == 'ogv') || (ext == 'oga')) {
+                    file = file.substr(0, file.lastIndexOf('.')) + '.jpg';
+                }
 
 
-            //if(file.indexOf("yale.edu") > -1 ||file.indexOf("gallica.bnf.fr") > -1 )
-            //{
-            //    img_src = file + "/full/" + w_img+ ",/0/native.jpg";
-            //    $(img).attr('src', img_src);
-            //}
-            //else
-            //{
-            //    img_src = file + "/full/" + w_img+ ",/0/default.jpg";
-            //    $(img).attr('src', img_src);
-            //}
-            //return;
+                if (file.indexOf("yale.edu") > -1 || file.indexOf("gallica.bnf.fr") > -1) {
+                    img_src = file + "/full/" + w_img + ",/0/native.jpg";
+                    $(img).attr('src', img_src);
+                }
+                else {
+                    img_src = file + "/full/" + w_img + ",/0/default.jpg";
+                    $(img).attr('src', img_src);
+                }
+                return;
+            }
             // END: IIIF
 
 
@@ -2305,7 +2321,7 @@
         self.getRecord = function (id, lang_id) {
             $.ajax({
                 method: 'GET',
-                url: "@Url.Content("~/api/Search/Item/")" + item_id + '/' + lang_id,
+                url: "@Url.Content("~/api/Search/Item/")" + id + '/' + lang_id,
                 dataType: 'JSON',
                 contentType: 'application/json',
             })
@@ -2734,8 +2750,9 @@
             // but we don't want to clear the searchTerm property in case the user use's the "back" button
             // (their original search would be lost)
             var search_term = IsFieldNullOrEmpty(self.searchParentId()) ? self.searchTerm() : '';
+            var search_params = { "UserId": self.userID, "Term": search_term, "Rows": self.recordsetPageSize(), "RowStart": self.recordsetRowStart(), "SortOrders": self.sortField(), "FacetConstraints": self.facetsAppliedString(), "CollectionIds": scids, "ParentId": self.searchParentId(), "LangId": self.languageId() };
 
-            self.searchRequest = $.post("@Url.Content("~/api/Search/Items")", { "UserId": self.userID, "Term": search_term, "Rows": self.recordsetPageSize(), "RowStart": self.recordsetRowStart(), "SortOrders": self.sortField(), "FacetConstraints": self.facetsAppliedString(),"CollectionIds": scids, "ParentId": self.searchParentId(), "LangId": self.languageId() },
+            self.searchRequest = $.post("@Url.Content("~/api/Search/Items")", search_params,
                 function (data) {
                     var d = data.SearchResults;
                     self.applyHighlights(d);
@@ -3109,7 +3126,7 @@
             _vm.search();*/
     });
 
-    function toggleSidebar (e) {
+    function toggleSidebar(e) {
         if(e != null)
         {
             e.preventDefault();
@@ -3172,13 +3189,87 @@
         return { Key: key.toLowerCase().substring(0, key.length-1), Value: value, Query: '[' + key};
     }
 
+    function dateFormat(str) {
+        var d;
+        if (str.startsWith("/Date")) {
+            d = dateFormatMs(str);
+        } else {
+            d = dateFormatDateTime(str);
+        }
 
-    function dateFormat(ms) {
+        if (_useTimeSince) {
+            return timeSince(d);
+        } else {
+            return d.getDate() + '/' + d.getMonth() + '/' + d.getFullYear();
+        }
+    }
+
+    function dateFormatMs(ms) {
         ms = ms.replace('/Date(', '');
         ms = ms.replace(')/', '');
-        var d = new Date(parseInt(ms));
-        return d.getDate() + '/' + d.getMonth() + '/' + d.getFullYear();
+        return new Date(parseInt(ms));
     }
+
+    function dateFormatDateTime(date_time) {
+        return new Date(date_time);
+    }
+
+    var timeSince = function (date) {
+        if (typeof date !== 'object') {
+            date = new Date(date);
+        }
+
+        var seconds = Math.floor((new Date() - date) / 1000);
+        var intervalType;
+
+        var interval = Math.floor(seconds / 31536000);
+        if (interval > 1) {
+            intervalType = 'y';
+        } else {
+            var interval = Math.floor(seconds / 2592000);
+            if (interval >= 1) {
+                intervalType = 'w';
+                interval = interval * 4;
+            } else {
+            //interval = Math.floor(seconds / 2592000);
+            //if (interval >= 1) {
+            //    intervalType = 'm';
+            //} else {
+            //interval = Math.floor(seconds / 604800);
+            //if (interval >= 1) {
+            //    intervalType = 'w';
+            //} else {
+            interval = Math.floor(seconds / 86400);
+                if (interval >= 1) {
+                    intervalType = 'd';
+                } else {
+                    interval = Math.floor(seconds / 3600);
+                    if (interval >= 1) {
+                        intervalType = "h";
+                    } else {
+                        interval = Math.floor(seconds / 60);
+                        if (interval >= 1) {
+                            intervalType = "m";
+                        } else {
+                            interval = seconds;
+                            intervalType = "s";
+                        }
+                    }
+                }
+            }
+        }
+
+        //if (interval > 1) {
+        //    intervalType += 's';
+        //}
+
+        if (interval === 0) {
+            interval = ' ';
+            intervalType = ' now';
+        }
+
+    return (interval + intervalType).trim();
+    };
 
 
     function resultChildrenCount(child_nodes) {
@@ -3386,14 +3477,16 @@
         //click on item and show submenu
         $('.has-children > a').on('click', function(event){
             var mq = checkMQ(),
-                selectedItem = $(this);
+                selectedItem = $(this).parent('li');
+            var list = $(selectedItem).find('ul')[0];
             if( mq == 'mobile' || mq == 'tablet' || mq == 'desktop' ) {
                 event.preventDefault();
-                if( selectedItem.parent('li').hasClass('selected')) {
-                    selectedItem.parent('li').removeClass('selected');
+                if (selectedItem.hasClass('selected')) {
+                    fadeOutThenSlideUp(list, function () { selectedItem.removeClass('selected'); });
                 } else {
-                    //_sidebar.find('.has-children.selected').removeClass('selected');
-                    selectedItem.parent('li').addClass('selected');
+                    //selectedItem.addClass('selected');
+                    selectedItem.addClass('selected');
+                    fadeInAndSlideDown(list);
                 }
             }
         });
@@ -3741,8 +3834,20 @@
         _vm.enableToolButtons();
     }
 
-    function fadeOutAndSlideUp(elem, callback) {
+    function fadeOutThenSlideUp(elem, callback) {
         $(elem).animate({opacity:0.01}, _fadeMsMax, _animType, function() { $(elem).slideUp(_fadeMsMax, _animType, callback )});
+    }
+
+    function fadeInAndSlideDown(elem, callback) {
+        $(elem).css({ opacity: 0.01 }).hide();
+        $(elem).slideDown(_fadeMsMax, _animType, callback);
+        $(elem).animate({ opacity: 1.0 }, _fadeMsMax, _animType);
+    }
+
+    function fadeOutAndSlideUp(elem, callback) {
+        // elem.opacity(1.0);
+        $(elem).slideUp(_fadeMsMax, _animType, callback);
+        $(elem).animate({ opacity: 0.01 }, _fadeMsMax, _animType);
     }
 
     @*function updateMetadata(result) {

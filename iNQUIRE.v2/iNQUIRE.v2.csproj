@@ -437,6 +437,7 @@
     <Compile Include="Models\InqItemIIIFBase.cs" />
     <Compile Include="Models\InqItemImageMetadataWidthAndHeightBase.cs" />
     <Compile Include="Models\IInqItemMultiLingual.cs" />
+    <Compile Include="Models\InqItemMultiLingualExample.cs" />
     <Compile Include="Models\InqItemRKD.cs" />
     <Compile Include="Models\InqItemXml.cs" />
     <Compile Include="Models\InqItemBodIIIF.cs" />

@@ -59,6 +59,7 @@ namespace iNQUIRE
             ImageHelper.Jpeg2000Directory = ConfigurationManager.AppSettings["Jpeg2000Directory"];
             ImageHelper.ImageDirectory = ConfigurationManager.AppSettings["ImageDirectory"];
             ImageHelper.ImageFilenameAppend = ConfigurationManager.AppSettings["ImageFilenameAppend"];
+            ImageHelper.ForceHttpForImageRequests = Convert.ToBoolean(ConfigurationManager.AppSettings["ForceHttpForImageRequests"]);
 
             Helper.JP2ConfigHelper.ApplicationBaseUri = ConfigurationManager.AppSettings["ApplicationBaseUri"];
             Helper.JP2ConfigHelper.ProxyResolverFile = ConfigurationManager.AppSettings["ProxyResolverFile"];
@@ -92,8 +93,8 @@ namespace iNQUIRE
             Controllers.DiscoverController.OpenDeepZoomTouchIcon = ConfigurationManager.AppSettings["OpenDeepZoomTouchIcon"];
             Controllers.DiscoverController.AlwaysShowOpenDeepZoomTouchIcon = Convert.ToBoolean(ConfigurationManager.AppSettings["AlwaysShowOpenDeepZoomTouchIcon"]);
             Controllers.DiscoverController.FacebookShareHashtag = ConfigurationManager.AppSettings["FacebookShareHashtag"];
+            Controllers.DiscoverController.UseTimeSince = Convert.ToBoolean(ConfigurationManager.AppSettings["UseTimeSince"]);
 
-            
             Controllers.DiscoverController.SearchDebugParameters = ConfigurationManager.AppSettings["SearchDebugParameters"];
             Controllers.DiscoverController.SolrDebugParameters = ConfigurationManager.AppSettings["SolrDebugParameters"];
             Controllers.DiscoverController.IIPDebugParameters = ConfigurationManager.AppSettings["IIPDebugParameters"];
@@ -146,7 +147,7 @@ namespace iNQUIRE
             //SolrNet.Startup.Init<InqItemArmNode>(ConfigurationManager.AppSettings["SolrUri"]);
             //SolrNet.Startup.Init<InqItemRKD>(ConfigurationManager.AppSettings["SolrUri"]);
             //var inq_type = WebApiConfig.UnityContainer.Resolve(typeof(InqItemBase), null, null);
-            SolrNet.Startup.Init<InqItemRKD>(ConfigurationManager.AppSettings["SolrUri"]);
+            SolrNet.Startup.Init<InqItemBodIIIF>(ConfigurationManager.AppSettings["SolrUri"]);
             // Startup.Init<InqItemBod>(ConfigurationManager.AppSettings["SolrUri"]);
 
             // throw new Exception("moo!");

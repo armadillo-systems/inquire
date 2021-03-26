@@ -36,6 +36,7 @@ namespace iNQUIRE.Controllers
         public static string OpenDeepZoomTouchIcon { get; set; }
         public static Boolean AlwaysShowOpenDeepZoomTouchIcon { get; set; }
         public static string FacebookShareHashtag { get; set; }
+        public static Boolean UseTimeSince { get; set; }
 
         // public static bool DebugJp2HandlerRequests { get; set; }
         public static string SearchDebugParameters { get; set; }
@@ -273,7 +274,7 @@ namespace iNQUIRE.Controllers
 
                     foreach (IInqItem r in results)
                     {
-                        string img_src = ImageHelper.GetImageUri(r, ImageHelper.ExportImageWidth, ImageHelper.ExportImageHeight, Request.Url.Host, JP2MediaDir, _IJP2Helper);
+                        string img_src = ImageHelper.GetImageUri(r, ImageHelper.ExportImageWidth, ImageHelper.ExportImageHeight, Request.Url.GetLeftPart(UriPartial.Authority), _IJP2Helper.MediaDirectory, _IJP2Helper);
 
                         // images
                         using (Stream fs = ImageHelper.GetImageStream(img_src, Url.Content("~/Content/images/export-image-not-found.png")))
@@ -322,7 +323,7 @@ namespace iNQUIRE.Controllers
                         ViewBag.ogTitle = r.Title;
 
                         ViewBag.ogDescription = r.Description;
-                        ViewBag.ogImage = ImageHelper.GetImageUri(r, fb_img_w, fb_img_h, Request.Url.Host, JP2MediaDir, _IJP2Helper);
+                        ViewBag.ogImage = ImageHelper.GetImageUri(r, fb_img_w, fb_img_h, Request.Url.GetLeftPart(UriPartial.Authority), _IJP2Helper.MediaDirectory, _IJP2Helper);
 
                         var preview_img_w = 0;
                         var preview_img_h = 0;
@@ -362,6 +363,7 @@ namespace iNQUIRE.Controllers
             ViewBag.TouchDoubleClickDelayMs = TouchDoubleClickDelayMs;
             ViewBag.OpenDeepZoomTouchIcon = OpenDeepZoomTouchIcon;
             ViewBag.AlwaysShowOpenDeepZoomTouchIcon = AlwaysShowOpenDeepZoomTouchIcon;
+            ViewBag.UseTimeSince = UseTimeSince;
 
             ViewBag.Languages = JsonConvert.SerializeObject(Languages.Select(x => new { code = x.Key, name = x.Value }));
         }
@@ -418,15 +420,15 @@ namespace iNQUIRE.Controllers
 
             var r = res.Results[0];
 
-            ViewBag.ImageUri = ImageHelper.GetImageUri(r, (int)w, (int)h, Request.Url.Host, JP2MediaDir, _IJP2Helper); //  _IJP2Helper.GetImageUri(r.ImageMetadata, MediaDirectoryFullUri, _IJP2Helper.ResolverReverseProxy, (double)w, (double)h);
+            ViewBag.ImageUri = ImageHelper.GetImageUri(r, (int)w, (int)h, Request.Url.GetLeftPart(UriPartial.Authority), _IJP2Helper.MediaDirectory, _IJP2Helper); //  _IJP2Helper.GetImageUri(r.ImageMetadata, MediaDirectoryFullUri, _IJP2Helper.ResolverReverseProxy, (double)w, (double)h);
             return View(r);
         }
 
 
-       private string JP2MediaDir
-        {
-            get { return Url.Content(String.Format("~/{0}", _IJP2Helper.MediaDirectory)); }
-        }
+       //private string JP2MediaDir
+       // {
+       //     get { return Url.Content(String.Format("~/{0}", _IJP2Helper.MediaDirectory)); }
+       // }
         #region moved to ImageHelper.cs
         //private string MediaDirectoryFullUri
         //{

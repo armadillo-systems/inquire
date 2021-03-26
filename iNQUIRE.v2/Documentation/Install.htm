@@ -1,15 +1,19 @@
 ﻿<!doctype html>
 <html lang="en">
-    <head>
-    	<meta charset="UTF-8">
-        <link href="css/inquire.css" rel="stylesheet" type="text/css" />
-        <link href="google-code-prettify/prettify.css" type="text/css" rel="stylesheet" />
-        <script type="text/javascript" src="google-code-prettify/prettify.js"></script>
-		<style>
-			.red { background-color: red; }
-		</style>
-        <title>iNQUIRE Installation</title>
-    </head>
+<head>
+    <meta charset="UTF-8">
+    <link href="css/inquire.css" rel="stylesheet" type="text/css" />
+    <link href="google-code-prettify/prettify.css" type="text/css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,700" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed&display=swap" rel="stylesheet">
+    <script type="text/javascript" src="google-code-prettify/prettify.js"></script>
+    <style>
+        .red {
+            background-color: red;
+        }
+    </style>
+    <title>iNQUIRE Installation</title>
+</head>
     <body onload="prettyPrint()">
         <article>
             <h1>iNQUIRE Installation v1.3 28/02/2019</h1>
@@ -126,16 +130,40 @@
                 <section>
                     <h3>2.6 iNQUIRE</h3>
 
-                        <ol>
-                        	<li>If you have been supplied precompiled web deployment files then you can skip this step, else if compiling iNQUIRE from source code it must be compiled with reference to correct data object class (derived from InqItemBase), currently in use InqItemBod (for Bodleian) and InqItemArmNode (for BL Crimea test data), use these as example of how to build your data object class (which maps your Solr fields to C# object properties):
-                        			<ul>
-                        				<li>Global.asax.cs: 
+                    <ol>
+                        <li>
+                            If you have been supplied precompiled web deployment files then you can skip this step,
+                            else if compiling iNQUIRE from source code it must be compiled with reference to correct
+                            data object class (derived from InqItemBase), you will need to code your own class to map your Solr fields to C# class properties.
+                            <p>
+                                Some tips for creating your data class:
+                                <ul>
+                                    <li>Solr data which refers to images which have IIIF image endpoints (for example if you are using IIPImage Server as your image source) should have a data class that inherits from InqItemImageMetadataWidthAndHeightBase</li>
+                                    <li>Solr data which has been created from data such as a database or Xml harvest which has multi-lingual fields should have a data class which implement IInqItemMultiLingual</li>
+                                    <li>Solr data which has been created from IIIF data manifests should have a data class which inherits from InqItemIIIFBase</li>
+                                </ul>
+                            </p>
+                            <p>
+                                Some classes are included as examples which can be used as a starting point:
+                                <ul>
+                                    <li>InqItemBod: Solr data imported from Xml or database with single language fields</li>
+                                    <li>InqItemBodIIIF: Solr data imported from a IIIF manifest</li>
+                                    <li>InqItemMultiLingualExample: Solr data imported from Xml or database including multi-lingual fields</li>
+                                </ul>
+                            </p>
+
+                            <p>
+                                Points in the code which need references to your data class:
+                                <ul>
+                                    <li>
+                                        Global.asax.cs:
 <pre class="prettyprint">
 	Startup.Init&lt;<span class="red">InqItemBod</span>&gt;(ConfigurationManager.AppSettings["SolrUri"]);
 </pre>
-                        				</li>
-                        				
-                        				<li>SolrRepository.cs
+                                    </li>
+
+                                    <li>
+                                        SolrRepository.cs
 <pre class="prettyprint">
         private static ISolrOperations&lt;<span class="red">InqItemBod</span>&gt; _solr;
         private static ISolrOperations&lt;<span class="red">InqItemBod</span>&gt; Solr
@@ -159,18 +187,20 @@
 	{
 		...	
 </pre>
-		                       				
-                        				</li>
-                        			
-                        			</ul>
-                        			
-                        			
-                        	</li>
-                            <li>Unpack latest build (eg 1.13) to chosen deployment directory, eg "C:\ASPSites\inquire\1.13"</li>
-                            <li>Edit Views\Discover\Print.cshtml to match object metadata fields</li>
-                            <li>iNQUIRE must be compiled to match the JPEG2000 image server being used (currently supported Djatoka, IIP Image Server)
-                            	<ul>
-                            		<li>iNQUIRE.Controllers.DiscoverController.cs
+
+                                    </li>
+                                    <li>Edit Views\Discover\Search\_MetadataFields.cshtml to match your data class fields</li>
+                                    <li>Edit Views\Discover\Print.cshtml to match your data class fields</li>
+                                </ul>
+                            </p>
+
+                        </li>
+                        <li>Unpack latest build (eg 1.13) to chosen deployment directory, eg "C:\ASPSites\inquire\1.13"</li>
+                        <li>
+                            iNQUIRE must be compiled to match the JPEG2000 image server being used (currently supported Djatoka, IIP Image Server)
+                            <ul>
+                                <li>
+                                    iNQUIRE.Controllers.DiscoverController.cs
 <pre class="prettyprint">
     public class JP2HelperModule : NinjectModule
     {
@@ -182,8 +212,9 @@
     }
 </pre>
 
-                            		</li>
-                            		<li>Edit JPEG2000 Image Server Settings in Web.Config:
+                                </li>
+                                <li>
+                                    Edit JPEG2000 Image Server Settings in Web.Config:
 <pre class="prettyprint">
     &lt;!-- JPEG2000 Image Server Settings --&gt;
     &lt;!-- Use thes settings with IIP Image Server --&gt;
@@ -210,9 +241,10 @@
     &lt;add key="DeepZoomViewerFile" value="viewer.dzi" /&gt;
     &lt;!-- end: JPEG2000 Image Server Settings --&gt;
 </pre>
-                            		</li>
+                                </li>
 
-                            		<li>Edit the handlers section in Web.Config, comment/uncomment the two lines which refer to IIPImageServer/Djatoka as needed:
+                                <li>
+                                    Edit the handlers section in Web.Config, comment/uncomment the two lines which refer to IIPImageServer/Djatoka as needed:
 <pre class="prettyprint">
     &lt;handlers&gt;
       ...
@@ -223,11 +255,12 @@
       ...
     &lt;/handlers&gt;
 </pre>
-                            		</li>
-                            	</ul>
-                            </li>
-                            
-                            <li>Edit Web.config to set user security settings, eg minimum password length:
+                                </li>
+                            </ul>
+                        </li>
+
+                        <li>
+                            Edit Web.config to set user security settings, eg minimum password length:
 <pre class="prettyprint">
     &lt;membership defaultProvider="SqlProvider" userIsOnlineTimeWindow="15"&gt;
       &lt;providers&gt;
@@ -245,9 +278,9 @@
              minRequiredNonalphanumericCharacters="0" /&gt;
       &lt;/providers&gt;
     &lt;/membership&gt;
-</pre>                            
-                            </li>
-                        </ol>
+</pre>
+                        </li>
+                    </ol>
                 </section>
 
                 <section>
@@ -524,7 +557,7 @@ echo The Service "%SERVICE_NAME%" has been installed
                 </section> -->
 
                 <section>
-                    <h3>3.4 iNQUIRE</h3>
+                    <h3>3.4 Installation Specific iNQUIRE Settings</h3>
                     <ol>
                         <li>Edit "[iNQUIRE deployment path]\Web.config"</li>
                         <li>Edit email settings</li>
@@ -532,18 +565,63 @@ echo The Service "%SERVICE_NAME%" has been installed
                         <li>XmlDataFile is deprecated</li>
                         <li>MediaDirectoryRemote is for non Jpeg2000 media, can just be set to "/" if none exist, or create "Media" directory in deployment directory if needed</li>
                         <li>ImageDirectory can be set to eg "C:\ASPSites\inquire\1.8\" if no non-jpeg2000 media, or point at non-jp2 media directory</li>
-                        <li>connectionStrings: DataSource should be Sql Server machine, eg localhost, user should be the username and password created in Sql Server management utility above:
+                        <li>
+                            connectionStrings: DataSource should be Sql Server machine, eg localhost, user should be the username and password created in Sql Server management utility above:
                             <pre class="prettyprint">
 &lt;add name="BL_DRE_INQUIREConnectionString"
 	connectionString="Data Source=BODL-DIGITAL-DE;Initial Catalog=BL_DRE_INQUIRE;Persist Security Info=True;User ID=dreuser2;Password=[PASSWORD]"
 	providerName="System.Data.SqlClient" /&gt;"</pre>
 
-                            NB: MS Sql Server seems to be happy with just eg "Data Source=BODL-DIGITAL-DE", but Sql Server Express needs [machine name]\[instance name] eg "Data Source=ACER-LAPTOP\SQLEXPRESS"</li>
+                            NB: MS Sql Server seems to be happy with just eg "Data Source=BODL-DIGITAL-DE", but Sql Server Express needs [machine name]\[instance name] eg "Data Source=ACER-LAPTOP\SQLEXPRESS"
+                        </li>
+                        <li>Edit AppSettingsSecrets.config to define your installation specific parameters (see AppSettingsSecrets_empty.config for examples and explanatory notes)</li>
+                        </ol>
+                    </section>
+
+                <section>
+                    <h3>3.5 Styling/Theming of the User Interface</h3>
+                    <ol>
+                        <li>
+                            If required you can easily change the look of the UI to match your institution's brand guidelines, simply Edit App_Start\BundleConfig.cs to add a custom style sheet (YOUR_STYLESHEET.css below):
+<pre class="prettyprint">
+bundles.Add(new StyleBundle("~/Content/css").Include(
+    "~/Content/reset.css",
+    "~/Content/bootstrap.css",
+    "~/Content/bootstrap-social.css",
+    "~/Content/font-awesome.css",
+    "~/Content/jquery-ui.min.css",
+    "~/Content/jquery-ui.structure.min.css",
+    "~/Content/jquery-ui.theme.min.css",
+    "~/Content/openid.css",
+    "~/Content/openid-shadow.css",
+    "~/Content/cd-rsn.css",
+    "~/Content/cd-3dnav.css",
+    "~/Content/Site2.css",
+    "~/Content/UserDefined2.css",
+    "~/Content/RKD/YOUR_STYLESHEET.css"
+));
+</pre>
+                            Remember to flag this file (.scss or .css as applicable) as ignored by Git to avoid checking it back in to the main source repository.
+                        </li>
+                        <li>
+                            You can also import a custom scss/css file in to cd-rsn.css to change the appearance of the side information bar, general screen layout, and layout break points (desktop/tablet/mobile):
+                            <pre class="prettyprint">
+@import '_cd-properties.scss';
+@import '_[YOUR_CSS]-cd-properties.scss'; /* line can be removed if this file not found, it's custom css settings */
+</pre>
+
+                            and in cd-3dnav.css to change the appearance of the facet filter dropdown:
+                            <pre class="prettyprint">
+@import '_cd-properties.scss';
+@import '_[YOUR_CSS]-cd-properties.scss'; /* line can be removed if this file not found, it's custom css settings */
+</pre>
+                            It is recommended not to edit properties in the _cd-properties.scss file, but to override them in your own scss/css files and import them at the top of cd-rsn.scss and cd-3dnav.scss (as above). Remember to flag any custom scss/css files you add to the project as ignored by Git source control.
+                        </li>
                     </ol>
                 </section>
 
                 <section>
-                    <h3>3.5 IIS</h3>
+                    <h3>3.6 IIS</h3>
                     <ol>
                         <li>Launch IIS, right click "Default Web Site -> Add Application"</li>
                         <li>Alias: eg "inquire_1.8", Application pool: "ASP.NET v4.0", Physical path "[inquire deployment directory]", eg "C:\ASPSites\inquire\1.8"</li>
@@ -553,7 +631,7 @@ echo The Service "%SERVICE_NAME%" has been installed
                 </section>
 
                 <section>
-                    <h3>3.6 Microsoft IIS Url Rewrite [Optional]</h3>
+                    <h3>3.7 Microsoft IIS Url Rewrite [Optional]</h3>
                     <ol>
                     <li>Open web.config, copy rewrite section to default website web.config (usually in inetput/wwwroot) so rules are inherited by inquire site.
                         Then comment out the rewrite section in the inquire web.config. The default

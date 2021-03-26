@@ -28,6 +28,8 @@ namespace iNQUIRE.Models
         public abstract int Width { get; set; }
         public abstract int Height { get; set; }
 
+        public virtual int Levels { get { return 0; }  set { } }
+
         public abstract string ExportRis(string lang_id = null);
         public abstract XElement ExportXml(string lang_id = null);
         public abstract string ExportHtmlFields(string lang_id = null);

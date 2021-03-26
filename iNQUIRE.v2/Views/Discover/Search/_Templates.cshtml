@@ -59,26 +59,26 @@
             </span>
 
 
-                 <div class="btn-group no-padding" role="group">
+            <div class="btn-group no-padding" role="group">
 
-                    <div class="btn-group no-padding" role="group">
-                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <span class="fa fa-cog collection-dd-icon"></span>
-                        </button>
-                        <ul class="dropdown-menu collection-dd">
-                            <li><a class="but-collection-rename" data-bind="attr: { 'data-id': id }">Rename collection</a></li>
-                            <li><a class="but-collection-email" data-bind="attr: { 'data-id': id }">Email collection</a></li>
-                            <li><a class="but-collection-download" data-bind="attr: { 'data-id': id }">Download collection</a></li>
-                            <li><a class="but-collection-del" data-bind="attr: { 'data-id': id }">Delete collection <span><i class="fa fa-remove"></i></span></a></li>
-                        </ul>
-                    </div>
-
-                     <button type="button" class="btn btn-default" data-bind="click: function() {$root.collectionViewToggle(id)}">
-                         <span data-bind="css : {'fa-caret-up' : visible(), 'fa-caret-down' : !visible()}" class="fa collection-dd-icon"></span>
-                     </button>
+                <div class="btn-group no-padding" role="group">
+                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <span class="fa fa-cog collection-dd-icon"></span>
+                    </button>
+                    <ul class="dropdown-menu collection-dd">
+                        <li><a class="but-collection-rename" data-bind="attr: { 'data-id': id }">Rename collection</a></li>
+                        <li><a class="but-collection-email" data-bind="attr: { 'data-id': id }">Email collection</a></li>
+                        <li><a class="but-collection-download" data-bind="attr: { 'data-id': id }">Download collection</a></li>
+                        <li><a class="but-collection-del" data-bind="attr: { 'data-id': id }">Delete collection <span><i class="fa fa-remove"></i></span></a></li>
+                    </ul>
                 </div>
-                
+
+                <button type="button" class="btn btn-default" data-bind="click: function() {$root.collectionViewToggle(id)}">
+                    <span data-bind="css : {'fa-caret-up' : visible(), 'fa-caret-down' : !visible()}" class="fa collection-dd-icon"></span>
+                </button>
             </div>
+
+        </div>
 
 
 
@@ -110,7 +110,7 @@
 
             <div class="clear"></div>
         </div>*@
-        <ol id="collection-list" data-bind="template: { name: 'collection-item-template', foreach: items }, visible: visible"></ol> <!-- , templateOptions: { collection_id: $value.id } -->
+        <ol id="collection-list" data-bind="attr: { 'id': 'collection-list-' + id }, template: { name: 'collection-item-template', foreach: items }, visible: visible"></ol> <!-- , templateOptions: { collection_id: $value.id } -->
     </div>
     <div class="clear"></div>
     <hr />

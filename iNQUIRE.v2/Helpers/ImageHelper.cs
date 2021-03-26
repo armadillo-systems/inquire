@@ -26,6 +26,7 @@ namespace iNQUIRE.Helpers
         public static string Jpeg2000Directory { get; set; }
         public static string ImageDirectory { get; set; }
         public static string ImageFilenameAppend { get; set; }
+        public static bool ForceHttpForImageRequests { get; set; }
 
         public static int ExportImageWidth { get; set; }
         public static int ExportImageHeight { get; set; }
@@ -267,7 +268,10 @@ namespace iNQUIRE.Helpers
 
         public static string JP2MediaDirectoryFullUri(string request_url_host, string url_jp2_mediadir)
         {
-            return string.Format("http://{0}{1}", request_url_host, url_jp2_mediadir);
+            if (ForceHttpForImageRequests)
+                request_url_host = request_url_host.Replace("https://", "http://");
+            // var request_url_host = (ForceHttpForImageRequests) ? "http" : request_url_protocol;
+            return string.Format("{0}{1}", request_url_host, url_jp2_mediadir);
         }
 
         //public static string ImageNotFound(string request_url_host, string export_image_not_found)

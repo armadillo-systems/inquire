@@ -19,7 +19,7 @@ namespace iNQUIRE.Models
             set { ImageMetadata.Height = value; }
         }
 
-        public int Levels
+        public override int Levels
         {
             get { return ImageMetadata.Levels; }
             set { ImageMetadata.Levels = value; }

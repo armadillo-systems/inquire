@@ -32,13 +32,13 @@ namespace iNQUIRE.Models
 
         public static List<KeyValuePair<string, bool>> HyperlinkFields { get; set; }
         
-        private static ISolrOperations<InqItemRKD> _solr;
-        private static ISolrOperations<InqItemRKD> Solr
+        private static ISolrOperations<InqItemBodIIIF> _solr;
+        private static ISolrOperations<InqItemBodIIIF> Solr
         {
             get
             {
                 if (_solr == null)
-                    _solr = ServiceLocator.Current.GetInstance<ISolrOperations<InqItemRKD>>();
+                    _solr = ServiceLocator.Current.GetInstance<ISolrOperations<InqItemBodIIIF>>();
 
                 return _solr;
             }
@@ -362,14 +362,14 @@ namespace iNQUIRE.Models
             return makeSolrSearchResults(results);
         }
 
-        protected SolrSearchResults makeSolrSearchResults(SolrQueryResults<InqItemRKD> results)
+        protected SolrSearchResults makeSolrSearchResults(SolrQueryResults<InqItemBodIIIF> results)
         //protected SolrSearchResults makeSolrSearchResults(SolrQueryResults<InqItemArmNode> results)
         // protected SolrSearchResults makeSolrSearchResults(SolrQueryResults<InqItemBase> results)
         {
             return makeSolrSearchResults(results, new List<KeyValuePair<string, string>>(), new List<FacetRange>());
         }
 
-        protected SolrSearchResults makeSolrSearchResults(SolrQueryResults<InqItemRKD> results, List<KeyValuePair<string, string>> facets, List<FacetRange> facet_ranges)
+        protected SolrSearchResults makeSolrSearchResults(SolrQueryResults<InqItemBodIIIF> results, List<KeyValuePair<string, string>> facets, List<FacetRange> facet_ranges)
         //protected SolrSearchResults makeSolrSearchResults(SolrQueryResults<InqItemArmNode> results, List<KeyValuePair<string, string>> facets, List<FacetRange> facet_ranges)
         // protected SolrSearchResults makeSolrSearchResults(SolrQueryResults<InqItemBase> results, List<KeyValuePair<string, string>> facets, List<FacetRange> facet_ranges)
         {

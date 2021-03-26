@@ -104,7 +104,12 @@ namespace iNQUIRE.Controllers.WebApi
         [HttpPost, Route("Items")]// /{rows:int}/{row_start:int}/{user_id}/{lang_id}/{term}/{collection_ids}/{parent_id}/{sort_orders}/{facet_constraints}")]
         public IHttpActionResult GetItems([FromBody] SearchParameters search_params)
         {
-            var sq = new SearchQuery(search_params.UserId, search_params.Term, search_params.CollectionIds, search_params.Rows, search_params.RowStart, search_params.ParentId, search_params.SortOrders, search_params.FacetConstraints, search_params.LangId);
+            // we don't want a null value here as it causes clicking on past searches to break (pid+null rather than pid+)
+            // this value comes through as null since changing the way the params come through to a json object
+            var parent_id = search_params.ParentId == null ? "" : search_params.ParentId;
+            var term = search_params.Term == null ? "" : search_params.Term;
+
+            var sq = new SearchQuery(search_params.UserId, term, search_params.CollectionIds, search_params.Rows, search_params.RowStart, parent_id, search_params.SortOrders, search_params.FacetConstraints, search_params.LangId);
 
             var user_id = string.IsNullOrEmpty(search_params.UserId) ? Guid.Empty.ToString() : search_params.UserId;
 
@@ -149,7 +154,7 @@ namespace iNQUIRE.Controllers.WebApi
             var count = 0;
             foreach (IInqItem r in results)
             {
-                var img_src = ImageHelper.GetImageUri(r, ImageHelper.ExportImageWidth, ImageHelper.ExportImageHeight, Request.RequestUri.Host, Url.Content(String.Format("~/{0}", _IJP2Helper.MediaDirectory)), _IJP2Helper);
+                var img_src = ImageHelper.GetImageUri(r, ImageHelper.ExportImageWidth, ImageHelper.ExportImageHeight, Request.RequestUri.GetLeftPart(UriPartial.Authority), _IJP2Helper.MediaDirectory, _IJP2Helper);
                 // var img_src = _IJP2Helper.GetImageUri(r.ImageMetadata, MediaDirectoryFullUri, _IJP2Helper.ResolverUri, ExportImageWidth, ExportImageHeight);
                 export_items.Add(new ExportItem(r, img_src, email_params.LangId));
                 count++;
