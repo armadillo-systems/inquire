@@ -35,7 +35,7 @@ namespace iNQUIRE
                 defaults: new { id = RouteParameter.Optional }
             );
 
-            if (System.Web.HttpContext.Current.IsDebuggingEnabled == false)
+            //if (System.Web.HttpContext.Current.IsDebuggingEnabled == false)
                 config.Filters.Add(new AuthorizeAttribute());
         }
 

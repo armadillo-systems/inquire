@@ -795,8 +795,8 @@
     <Content Include="Views\Discover\Search\_DownloadItems.cshtml" />
     <Content Include="Views\Discover\Search\_EmailItems.cshtml" />
     <Content Include="Views\Discover\Search\_MetadataCol.cshtml" />
-    <Content Include="Views\Discover\Search\_MetadataFields.cshtml" />
-    <Content Include="Views\Discover\Search\_ResultTemplates.cshtml" />
+    <Content Include="Views\Discover\Search\_MetadataFields_default.cshtml" />
+    <Content Include="Views\Discover\Search\_ResultTemplates_default.cshtml" />
     <Content Include="Views\Discover\Search\_SearchBox.cshtml" />
     <Content Include="Views\Discover\Search\_Templates.cshtml" />
     <Content Include="Views\Discover\Search.cshtml" />
@@ -839,6 +839,9 @@
     <Content Include="Views\Shared\_HeaderJS.cshtml" />
     <Content Include="Views\Discover\Test.cshtml" />
     <Content Include="Unity.config" />
+    <Content Include="Views\Discover\Search\_MetadataFields.cshtml" />
+    <Content Include="Views\Discover\Search\_ResultTemplates.cshtml" />
+    <Content Include="Views\Discover\Print_default.cshtml" />
     <None Include="Web.armserv.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

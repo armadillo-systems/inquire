@@ -217,6 +217,11 @@ Web.armserv.config
 AppSettingsSecrets.config
 ConnectionStrings.config
 
+# Files which are dependent on specific fields in the source data
+/iNQUIRE.v2/Views/Discover/Print.cshtml
+/iNQUIRE.v2/Views/Discover/Search/_MetadataFields.cshtml
+/iNQUIRE.v2/Views/Discover/Search/_ResultTemplates.cshtml
+
 # Organisation specific styling
 /iNQUIRE.v2/Content/RKD/
 

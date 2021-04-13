@@ -61,6 +61,7 @@ namespace iNQUIRE.Controllers.WebApi
             return Ok(r);
         }
 
+        [AllowAnonymous]
         [HttpGet, Route("Item/{item_id}/{approved:bool}")]
         public IHttpActionResult GetItemPublicNotes(string item_id, bool approved)
         {

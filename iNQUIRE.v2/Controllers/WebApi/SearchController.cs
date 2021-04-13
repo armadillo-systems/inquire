@@ -70,6 +70,7 @@ namespace iNQUIRE.Controllers.WebApi
             return Json(r);
         }
 
+        [AllowAnonymous]
         [HttpGet, Route("Suggestions/{lang_id}/{term}")]
         public IHttpActionResult GetSearchSuggestions(string lang_id, string term)
         {
@@ -85,6 +86,8 @@ namespace iNQUIRE.Controllers.WebApi
             return Json(sug);
         }
 
+
+        [AllowAnonymous]
         [HttpGet, Route("Item/{item_id}/{lang_id}")]
         public IHttpActionResult GetItem(string item_id, string lang_id)
         {
@@ -101,6 +104,7 @@ namespace iNQUIRE.Controllers.WebApi
         #endregion
 
 
+        [AllowAnonymous]
         [HttpPost, Route("Items")]// /{rows:int}/{row_start:int}/{user_id}/{lang_id}/{term}/{collection_ids}/{parent_id}/{sort_orders}/{facet_constraints}")]
         public IHttpActionResult GetItems([FromBody] SearchParameters search_params)
         {
@@ -134,6 +138,8 @@ namespace iNQUIRE.Controllers.WebApi
             return Ok(results_vm);
         }
 
+
+        [AllowAnonymous]
         [HttpPost, Route("Email")]
         public IHttpActionResult EmailExport([FromBody] EmailExportParameters email_params)
         {

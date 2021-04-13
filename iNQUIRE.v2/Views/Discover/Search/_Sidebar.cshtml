@@ -18,20 +18,22 @@
         <li class="has-children overview">
             <a href="" onclick="return false;"><i class="sidebar-header-icon fa fa-list-ol"></i>Collections <span id="collections-count" class="count" data-bind="visible: collectionsCountText, text: collectionsCountText"></span></a>
            
-            <ul id="add-new-collection">
+            <ul>
                 <li>
-                    @*<button id="but-new-collection" type="button" class="btn btn-default btn-xs">Add new collection <i class="fa fa-plus fa-1" aria-hidden="true"></i></button>*@
-                    <div id="but-new-collection">
-                        @*<button type="button" class="btn btn-default btn-xs">Add new collection <i class="fa fa-plus" aria-hidden="true"></i></button>*@
-                        <i class="fa fa-plus" aria-hidden="true"></i> <span>Add new collection</span>
-                    </div>
+                    <ul id="add-new-collection">
+                        <li>
+                            @*<button id="but-new-collection" type="button" class="btn btn-default btn-xs">Add new collection <i class="fa fa-plus fa-1" aria-hidden="true"></i></button>*@
+                            <div id="but-new-collection">
+                                @*<button type="button" class="btn btn-default btn-xs">Add new collection <i class="fa fa-plus" aria-hidden="true"></i></button>*@
+                                <i class="fa fa-plus" aria-hidden="true"></i> <span>Add new collection</span>
+                            </div>
+                            <hr />
+                        </li>
+                    </ul>
                 </li>
 
-                <hr>
+                <li><ul id="collections" data-bind="template: { name: 'collections-template', foreach: collections(), afterRender: afterRenderCollection }"></ul></li>
             </ul>
-
-            <ul id="collections" data-bind="template: { name: 'collections-template', foreach: collections(), afterRender: afterRenderCollection }"></ul>
-             
         </li>
 
         <li class="has-children comments" id="notes">
