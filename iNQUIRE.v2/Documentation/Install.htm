@@ -189,13 +189,14 @@
 </pre>
 
                                     </li>
-                                    <li>Edit Views\Discover\Search\_MetadataFields.cshtml to match your data class fields</li>
-                                    <li>Edit Views\Discover\Print.cshtml to match your data class fields</li>
+                                    <li>Copy Views\Discover\Search\_MetadataFields_default.cshtml to Views\Discover\Search\_MetadataFields.cshtml and edit to match your data class fields</li>
+                                    <li>Copy Views\Discover\Search\_ResultTemplates_default.cshtml to Views\Discover\Search\_ResultTemplates.cshtml and edit to match your data class fields</li>
+                                    <li>Copy Views\Discover\Print_default.cshtml to Views\Discover\Print.cshtml and edit to match your data class fields</li>
                                 </ul>
                             </p>
 
                         </li>
-                        <li>Unpack latest build (eg 1.13) to chosen deployment directory, eg "C:\ASPSites\inquire\1.13"</li>
+                        <li>If compiling the source code then copy the build to chosen deployment directory, eg "C:\ASPSites\inquire\", if you have been supplied with a precompiled build then unpack to your desired IIS directory</li>
                         <li>
                             iNQUIRE must be compiled to match the JPEG2000 image server being used (currently supported Djatoka, IIP Image Server)
                             <ul>

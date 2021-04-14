@@ -45,6 +45,7 @@ namespace iNQUIRE.Controllers.WebApi
             return Ok(r);
         }
 
+        [AllowAnonymous]
         [HttpGet, Route("Item/User/{item_id}/{lang_id}/{user_id?}")]
         public IHttpActionResult GetItemTagsForUser(string item_id, string lang_id, string user_id = null)
         {

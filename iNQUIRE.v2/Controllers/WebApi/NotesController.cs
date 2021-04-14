@@ -48,6 +48,7 @@ namespace iNQUIRE.Controllers.WebApi
             return Ok(r);
         }
 
+        [AllowAnonymous]
         [HttpGet, Route("Item/{item_id}/{user_id?}")]
         public IHttpActionResult GetItemNotes(string item_id, string user_id = null)
         {
