@@ -10,7 +10,7 @@ You can see iNQUIRE running at Digital Bodleian:
 http://digital.bodleian.ox.ac.uk/
 
 and a beta demonstration of a IIIF manifest mashup can be found here:
-http://inquire.armtest.uk
+https://inquire.armtest.uk
 
 A presentation about the above mashup site can be found here:
 https://www.youtube.com/watch?v=FjR7hZIj0IU
