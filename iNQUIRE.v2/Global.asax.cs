@@ -39,6 +39,9 @@ namespace iNQUIRE
         {
             AreaRegistration.RegisterAllAreas();
             GlobalConfiguration.Configure(WebApiConfig.Register);
+            // adding this means http requests to this app won't work, so better make sure all http requests get rewritten to https (not currently working)
+            // think about already sent out http links with url params eg shared items in deepzoom mode, should be ok if all http requests are redirected to https 
+            //GlobalFilters.Filters.Add(new RequireHttpsAttribute()); 
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
